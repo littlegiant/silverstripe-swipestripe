@@ -3,39 +3,31 @@
 	"description": "Ecommerce module to create online shops using SilverStripe.",
 	"homepage": "http://swipestripe.com",
 	"license": "BSD-3-Clause",
-	"type": "silverstripe-module",
+	"type": "silverstripe-vendormodule",
 	"keywords": ["silverstripe", "ecommerce", "e-commerce", "shop", "swipestripe", "swipe stripe"],
 	"authors": [
 		{
-			"name": "Frank Mullenger",
-			"email": "frankmullenger@gmail.com"
+			"name": "Harsh Chokshi",
+			"email": "harsh.chokshi@littlegiant.co.nz"
 		}
 	],
-	"require":
-	{
-		"silverstripe/framework": "~3.1",
-		"silverstripe/cms": "~3.1",
-		"silverstripe/payment": "1.0.*"
+	"minimum-stability": "dev",
+	"prefer-stable": true,
+	"require": {
+		"php": ">=7.1",
+		"ext-intl": "*",
+		"silverstripe/framework": "^4",
+		"silverstripe/versioned": "^1.2"
 	},
-	"require-dev": 
-	{
-		"silverstripe/sqlite3": "*"
+	"autoload": {
+		"psr-4": {
+			"SwipeStripe\\": "src/",
+		}
 	},
-	"suggest": {
-		"frankmullenger/payment-cheque": "Simple payment method for testing"
-	},
-	"support": 
-	{
+	"support": {
 		"email": "info@swipestripe.com",
 		"irc": "irc://irc.freenode.org/silverstripe",
 		"forum": "http://www.silverstripe.org/e-commerce-modules/",
 		"issues": "https://github.com/frankmullenger/silverstripe-swipestripe/issues"
-	},
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "git@github.com:silverstripe-labs/silverstripe-payment.git"
-		}
-	],
-	"minimum-stability": "dev"
+	}
 }
