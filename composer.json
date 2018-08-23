@@ -19,14 +19,13 @@
 		"silverstripe/framework": "^4",
 		"silverstripe/versioned": "^1.2",
         "littlegiant/silverstripe-config-validator": "^1.0",
-        "silverstripe/silverstripe-omnipay": "dev-feature/omnipay-v3",
-        "php-http/guzzle6-adapter": "^1.1"
-	},
-	"autoload": {
-		"psr-4": {
-			"SwipeStripe\\": "src/",
-		}
-	},
+        "silverstripe/silverstripe-omnipay": "dev-feature/omnipay-v3"
+    },
+    "autoload": {
+        "psr-4": {
+            "SwipeStripe\\": "src/"
+        }
+    },
 	"support": {
 		"email": "info@swipestripe.com",
 		"irc": "irc://irc.freenode.org/silverstripe",
@@ -38,5 +37,8 @@
             "type": "vcs",
             "url": "https://github.com/hchokshi/silverstripe-omnipay.git",
         }
-    ]
+    ],
+    "require-dev": {
+        "php-http/guzzle6-adapter": "^1.1"
+    }
 }
