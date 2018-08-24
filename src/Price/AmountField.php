@@ -7,6 +7,7 @@ use SilverStripe\Forms\NumericField;
 /**
  * Text input field with validation for numeric values. Modified to support numbers larger than
  * PHP_INT_MAX / PHP_FLOAT_MAX.
+ * @package SwipeStripe\Price
  */
 class AmountField extends NumericField
 {
