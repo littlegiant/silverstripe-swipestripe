@@ -3,7 +3,7 @@
 namespace SwipeStripe\Purchasable;
 
 use SilverStripe\ORM\DataObjectInterface;
-use SilverStripe\ORM\FieldType\DBMoney;
+use SwipeStripe\Price\DBPrice;
 
 /**
  * Interface Purchasable
@@ -27,7 +27,7 @@ interface Purchasable extends DataObjectInterface
     public function getDescription(): string;
 
     /**
-     * @return DBMoney
+     * @return DBPrice
      */
-    public function getPrice(): DBMoney;
+    public function getPrice(): DBPrice;
 }
