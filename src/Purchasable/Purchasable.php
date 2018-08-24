@@ -19,11 +19,6 @@ interface Purchasable extends DataObjectInterface
     /**
      * @return string
      */
-    public function getName(): string;
-
-    /**
-     * @return string
-     */
     public function getDescription(): string;
 
     /**
