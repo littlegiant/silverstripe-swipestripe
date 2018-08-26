@@ -3,13 +3,13 @@
 namespace SwipeStripe\Price;
 
 use Money\Currency;
-use Money\Formatter\IntlLocalizedDecimalFormatter;
 use Money\Formatter\IntlMoneyFormatter;
 use Money\Money;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\FieldType\DBComposite;
 use SilverStripe\ORM\FieldType\DBMoney;
 use SilverStripe\ORM\FieldType\DBVarchar;
+use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * A monetary value database object that's currency aware, and explicitly designed to use MoneyPHP to avoid potential
@@ -39,11 +39,11 @@ class DBPrice extends DBComposite
      * @var array
      */
     private static $dependencies = [
-        'supportedCurrencies' => '%$' . SupportedCurrencies::class,
+        'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
     ];
 
     /**
-     * @var SupportedCurrencies
+     * @var SupportedCurrenciesInterface
      */
     public $supportedCurrencies;
 
@@ -60,9 +60,7 @@ class DBPrice extends DBComposite
     {
         $money = $this->getMoney();
 
-        $numberFormatter = $this->getNumberFormatter();
-        $formatter = new IntlMoneyFormatter($numberFormatter, $this->supportedCurrencies);
-
+        $formatter = new IntlMoneyFormatter($this->getNumberFormatter(), $this->supportedCurrencies);
         return $formatter->format($money);
     }
 
@@ -125,8 +123,7 @@ class DBPrice extends DBComposite
     public function getValue()
     {
         $money = $this->getMoney();
-        $formatter = new IntlLocalizedDecimalFormatter($this->getNumberFormatter(), $this->supportedCurrencies);
-        return $formatter->format($money) . ' ' . $money->getCurrency()->getCode();
+        return $this->supportedCurrencies->formatDecimal($money) . ' ' . $money->getCurrency()->getCode();
     }
 
     /**

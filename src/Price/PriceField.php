@@ -14,6 +14,7 @@ use SilverStripe\Forms\MoneyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
+use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * A field for storing money values into the database via DBPrice, while minimising potential for float errors.
@@ -27,11 +28,11 @@ class PriceField extends FormField
      * @var array
      */
     private static $dependencies = [
-        'supportedCurrencies' => '%$' . SupportedCurrencies::class,
+        'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
     ];
 
     /**
-     * @var SupportedCurrencies
+     * @var SupportedCurrenciesInterface
      */
     public $supportedCurrencies;
 
