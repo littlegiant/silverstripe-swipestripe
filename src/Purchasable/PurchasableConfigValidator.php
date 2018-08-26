@@ -20,7 +20,7 @@ class PurchasableConfigValidator implements ClassConfigValidator
      */
     public static function getConfigValidatedClasses()
     {
-        return ClassInfo::implementorsOf(Purchasable::class);
+        return ClassInfo::implementorsOf(PurchasableInterface::class);
     }
 
     /**
@@ -29,7 +29,7 @@ class PurchasableConfigValidator implements ClassConfigValidator
     public static function validateClassConfig($className, Config_ForClass $config, ClassConfigValidationResult $result)
     {
         if (!Extensible::has_extension($className, Versioned::class)) {
-            $result->addError('extensions', Purchasable::class . ' implementations must have the "Versioned" extension.');
+            $result->addError('extensions', PurchasableInterface::class . ' implementations must have the "Versioned" extension.');
         }
     }
 }
