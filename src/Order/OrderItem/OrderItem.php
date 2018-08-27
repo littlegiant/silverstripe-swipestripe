@@ -67,7 +67,7 @@ class OrderItem extends DataObject implements ItemInterface
      */
     public function getTitle()
     {
-        return $this->Purchasable()->getTitle();
+        return $this->Purchasable() ? $this->Purchasable()->getTitle() : '';
     }
 
     /**
@@ -75,7 +75,7 @@ class OrderItem extends DataObject implements ItemInterface
      */
     public function getDescription(): string
     {
-        return $this->Purchasable()->getDescription();
+        return $this->Purchasable() ? $this->Purchasable()->getDescription() : '';
     }
 
     /**
