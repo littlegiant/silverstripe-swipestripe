@@ -4,6 +4,7 @@ namespace SwipeStripe\Price;
 
 use InvalidArgumentException;
 use Money\Currencies;
+use Money\Currencies\CurrencyList;
 use Money\Currency;
 use Money\Money;
 use SilverStripe\Core\Injector\Injector;
@@ -160,11 +161,32 @@ class PriceField extends FormField
 
     /**
      * Set list of allowed currencies.
-     * @param Currencies|null $currencies
+     * @param string[]|Currencies|null $currencies Currencies instance, null, or array of currency code strings. Array
+     * currencies must be of form CODE => SUBUNIT or must be in SupportedCurrencies.
      * @return $this
      */
-    public function setAllowedCurrencies(?Currencies $currencies): self
+    public function setAllowedCurrencies($currencies): self
     {
+        if (empty($currencies)) {
+            $currencies = null;
+        } elseif (is_array($currencies)) {
+            $subUnitMap = [];
+
+            foreach ($currencies as $key => $value) {
+                if (is_int($key) && is_string($value)) {
+                    // Array of codes
+                    $subUnitMap[$value] = $this->supportedCurrencies->subunitFor(new Currency($value));
+                } elseif (is_string($key) && is_int($value)) {
+                    // Map of code => subunit
+                    $subUnitMap[$key] = $value;
+                }
+            }
+
+            $currencies = new CurrencyList($subUnitMap);
+        } elseif (!$currencies instanceof Currencies) {
+            throw new \InvalidArgumentException('Currencies must be null, array or instance of Currencies interface.');
+        }
+
         $this->allowedCurrencies = $currencies;
 
         // Rebuild currency field
