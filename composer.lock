@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d951486b10db10f3a4d6c0dc7610b1ef",
+    "content-hash": "f3ec448195ef9ace365364b80258c790",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -467,6 +467,43 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
+            "name": "hchokshi/silverstripe-trait-config",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hchokshi/silverstripe-trait-config.git",
+                "reference": "e32e8dbf04fc0e91197c7b6bc7d496038504f4d6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hchokshi/silverstripe-trait-config/zipball/e32e8dbf04fc0e91197c7b6bc7d496038504f4d6",
+                "reference": "e32e8dbf04fc0e91197c7b6bc7d496038504f4d6",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6 || ^7.0",
+                "silverstripe/framework": "^4.0"
+            },
+            "type": "silverstripe-vendormodule",
+            "autoload": {
+                "psr-4": {
+                    "hchokshi\\SilverStripe\\TraitConfig\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Harsh Chokshi",
+                    "email": "hchokshi@users.noreply.github.com"
+                }
+            ],
+            "description": "Merge SilverStripe configuration from traits into class configuration, while avoiding private static property conflicts.",
+            "time": "2018-07-25T00:45:01+00:00"
         },
         {
             "name": "intervention/image",

@@ -5,16 +5,14 @@ namespace SwipeStripe\Order;
 use Money\Money;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Omnipay\Model\Payment;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\HasManyList;
-use SilverStripe\ORM\ManyManyThroughList;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ManyManyList;
 use SwipeStripe\CartInterface;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Price\DBPrice;
-use SwipeStripe\Purchasable\PurchasableAddOnInterface;
+use SwipeStripe\Purchasable\PurchasableAddOn;
 use SwipeStripe\Purchasable\PurchasableInterface;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
@@ -25,7 +23,7 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  * @property bool $CartLocked
  * @property HasManyList|Payment[] Payments()
  * @method HasManyList|OrderItem[] OrderItems()
- * @method ManyManyThroughList|OrderAddOnInterface[] OrderAddOns()
+ * @method ManyManyList|OrderAddOn[] OrderAddOns()
  */
 class Order extends DataObject implements CartInterface
 {
@@ -49,18 +47,14 @@ class Order extends DataObject implements CartInterface
      */
     private static $has_many = [
         'OrderItems' => OrderItem::class,
-        'Payments'   => Payment::class,
+        'Payments' => Payment::class,
     ];
 
     /**
      * @var array
      */
     private static $many_many = [
-        'OrderAddOns' => [
-            'through' => OrderOrderAddOnMapping::class,
-            'from'    => OrderOrderAddOnMapping::ORDER,
-            'to'      => OrderOrderAddOnMapping::ORDER_ADD_ONS,
-        ],
+        'OrderAddOns' => OrderAddOn::class,
     ];
 
     /**
@@ -101,7 +95,8 @@ class Order extends DataObject implements CartInterface
         $cartObj->IsCart = true;
         $cartObj->write();
 
-        $session->set(static::SESSION_CART_ID, $cartObj->ID);
+        $session->set(static::SESSION_CART_ID, $cartObj->ID)
+            ->save($this->request);
         return $cartObj;
     }
 
@@ -121,7 +116,8 @@ class Order extends DataObject implements CartInterface
         $subTotal = $this->getSubTotal()->getMoney();
         $runningTotal = $subTotal;
 
-        foreach ($this->SortedOrderAddOns() as $addOn) {
+        /** @var OrderAddOn $addOn */
+        foreach ($this->OrderAddOns()->sort('Priority') as $addOn) {
             $addOnAmount = $addOn->getAmount($this, $subTotal, $runningTotal);
             $runningTotal = $runningTotal->add($addOnAmount);
         }
@@ -153,17 +149,6 @@ class Order extends DataObject implements CartInterface
     }
 
     /**
-     * @return SS_List|OrderAddOnInterface[]
-     */
-    public function SortedOrderAddOns(): SS_List
-    {
-        $addOns = $this->OrderAddOns()->toArray();
-        usort($addOns, OrderAddOnInterface::COMPARATOR_FUNCTION);
-
-        return ArrayList::create($addOns);
-    }
-
-    /**
      * @inheritDoc
      */
     public function setPurchasableQuantity(PurchasableInterface $item, int $quantity = 1): void
@@ -192,8 +177,8 @@ class Order extends DataObject implements CartInterface
     protected function getOrderItem(PurchasableInterface $item, bool $createIfMissing = true): ?OrderItem
     {
         $match = $this->OrderItems()->filter([
-            'ClassName' => $item->ClassName,
-            'ID'        => $item->ID,
+            OrderItem::PURCHASABLE_CLASS => $item->ClassName,
+            OrderItem::PURCHASABLE_ID    => $item->ID,
         ])->first();
 
         if ($match !== null || !$createIfMissing) {
@@ -211,7 +196,7 @@ class Order extends DataObject implements CartInterface
     /**
      * @inheritDoc
      */
-    public function attachOrderAddOn(OrderAddOnInterface $addOn): void
+    public function attachOrderAddOn(OrderAddOn $addOn): void
     {
         $this->OrderAddOns()->add($addOn);
     }
@@ -219,7 +204,7 @@ class Order extends DataObject implements CartInterface
     /**
      * @inheritDoc
      */
-    public function detachOrderAddOn(OrderAddOnInterface $addOn): void
+    public function detachOrderAddOn(OrderAddOn $addOn): void
     {
         $this->OrderAddOns()->remove($addOn);
     }
@@ -227,7 +212,7 @@ class Order extends DataObject implements CartInterface
     /**
      * @inheritDoc
      */
-    public function attachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOnInterface $addOn): void
+    public function attachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOn $addOn): void
     {
         $orderItem = $this->getOrderItem($item, false);
 
@@ -239,7 +224,7 @@ class Order extends DataObject implements CartInterface
     /**
      * @inheritDoc
      */
-    public function detachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOnInterface $addOn): void
+    public function detachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOn $addOn): void
     {
         $orderItem = $this->getOrderItem($item, false);
 

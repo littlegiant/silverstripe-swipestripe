@@ -8,7 +8,6 @@ use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config_ForClass;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Versioned\Versioned;
-use SwipeStripe\AddOnInterface;
 use SwipeStripe\Purchasable\PurchasableInterface;
 
 /**
@@ -18,7 +17,6 @@ use SwipeStripe\Purchasable\PurchasableInterface;
 final class VersionedObjectsConfigValidator implements ClassConfigValidator
 {
     const INTERFACES = [
-        AddOnInterface::class,
         PurchasableInterface::class,
     ];
 
@@ -27,12 +25,7 @@ final class VersionedObjectsConfigValidator implements ClassConfigValidator
      */
     public static function getConfigValidatedClasses()
     {
-        $classes = [];
-        foreach (static::INTERFACES as $interface) {
-            $classes = array_merge($classes, ClassInfo::implementorsOf($interface));
-        }
-
-        return array_values($classes);
+        return ClassInfo::implementorsOf(PurchasableInterface::class);
     }
 
     /**
@@ -41,10 +34,7 @@ final class VersionedObjectsConfigValidator implements ClassConfigValidator
     public static function validateClassConfig($className, Config_ForClass $config, ClassConfigValidationResult $result)
     {
         if (!Extensible::has_extension($className, Versioned::class)) {
-            $implInterfaces = implode("', '", array_filter(static::INTERFACES,
-                function (string $interface) use ($className) {
-                    return ClassInfo::classImplements($className, $interface);
-                }));
+            $implInterfaces = PurchasableInterface::class;
             $versioned = Versioned::class;
 
             $result->addError('extensions', "Implementations of '{$implInterfaces}' must have the '{$versioned}' extension.");

@@ -19,7 +19,8 @@
 		"silverstripe/framework": "^4",
 		"silverstripe/versioned": "^1.2",
         "littlegiant/silverstripe-config-validator": "^1.0",
-        "silverstripe/silverstripe-omnipay": "dev-feature/omnipay-v3"
+        "silverstripe/silverstripe-omnipay": "dev-feature/omnipay-v3",
+        "hchokshi/silverstripe-trait-config": "^1.0"
     },
     "autoload": {
         "psr-4": {

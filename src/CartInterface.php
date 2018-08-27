@@ -2,8 +2,8 @@
 
 namespace SwipeStripe;
 
-use SwipeStripe\Order\OrderAddOnInterface;
-use SwipeStripe\Purchasable\PurchasableAddOnInterface;
+use SwipeStripe\Order\OrderAddOn;
+use SwipeStripe\Purchasable\PurchasableAddOn;
 use SwipeStripe\Purchasable\PurchasableInterface;
 
 /**
@@ -29,24 +29,24 @@ interface CartInterface
     public function setPurchasableQuantity(PurchasableInterface $item, int $quantity = 1): void;
 
     /**
-     * @param OrderAddOnInterface $addOn
+     * @param OrderAddOn $addOn
      */
-    public function attachOrderAddOn(OrderAddOnInterface $addOn): void;
+    public function attachOrderAddOn(OrderAddOn $addOn): void;
 
     /**
-     * @param OrderAddOnInterface $addOn
+     * @param OrderAddOn $addOn
      */
-    public function detachOrderAddOn(OrderAddOnInterface $addOn): void;
-
-    /**
-     * @param PurchasableInterface $item
-     * @param PurchasableAddOnInterface $addOn
-     */
-    public function attachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOnInterface $addOn): void;
+    public function detachOrderAddOn(OrderAddOn $addOn): void;
 
     /**
      * @param PurchasableInterface $item
-     * @param PurchasableAddOnInterface $addOn
+     * @param PurchasableAddOn $addOn
      */
-    public function detachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOnInterface $addOn): void;
+    public function attachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOn $addOn): void;
+
+    /**
+     * @param PurchasableInterface $item
+     * @param PurchasableAddOn $addOn
+     */
+    public function detachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOn $addOn): void;
 }

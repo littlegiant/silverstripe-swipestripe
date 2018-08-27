@@ -4,13 +4,11 @@ namespace SwipeStripe\Order\OrderItem;
 
 use Money\Money;
 use Omnipay\Common\ItemInterface;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBInt;
-use SilverStripe\ORM\ManyManyThroughList;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ManyManyList;
 use SwipeStripe\Order\Order;
-use SwipeStripe\Purchasable\PurchasableAddOnInterface;
+use SwipeStripe\Purchasable\PurchasableAddOn;
 use SwipeStripe\Purchasable\PurchasableInterface;
 
 /**
@@ -22,10 +20,13 @@ use SwipeStripe\Purchasable\PurchasableInterface;
  * @property string PurchasableClass
  * @method Order|null Order()
  * @method DataObject|PurchasableInterface Purchasable()
- * @method ManyManyThroughList|PurchasableAddOnInterface[] PurchasableAddOns()
+ * @method ManyManyList|PurchasableAddOn[] PurchasableAddOns()
  */
 class OrderItem extends DataObject implements ItemInterface
 {
+    const PURCHASABLE_CLASS = 'PurchasableClass';
+    const PURCHASABLE_ID = 'PurchasableID';
+
     /**
      * @var string
      */
@@ -50,11 +51,7 @@ class OrderItem extends DataObject implements ItemInterface
      * @var array
      */
     private static $many_many = [
-        'PurchasableAddOns' => [
-            'through' => OrderItemPurchasableAddOnMapping::class,
-            'from'    => OrderItemPurchasableAddOnMapping::ORDER_ITEM,
-            'to'      => OrderItemPurchasableAddOnMapping::PURCHASABLE_ADD_ON,
-        ],
+        'PurchasableAddOns' => PurchasableAddOn::class,
     ];
 
     /**
@@ -91,7 +88,8 @@ class OrderItem extends DataObject implements ItemInterface
         $basePrice = $this->Purchasable()->getPrice()->getMoney();
         $runningPrice = $basePrice;
 
-        foreach ($this->SortedPurchasableAddOns() as $addOn) {
+        /** @var PurchasableAddOn $addOn */
+        foreach ($this->PurchasableAddOns()->sort('Priority') as $addOn) {
             $addOnAmount = $addOn->getAmount($item, $quantity, $basePrice, $runningPrice);
             $runningPrice = $runningPrice->add($addOnAmount);
         }
@@ -105,17 +103,6 @@ class OrderItem extends DataObject implements ItemInterface
     public function getQuantity(): int
     {
         return intval($this->getField('Quantity'));
-    }
-
-    /**
-     * @return SS_List|PurchasableAddOnInterface[]
-     */
-    public function SortedPurchasableAddOns(): SS_List
-    {
-        $addOns = $this->PurchasableAddOns()->toArray();
-        usort($addOns, PurchasableAddOnInterface::COMPARATOR_FUNCTION);
-
-        return ArrayList::create($addOns);
     }
 
     /**
