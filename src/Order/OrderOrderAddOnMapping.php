@@ -16,7 +16,7 @@ class OrderOrderAddOnMapping extends DataObject
     /**
      * @var string
      */
-    private static $table = 'SwipeStripe_Order_OrderAddOns';
+    private static $table_name = 'SwipeStripe_Order_OrderAddOns';
 
     /**
      * @var array
