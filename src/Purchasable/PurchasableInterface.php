@@ -2,15 +2,25 @@
 
 namespace SwipeStripe\Purchasable;
 
-use SwipeStripe\Order\OrderEntryInterface;
+use SilverStripe\ORM\DataObjectInterface;
 use SwipeStripe\Price\DBPrice;
 
 /**
  * Interface PurchasableInterface
  * @package SwipeStripe\Purchasable
  */
-interface PurchasableInterface extends OrderEntryInterface
+interface PurchasableInterface extends DataObjectInterface
 {
+    /**
+     * @return string
+     */
+    public function getTitle(): string;
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string;
+
     /**
      * @return int
      */
