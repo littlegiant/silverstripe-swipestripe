@@ -2,12 +2,14 @@
 
 namespace SwipeStripe\Purchasable;
 
+use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
 use SwipeStripe\Price\DBPrice;
 
 /**
  * Interface PurchasableInterface
  * @package SwipeStripe\Purchasable
+ * @mixin DataObject
  */
 interface PurchasableInterface extends DataObjectInterface
 {
