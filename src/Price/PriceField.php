@@ -132,19 +132,22 @@ class PriceField extends FormField
      */
     protected function getAllowedCurrenciesMap(): array
     {
+        $allowedCurrencies = $this->getAllowedCurrencies();
         $defaultCurrency = $this->supportedCurrencies->getDefaultCurrency();
-        $currencies = [
-            $defaultCurrency->getCode() => $defaultCurrency->getCode(),
-        ];
+        $currencyMap = [];
+
+        if ($allowedCurrencies->contains($defaultCurrency)) {
+            $currencyMap[$defaultCurrency->getCode()] = $defaultCurrency->getCode();
+        }
 
         /** @var Currency $currency */
-        foreach ($this->getAllowedCurrencies() as $currency) {
+        foreach ($allowedCurrencies as $currency) {
             if (!$currency->equals($defaultCurrency)) {
-                $currencies[$currency->getCode()] = $currency->getCode();
+                $currencyMap[$currency->getCode()] = $currency->getCode();
             }
         }
 
-        return $currencies;
+        return $currencyMap;
     }
 
     /**
