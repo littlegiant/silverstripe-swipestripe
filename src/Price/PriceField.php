@@ -9,8 +9,8 @@ use Money\Money;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FormField;
-use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\MoneyField;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
@@ -83,7 +83,7 @@ class PriceField extends FormField
         $allowedCurrencies = $this->getAllowedCurrenciesMap();
         if (count($allowedCurrencies) === 1) {
             // Hidden field for single currency
-            $field = HiddenField::create($fieldName);
+            $field = ReadonlyField::create($fieldName);
             reset($allowedCurrencies);
             $fieldValue = key($allowedCurrencies);
         } elseif (!empty($allowedCurrencies)) {
@@ -195,6 +195,11 @@ class PriceField extends FormField
             throw new InvalidArgumentException('Value is not submitted array');
         }
 
+        if (!isset($value['Currency']) && $this->getCurrencyField() instanceof ReadonlyField) {
+            // Read-only field for single choice
+            $value['Currency'] = $this->getCurrencyField()->Value();
+        }
+
         $this->setCurrency($value['Currency'], $value, true)
             ->setAmount($value['Amount'], $value, true);
 
@@ -287,8 +292,7 @@ class PriceField extends FormField
     {
         return $this->supportedCurrencies->parseDecimal(
             $this->getActiveCurrency(),
-            $this->getAmountField()->dataValue() ?? 0,
-            $this->getAllowedCurrencies()
+            $this->getAmountField()->dataValue() ?? 0
         );
     }
 
@@ -332,7 +336,7 @@ class PriceField extends FormField
 
             $value = [
                 'Currency' => $money !== null ? $money->getCurrency()->getCode() : null,
-                'Amount'   => $money !== null ? $this->supportedCurrencies->formatDecimal($money, $this->getAllowedCurrencies()) : null,
+                'Amount'   => $money !== null ? $this->supportedCurrencies->formatDecimal($money) : null,
             ];
         } elseif (!is_array($value)) {
             throw new InvalidArgumentException("Invalid currency format");
