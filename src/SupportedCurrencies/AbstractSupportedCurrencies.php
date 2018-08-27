@@ -9,7 +9,6 @@ use Money\Money;
 use Money\MoneyFormatter;
 use Money\MoneyParser;
 use Money\Parser\DecimalMoneyParser;
-use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injector;
 
 /**
@@ -18,8 +17,6 @@ use SilverStripe\Core\Injector\Injector;
  */
 abstract class AbstractSupportedCurrencies implements SupportedCurrenciesInterface
 {
-    use Configurable;
-
     /**
      * @var Currencies
      */
@@ -48,7 +45,7 @@ abstract class AbstractSupportedCurrencies implements SupportedCurrenciesInterfa
     public function __construct(?Currencies $subUnitSource = null, ?string $defaultCurrencyCode = null)
     {
         $injector = Injector::inst();
-        $this->subUnitSource = $subUnitSource ?? $injector->get(self::class .'.DefaultSubUnitSource');
+        $this->subUnitSource = $subUnitSource ?? $injector->get(self::class . '.DefaultSubUnitSource');
         $this->decimalFormatter = $injector->create(DecimalMoneyFormatter::class, $this);
         $this->decimalParser = $injector->create(DecimalMoneyParser::class, $this);
         $this->defaultCurrencyCode = $defaultCurrencyCode;
