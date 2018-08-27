@@ -279,7 +279,10 @@ class PriceField extends FormField
             $codeOrCurrency = new Currency($codeOrCurrency);
         }
 
-        $this->getAmountField()->setScale($this->getAllowedCurrencies()->subunitFor($codeOrCurrency));
+        $allowedCurrencies = $this->getAllowedCurrencies();
+        if ($allowedCurrencies->contains($codeOrCurrency)) {
+            $this->getAmountField()->setScale($allowedCurrencies->subunitFor($codeOrCurrency));
+        }
 
         if ($submitted) {
             $this->getCurrencyField()->setSubmittedValue($codeOrCurrency->getCode(), $data);
