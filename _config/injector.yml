@@ -7,3 +7,6 @@ SilverStripe\Core\Injector\Injector:
 
   SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface:
     class: SwipeStripe\SupportedCurrencies\SingleSupportedCurrency
+
+  SwipeStripe\CartInterface:
+    class: SwipeStripe\Order\Order
