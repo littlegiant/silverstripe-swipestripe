@@ -7,6 +7,7 @@ use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\HasManyList;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
@@ -20,12 +21,14 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  * @property bool $IsCart
  * @property bool $CartLocked
  * @property int $PaymentID
+ * @property string $GuestToken
  * @property null|Payment Payment()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
  */
 class Order extends DataObject
 {
+    const GUEST_TOKEN_BYTES = 16;
     const SESSION_CART_ID = self::class . '.ActiveCartID';
 
     /**
@@ -39,6 +42,7 @@ class Order extends DataObject
     private static $db = [
         'IsCart'     => DBBoolean::class,
         'CartLocked' => DBBoolean::class,
+        'GuestToken' => DBVarchar::class,
     ];
 
     /**
@@ -73,6 +77,16 @@ class Order extends DataObject
      * @var SupportedCurrenciesInterface
      */
     public $supportedCurrencies;
+
+    /**
+     * @inheritDoc
+     */
+    public function populateDefaults()
+    {
+        parent::populateDefaults();
+        $this->GuestToken = bin2hex(random_bytes(static::GUEST_TOKEN_BYTES));
+        return $this;
+    }
 
     /**
      * @return static
