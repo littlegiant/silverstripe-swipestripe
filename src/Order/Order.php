@@ -108,36 +108,35 @@ class Order extends DataObject
     }
 
     /**
+     * @param bool $applyAddOns
+     * @param bool $applyOrderItemAddOns
      * @return DBPrice
      */
-    public function getTotal(): DBPrice
+    public function Total(bool $applyAddOns = true, bool $applyOrderItemAddOns = true): DBPrice
     {
-        $subTotal = $this->getSubTotal()->getMoney();
+        $subTotal = $this->SubTotal($applyOrderItemAddOns)->getMoney();
         $runningTotal = $subTotal;
 
-        /** @var OrderAddOn $addOn */
-        foreach ($this->OrderAddOns() as $addOn) {
-            $runningTotal = $runningTotal->add($addOn->Amount->getMoney());
+        if ($applyAddOns) {
+            /** @var OrderAddOn $addOn */
+            foreach ($this->OrderAddOns() as $addOn) {
+                $runningTotal = $runningTotal->add($addOn->getAmount());
+            }
         }
 
         return DBPrice::create_field(DBPrice::class, $runningTotal);
     }
 
     /**
+     * @param bool $applyAddOns
      * @return DBPrice
      */
-    public function getSubTotal(): DBPrice
+    public function SubTotal(bool $applyAddOns = true): DBPrice
     {
         $money = new Money(0, $this->supportedCurrencies->getDefaultCurrency());
 
         foreach ($this->OrderItems() as $item) {
-            // Unit price x quantity
-            $itemAmount = $item->getPrice()->multiply($item->getQuantity());
-
-            // Apply add-ons
-            foreach ($item->OrderItemAddOns() as $addOn) {
-                $itemAmount = $itemAmount->add($addOn->Amount->getMoney());
-            }
+            $itemAmount = $item->SubTotal($applyAddOns)->getMoney();
 
             /*
              * If money is initial zero, we use item amount as base - this avoids assuming $itemAmount is in

@@ -2,12 +2,12 @@
 
 namespace SwipeStripe\Order\OrderItem;
 
-use Money\Money;
 use Omnipay\Common\ItemInterface;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
 use SwipeStripe\Order\Order;
+use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Purchasable\PurchasableInterface;
 
 /**
@@ -15,7 +15,7 @@ use SwipeStripe\Purchasable\PurchasableInterface;
  * @package SwipeStripe\Order\OrderItem
  * @property string $Name
  * @property string $Description
- * @property Money $Price
+ * @property DBPrice $Price
  * @property int $Quantity
  * @property int $OrderID
  * @property int PurchasableID
@@ -81,11 +81,28 @@ class OrderItem extends DataObject implements ItemInterface
     }
 
     /**
-     * @return Money
+     * @param bool $applyAddOns
+     * @return DBPrice
      */
-    public function getPrice(): Money
+    public function SubTotal(bool $applyAddOns = true): DBPrice
     {
-        return $this->Purchasable()->getPrice()->getMoney();
+        $money = $this->getPrice()->getMoney()->multiply($this->getQuantity());
+
+        if ($applyAddOns) {
+            foreach ($this->OrderItemAddOns() as $addOn) {
+                $money = $money->add($addOn->getAmount());
+            }
+        }
+
+        return DBPrice::create_field(DBPrice::class, $money);
+    }
+
+    /**
+     * @return DBPrice
+     */
+    public function getPrice(): DBPrice
+    {
+        return $this->Purchasable()->getPrice();
     }
 
     /**
