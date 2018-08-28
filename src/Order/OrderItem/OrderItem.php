@@ -90,7 +90,7 @@ class OrderItem extends DataObject implements ItemInterface
 
         if ($applyAddOns) {
             foreach ($this->OrderItemAddOns() as $addOn) {
-                $money = $money->add($addOn->getAmount());
+                $money = $money->add($addOn->getAmount()->getMoney());
             }
         }
 

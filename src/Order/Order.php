@@ -120,7 +120,7 @@ class Order extends DataObject
         if ($applyAddOns) {
             /** @var OrderAddOn $addOn */
             foreach ($this->OrderAddOns() as $addOn) {
-                $runningTotal = $runningTotal->add($addOn->getAmount());
+                $runningTotal = $runningTotal->add($addOn->getAmount()->getMoney());
             }
         }
 

@@ -17,7 +17,7 @@ use SwipeStripe\Price\DBPrice;
  * @property string $Type The type of add-on this is.
  * @property string $Title
  * @property int $Priority
- * @property Money $Amount
+ * @property DBPrice $Amount
  */
 trait AddOn
 {
@@ -63,12 +63,10 @@ trait AddOn
     private static $__swipestripe_addon_default_sort = 'Priority ASC';
 
     /**
-     * @return Money
+     * @return DBPrice
      */
-    public function getAmount(): Money
+    public function getAmount(): DBPrice
     {
-        /** @var DBPrice $amount */
-        $amount = $this->getField('Amount');
-        return $amount->getMoney();
+        return $this->getField('Amount');
     }
 }
