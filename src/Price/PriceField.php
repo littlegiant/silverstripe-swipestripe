@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace SwipeStripe\Price;
 
@@ -318,7 +319,7 @@ class PriceField extends FormField
     {
         return $this->supportedCurrencies->parseDecimal(
             $this->getActiveCurrency(),
-            $this->getAmountField()->dataValue() ?? 0
+            $this->getAmountField()->dataValue() ?? '0'
         );
     }
 

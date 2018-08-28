@@ -1,8 +1,8 @@
 <?php
+declare(strict_types=1);
 
 namespace SwipeStripe;
 
-use Money\Money;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Versioned\Versioned;
