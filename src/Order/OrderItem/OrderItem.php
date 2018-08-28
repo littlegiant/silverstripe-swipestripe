@@ -30,7 +30,7 @@ class OrderItem extends DataObject implements ItemInterface
     /**
      * @var string
      */
-    private static $table_name = 'SwipeStripe_OrderItem';
+    private static $table_name = 'SwipeStripe_Order_OrderItem';
 
     /**
      * @var array
