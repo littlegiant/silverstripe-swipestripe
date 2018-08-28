@@ -2,13 +2,14 @@
 
 namespace SwipeStripe\Order;
 
-use Money\Money;
 use SilverStripe\ORM\DataObject;
 use SwipeStripe\AddOn;
 
 /**
  * Class OrderAddOn
  * @package SwipeStripe\Order
+ * @property int $OrderID
+ * @method null|Order Order()
  */
 class OrderAddOn extends DataObject
 {
@@ -19,20 +20,14 @@ class OrderAddOn extends DataObject
     const PRIORITY_LATE = 1;
 
     /**
-     * @param Order $order
-     * @param Money $subtotal Base sub-total.
-     * @param Money $runningTotal Running total with previous add-ons applied.
-     * @return Money Amount value of this add-on.
+     * @var string
      */
-    public function getAmount(Order $order, Money $subtotal, Money $runningTotal): Money
-    {
-        return new Money(0, $subtotal->getCurrency());
-    }
+    private static $table_name = 'SwipeStripe_OrderAddOn';
 
     /**
-     * @param Order $order
+     * @var array
      */
-    public function registerUse(Order $order): void
-    {
-    }
+    private static $has_one = [
+        'Order' => Order::class,
+    ];
 }

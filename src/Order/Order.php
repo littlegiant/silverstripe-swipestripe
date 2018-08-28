@@ -8,10 +8,9 @@ use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\HasManyList;
-use SilverStripe\ORM\ManyManyList;
 use SwipeStripe\Order\OrderItem\OrderItem;
+use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\Price\DBPrice;
-use SwipeStripe\Purchasable\PurchasableAddOn;
 use SwipeStripe\Purchasable\PurchasableInterface;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
@@ -20,9 +19,10 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  * @package SwipeStripe\Order
  * @property bool $IsCart
  * @property bool $CartLocked
- * @property HasManyList|Payment[] Payments()
+ * @property int $PaymentID
+ * @property null|Payment Payment()
  * @method HasManyList|OrderItem[] OrderItems()
- * @method ManyManyList|OrderAddOn[] OrderAddOns()
+ * @method HasManyList|OrderAddOn[] OrderAddOns()
  */
 class Order extends DataObject
 {
@@ -44,16 +44,16 @@ class Order extends DataObject
     /**
      * @var array
      */
-    private static $has_many = [
-        'OrderItems' => OrderItem::class,
-        'Payments' => Payment::class,
+    private static $has_one = [
+        'Payment' => Payment::class,
     ];
 
     /**
      * @var array
      */
-    private static $many_many = [
+    private static $has_many = [
         'OrderAddOns' => OrderAddOn::class,
+        'OrderItems'  => OrderItem::class,
     ];
 
     /**
@@ -116,9 +116,8 @@ class Order extends DataObject
         $runningTotal = $subTotal;
 
         /** @var OrderAddOn $addOn */
-        foreach ($this->OrderAddOns()->sort('Priority') as $addOn) {
-            $addOnAmount = $addOn->getAmount($this, $subTotal, $runningTotal);
-            $runningTotal = $runningTotal->add($addOnAmount);
+        foreach ($this->OrderAddOns() as $addOn) {
+            $runningTotal = $runningTotal->add($addOn->Amount->getMoney());
         }
 
         return DBPrice::create_field(DBPrice::class, $runningTotal);
@@ -132,7 +131,13 @@ class Order extends DataObject
         $money = new Money(0, $this->supportedCurrencies->getDefaultCurrency());
 
         foreach ($this->OrderItems() as $item) {
+            // Unit price x quantity
             $itemAmount = $item->getPrice()->multiply($item->getQuantity());
+
+            // Apply add-ons
+            foreach ($item->OrderItemAddOns() as $addOn) {
+                $itemAmount = $itemAmount->add($addOn->Amount->getMoney());
+            }
 
             /*
              * If money is initial zero, we use item amount as base - this avoids assuming $itemAmount is in
@@ -174,7 +179,7 @@ class Order extends DataObject
      * @param bool $createIfMissing
      * @return null|OrderItem
      */
-    protected function getOrderItem(PurchasableInterface $item, bool $createIfMissing = true): ?OrderItem
+    public function getOrderItem(PurchasableInterface $item, bool $createIfMissing = true): ?OrderItem
     {
         $match = $this->OrderItems()->filter([
             OrderItem::PURCHASABLE_CLASS => $item->ClassName,
@@ -194,45 +199,28 @@ class Order extends DataObject
     }
 
     /**
-     * @param OrderAddOn $addOn
-     */
-    public function attachOrderAddOn(OrderAddOn $addOn): void
-    {
-        $this->OrderAddOns()->add($addOn);
-    }
-
-    /**
-     * @param OrderAddOn $addOn
-     */
-    public function detachOrderAddOn(OrderAddOn $addOn): void
-    {
-        $this->OrderAddOns()->remove($addOn);
-    }
-
-    /**
      * @param PurchasableInterface $item
-     * @param PurchasableAddOn $addOn
-     * @throws \Exception
+     * @param OrderItemAddOn $addOn
      */
-    public function attachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOn $addOn): void
+    public function attachPurchasableAddOn(PurchasableInterface $item, OrderItemAddOn $addOn): void
     {
         $orderItem = $this->getOrderItem($item, false);
 
         if ($orderItem !== null) {
-            $orderItem->PurchasableAddOns()->add($item);
+            $orderItem->OrderItemAddOns()->add($addOn);
         }
     }
 
     /**
      * @param PurchasableInterface $item
-     * @param PurchasableAddOn $addOn
+     * @param OrderItemAddOn $addOn
      */
-    public function detachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOn $addOn): void
+    public function detachPurchasableAddOn(PurchasableInterface $item, OrderItemAddOn $addOn): void
     {
         $orderItem = $this->getOrderItem($item, false);
 
         if ($orderItem !== null) {
-            $orderItem->PurchasableAddOns()->remove($item);
+            $orderItem->OrderItemAddOns()->remove($addOn);
         }
     }
 }

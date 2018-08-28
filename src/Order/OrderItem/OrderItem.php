@@ -6,21 +6,23 @@ use Money\Money;
 use Omnipay\Common\ItemInterface;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBInt;
-use SilverStripe\ORM\ManyManyList;
+use SilverStripe\ORM\HasManyList;
 use SwipeStripe\Order\Order;
-use SwipeStripe\Purchasable\PurchasableAddOn;
 use SwipeStripe\Purchasable\PurchasableInterface;
 
 /**
  * Class OrderItem
  * @package SwipeStripe\Order\OrderItem
+ * @property string $Name
+ * @property string $Description
+ * @property Money $Price
  * @property int $Quantity
  * @property int $OrderID
  * @property int PurchasableID
  * @property string PurchasableClass
  * @method Order|null Order()
  * @method DataObject|PurchasableInterface Purchasable()
- * @method ManyManyList|PurchasableAddOn[] PurchasableAddOns()
+ * @method HasManyList|OrderItemAddOn[] OrderItemAddOns()
  */
 class OrderItem extends DataObject implements ItemInterface
 {
@@ -50,8 +52,8 @@ class OrderItem extends DataObject implements ItemInterface
     /**
      * @var array
      */
-    private static $many_many = [
-        'PurchasableAddOns' => PurchasableAddOn::class,
+    private static $has_many = [
+        'OrderItemAddOns' => OrderItemAddOn::class,
     ];
 
     /**
@@ -83,18 +85,7 @@ class OrderItem extends DataObject implements ItemInterface
      */
     public function getPrice(): Money
     {
-        $item = $this->Purchasable();
-        $quantity = $this->getQuantity();
-        $basePrice = $this->Purchasable()->getPrice()->getMoney();
-        $runningPrice = $basePrice;
-
-        /** @var PurchasableAddOn $addOn */
-        foreach ($this->PurchasableAddOns()->sort('Priority') as $addOn) {
-            $addOnAmount = $addOn->getAmount($item, $quantity, $basePrice, $runningPrice);
-            $runningPrice = $runningPrice->add($addOnAmount);
-        }
-
-        return $runningPrice;
+        return $this->Purchasable()->getPrice()->getMoney();
     }
 
     /**

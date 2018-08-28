@@ -2,19 +2,22 @@
 
 namespace SwipeStripe;
 
-use SilverStripe\ORM\DataObject;
+use Money\Money;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Order\OrderAddOn;
-use SwipeStripe\Purchasable\PurchasableAddOn;
+use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\Price\DBPrice;
 
 /**
  * Trait AddOn
  * @package SwipeStripe
- * @mixin DataObject
+ * @mixin Versioned
+ * @property string $Type The type of add-on this is.
  * @property string $Title
  * @property int $Priority
+ * @property Money $Amount
  */
 trait AddOn
 {
@@ -24,8 +27,10 @@ trait AddOn
      * @var array
      */
     private static $__swipestripe_addon_db = [
-        'Title'    => DBVarchar::class,
+        'Type'     => DBVarchar::class,
         'Priority' => DBInt::class,
+        'Title'    => DBVarchar::class,
+        'Amount'   => DBPrice::class,
     ];
 
     /**
@@ -45,8 +50,25 @@ trait AddOn
     private static $__swipestripe_addon_defaults = [
         /**
          * @see OrderAddOn::PRIORITY_NORMAL
-         * @see PurchasableAddOn::PRIORITY_NORMAL
+         * @see OrderItemAddOn::PRIORITY_NORMAL
          */
         'Priority' => 0,
     ];
+
+    /**
+     * @internal
+     * @aliasConfig $default_sort
+     * @var string
+     */
+    private static $__swipestripe_addon_default_sort = 'Priority ASC';
+
+    /**
+     * @return Money
+     */
+    public function getAmount(): Money
+    {
+        /** @var DBPrice $amount */
+        $amount = $this->getField('Amount');
+        return $amount->getMoney();
+    }
 }
