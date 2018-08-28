@@ -6,6 +6,7 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\View\TemplateGlobalProvider;
 use SilverStripe\View\ViewableData;
+use SwipeStripe\Order\Order;
 
 /**
  * $SwipeStripe global template helper.
@@ -26,13 +27,13 @@ class GlobalTemplateHelper extends ViewableData implements TemplateGlobalProvide
      * @var array
      */
     private static $dependencies = [
-        'cart' => CartInterface::class,
+        'order' => Order::class,
     ];
 
     /**
-     * @var CartInterface
+     * @var Order
      */
-    public $cart;
+    public $order;
 
     /**
      * @inheritDoc
@@ -48,10 +49,10 @@ class GlobalTemplateHelper extends ViewableData implements TemplateGlobalProvide
     }
 
     /**
-     * @return CartInterface
+     * @return Order
      */
-    public function ActiveCart(): CartInterface
+    public function ActiveCart(): Order
     {
-        return $this->cart->getActiveCart();
+        return $this->order->getActiveCart();
     }
 }

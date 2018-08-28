@@ -9,7 +9,6 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ManyManyList;
-use SwipeStripe\CartInterface;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Purchasable\PurchasableAddOn;
@@ -25,7 +24,7 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  * @method HasManyList|OrderItem[] OrderItems()
  * @method ManyManyList|OrderAddOn[] OrderAddOns()
  */
-class Order extends DataObject implements CartInterface
+class Order extends DataObject
 {
     const SESSION_CART_ID = self::class . '.ActiveCartID';
 
@@ -76,9 +75,9 @@ class Order extends DataObject implements CartInterface
     public $supportedCurrencies;
 
     /**
-     * @inheritDoc
+     * @return static
      */
-    public function getActiveCart(): CartInterface
+    public function getActiveCart(): self
     {
         $session = $this->request->getSession();
         $cartId = intval($session->get(static::SESSION_CART_ID));
@@ -101,7 +100,7 @@ class Order extends DataObject implements CartInterface
     }
 
     /**
-     * @inheritDoc
+     *
      */
     public function clearActiveCart(): void
     {
@@ -149,7 +148,8 @@ class Order extends DataObject implements CartInterface
     }
 
     /**
-     * @inheritDoc
+     * @param PurchasableInterface $item
+     * @param int $quantity
      */
     public function setPurchasableQuantity(PurchasableInterface $item, int $quantity = 1): void
     {
@@ -194,7 +194,7 @@ class Order extends DataObject implements CartInterface
     }
 
     /**
-     * @inheritDoc
+     * @param OrderAddOn $addOn
      */
     public function attachOrderAddOn(OrderAddOn $addOn): void
     {
@@ -202,7 +202,7 @@ class Order extends DataObject implements CartInterface
     }
 
     /**
-     * @inheritDoc
+     * @param OrderAddOn $addOn
      */
     public function detachOrderAddOn(OrderAddOn $addOn): void
     {
@@ -210,7 +210,9 @@ class Order extends DataObject implements CartInterface
     }
 
     /**
-     * @inheritDoc
+     * @param PurchasableInterface $item
+     * @param PurchasableAddOn $addOn
+     * @throws \Exception
      */
     public function attachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOn $addOn): void
     {
@@ -222,7 +224,8 @@ class Order extends DataObject implements CartInterface
     }
 
     /**
-     * @inheritDoc
+     * @param PurchasableInterface $item
+     * @param PurchasableAddOn $addOn
      */
     public function detachPurchasableAddOn(PurchasableInterface $item, PurchasableAddOn $addOn): void
     {
