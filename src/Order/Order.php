@@ -5,6 +5,7 @@ namespace SwipeStripe\Order;
 
 use Money\Money;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
@@ -69,14 +70,8 @@ class Order extends DataObject
      * @var array
      */
     private static $dependencies = [
-        'request'             => '%$' . HTTPRequest::class,
         'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
     ];
-
-    /**
-     * @var HTTPRequest
-     */
-    public $request;
 
     /**
      * @var SupportedCurrenciesInterface
@@ -98,7 +93,9 @@ class Order extends DataObject
      */
     public function getActiveCart(): self
     {
-        $session = $this->request->getSession();
+        /** @var HTTPRequest $request */
+        $request = Injector::inst()->get(HTTPRequest::class);
+        $session = $request->getSession();
         $cartId = intval($session->get(static::SESSION_CART_ID));
 
         if ($cartId > 0) {
@@ -114,7 +111,7 @@ class Order extends DataObject
         $cartObj->write();
 
         $session->set(static::SESSION_CART_ID, $cartObj->ID)
-            ->save($this->request);
+            ->save($request);
         return $cartObj;
     }
 
