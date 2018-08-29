@@ -49,8 +49,8 @@ class ViewOrderPageController extends \PageController
 
         $order = Order::get_by_id(intval($orderId));
 
-        // TODO - customer login, allow guest with token only if not attached to member customer
-        if ($order === null || $request->param('GuestToken') !== $order->GuestToken) {
+        if ($order === null || !$order->canViewOrderPage(null, $request->param('GuestToken'))) {
+            // Can't view = 404, because a 403 Forbidden would leak information (order ID exists)
             $this->httpError(404);
         }
 

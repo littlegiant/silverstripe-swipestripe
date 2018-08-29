@@ -11,6 +11,9 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\HasManyList;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\Security;
 use SwipeStripe\Customer\Customer;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
@@ -239,5 +242,27 @@ class Order extends DataObject
         if ($orderItem !== null) {
             $orderItem->OrderItemAddOns()->remove($addOn);
         }
+    }
+
+    /**
+     * @param null|Member $member
+     * @param null|string $guestToken
+     * @return bool
+     */
+    public function canViewOrderPage(?Member $member = null, ?string $guestToken = null): bool
+    {
+        if ($this->IsCart) {
+            // No one should be able to view carts as an order
+            return false;
+        }
+
+        $member = $member ?? Security::getCurrentUser();
+
+        // Allow valid guest token if the customer is a guest
+        return ($guestToken === $this->GuestToken && $this->Customer()->IsGuest()) ||
+            // Allow if logged in and member owns the customer object
+            ($member !== null && !$this->Customer()->IsGuest() && intval($this->Customer()->MemberID) === intval($member->ID)) ||
+            // Allow admins
+            Permission::check('ADMIN', 'any', $member);
     }
 }
