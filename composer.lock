@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "17e42adbd1c98fcebc50d0906cdcfa97",
+    "content-hash": "f10265153625eb112162b5577ccd906a",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -715,43 +715,6 @@
                 "storage"
             ],
             "time": "2018-08-22T07:45:22+00:00"
-        },
-        {
-            "name": "littlegiant/silverstripe-config-validator",
-            "version": "1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/littlegiant/silverstripe-config-validator.git",
-                "reference": "2b8cf2b945816a242e244ff426405433fbb6040c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/littlegiant/silverstripe-config-validator/zipball/2b8cf2b945816a242e244ff426405433fbb6040c",
-                "reference": "2b8cf2b945816a242e244ff426405433fbb6040c",
-                "shasum": ""
-            },
-            "require": {
-                "silverstripe/framework": "^4.0"
-            },
-            "type": "silverstripe-vendormodule",
-            "autoload": {
-                "psr-4": {
-                    "LittleGiant\\SilverStripe\\ConfigValidator\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Harsh Chokshi",
-                    "email": "harsh.chokshi@littlegiant.co.nz",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Build time configuration validation for SilverStripe framework.",
-            "time": "2018-07-30T04:21:09+00:00"
         },
         {
             "name": "m1/env",
