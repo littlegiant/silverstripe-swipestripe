@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\OrderItem;
 
-use Omnipay\Common\ItemInterface;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
@@ -14,18 +13,19 @@ use SwipeStripe\Purchasable\PurchasableInterface;
 /**
  * Class OrderItem
  * @package SwipeStripe\Order\OrderItem
- * @property string $Name
  * @property string $Description
  * @property DBPrice $Price
  * @property int $Quantity
  * @property int $OrderID
  * @property int PurchasableID
+ * @property DBPrice $SubTotal
+ * @property DBPrice $Total
  * @property string PurchasableClass
  * @method Order|null Order()
  * @method DataObject|PurchasableInterface Purchasable()
  * @method HasManyList|OrderItemAddOn[] OrderItemAddOns()
  */
-class OrderItem extends DataObject implements ItemInterface
+class OrderItem extends DataObject
 {
     const PURCHASABLE_CLASS = 'PurchasableClass';
     const PURCHASABLE_ID = 'PurchasableID';
@@ -60,14 +60,6 @@ class OrderItem extends DataObject implements ItemInterface
     /**
      * @inheritDoc
      */
-    public function getName(): string
-    {
-        return $this->getTitle();
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getTitle()
     {
         return $this->Purchasable() ? $this->Purchasable()->getTitle() : '';
@@ -82,23 +74,32 @@ class OrderItem extends DataObject implements ItemInterface
     }
 
     /**
-     * @param bool $applyAddOns
+     * Subtotal with add-ons.
      * @return DBPrice
      */
-    public function SubTotal(bool $applyAddOns = true): DBPrice
+    public function getTotal(): DBPrice
     {
-        $money = $this->getPrice()->getMoney()->multiply($this->getQuantity());
+        $money = $this->getSubTotal()->getMoney();
 
-        if ($applyAddOns) {
-            foreach ($this->OrderItemAddOns() as $addOn) {
-                $money = $money->add($addOn->getAmount()->getMoney());
-            }
+        foreach ($this->OrderItemAddOns() as $addOn) {
+            $money = $money->add($addOn->getAmount()->getMoney());
         }
 
         return DBPrice::create_field(DBPrice::class, $money);
     }
 
     /**
+     * Unit price x quantity.
+     * @return DBPrice
+     */
+    public function getSubTotal(): DBPrice
+    {
+        $money = $this->getPrice()->getMoney()->multiply($this->getQuantity());
+        return DBPrice::create_field(DBPrice::class, $money);
+    }
+
+    /**
+     * Unit price.
      * @return DBPrice
      */
     public function getPrice(): DBPrice

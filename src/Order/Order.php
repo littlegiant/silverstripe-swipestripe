@@ -123,16 +123,16 @@ class Order extends DataObject
     }
 
     /**
-     * @param bool $applyAddOns
+     * @param bool $applyOrderAddOns
      * @param bool $applyOrderItemAddOns
      * @return DBPrice
      */
-    public function Total(bool $applyAddOns = true, bool $applyOrderItemAddOns = true): DBPrice
+    public function Total(bool $applyOrderAddOns = true, bool $applyOrderItemAddOns = true): DBPrice
     {
         $subTotal = $this->SubTotal($applyOrderItemAddOns)->getMoney();
         $runningTotal = $subTotal;
 
-        if ($applyAddOns) {
+        if ($applyOrderAddOns) {
             /** @var OrderAddOn $addOn */
             foreach ($this->OrderAddOns() as $addOn) {
                 $runningTotal = $runningTotal->add($addOn->getAmount()->getMoney());
@@ -143,15 +143,17 @@ class Order extends DataObject
     }
 
     /**
-     * @param bool $applyAddOns
+     * @param bool $applyItemAddOns
      * @return DBPrice
      */
-    public function SubTotal(bool $applyAddOns = true): DBPrice
+    public function SubTotal(bool $applyItemAddOns = true): DBPrice
     {
         $money = new Money(0, $this->supportedCurrencies->getDefaultCurrency());
 
         foreach ($this->OrderItems() as $item) {
-            $itemAmount = $item->SubTotal($applyAddOns)->getMoney();
+            $itemAmount = $applyItemAddOns
+                ? $item->getTotal()->getMoney()
+                : $item->getSubTotal()->getMoney();
 
             /*
              * If money is initial zero, we use item amount as base - this avoids assuming $itemAmount is in
