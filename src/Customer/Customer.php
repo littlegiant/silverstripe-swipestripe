@@ -14,6 +14,7 @@ use SwipeStripe\Order\Order;
  * Class Customer
  * @package SwipeStripe\Customer
  * @property string $Email
+ * @property string $CustomerEmail
  * @property int $MemberID
  * @method null|Member|MemberExtension Member()
  * @method HasManyList|Order[] Orders()
@@ -29,7 +30,7 @@ class Customer extends DataObject
      * @var array
      */
     private static $db = [
-        'Email' => DBVarchar::class,
+        'CustomerEmail' => DBVarchar::class,
     ];
 
     /**
@@ -61,10 +62,20 @@ class Customer extends DataObject
     {
         $result = parent::validate();
 
-        if (!empty($this->Email) && !Email::is_valid_address($this->Email)) {
+        if (!empty($this->CustomerEmail) && !Email::is_valid_address($this->CustomerEmail)) {
             $result->addFieldError('Email', 'Email must be a valid email address.');
         }
 
         return $result;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getEmail(): ?string
+    {
+        return $this->IsGuest()
+            ? $this->CustomerEmail
+            : $this->Member()->Email;
     }
 }
