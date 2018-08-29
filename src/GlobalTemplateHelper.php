@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe;
 
+use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\View\TemplateGlobalProvider;
@@ -25,18 +26,8 @@ class GlobalTemplateHelper extends ViewableData implements TemplateGlobalProvide
     private static $template_helper_name = 'SwipeStripe';
 
     /**
-     * @var array
-     */
-    private static $dependencies = [
-        'order' => Order::class,
-    ];
-
-    /**
-     * @var Order
-     */
-    public $order;
-
-    /**
+     * Expose a $SwipeStripe (or other configured name) template variable that exposes template data without polluting
+     * the global scope.
      * @inheritDoc
      */
     public static function get_template_global_variables(): array
@@ -54,6 +45,8 @@ class GlobalTemplateHelper extends ViewableData implements TemplateGlobalProvide
      */
     public function ActiveCart(): Order
     {
-        return $this->order->getActiveCart();
+        /** @var Controller|HasActiveCart $controller */
+        $controller = Controller::curr();
+        return $controller->getActiveCart();
     }
 }

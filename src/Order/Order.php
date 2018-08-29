@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace SwipeStripe\Order;
 
 use Money\Money;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
@@ -37,7 +35,6 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 class Order extends DataObject
 {
     const GUEST_TOKEN_BYTES = 16;
-    const SESSION_CART_ID = self::class . '.ActiveCartID';
 
     /**
      * @var string
@@ -89,41 +86,6 @@ class Order extends DataObject
         parent::populateDefaults();
         $this->GuestToken = bin2hex(random_bytes(static::GUEST_TOKEN_BYTES));
         return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function getActiveCart(): self
-    {
-        /** @var HTTPRequest $request */
-        $request = Injector::inst()->get(HTTPRequest::class);
-        $session = $request->getSession();
-        $cartId = intval($session->get(static::SESSION_CART_ID));
-
-        if ($cartId > 0) {
-            $cartObj = self::get_by_id($cartId);
-
-            if ($cartObj !== null && $cartObj->IsCart) {
-                return $cartObj;
-            }
-        }
-
-        $cartObj = static::create();
-        $cartObj->IsCart = true;
-        $cartObj->write();
-
-        $session->set(static::SESSION_CART_ID, $cartObj->ID)
-            ->save($request);
-        return $cartObj;
-    }
-
-    /**
-     *
-     */
-    public function clearActiveCart(): void
-    {
-        $this->request->getSession()->clear(static::SESSION_CART_ID);
     }
 
     /**
