@@ -17,6 +17,7 @@ use SwipeStripe\Price\DBPrice;
  * @property string $Type The type of add-on this is.
  * @property string $Title
  * @property int $Priority
+ * @property DBPrice $BaseAmount
  * @property DBPrice $Amount
  */
 trait AddOn
@@ -27,10 +28,10 @@ trait AddOn
      * @var array
      */
     private static $__swipestripe_addon_db = [
-        'Type'     => DBVarchar::class,
-        'Priority' => DBInt::class,
-        'Title'    => DBVarchar::class,
-        'Amount'   => DBPrice::class,
+        'Type'       => DBVarchar::class,
+        'Priority'   => DBInt::class,
+        'Title'      => DBVarchar::class,
+        'BaseAmount' => DBPrice::class,
     ];
 
     /**
@@ -67,6 +68,6 @@ trait AddOn
      */
     public function getAmount(): DBPrice
     {
-        return $this->getField('Amount');
+        return $this->BaseAmount;
     }
 }
