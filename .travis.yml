@@ -1,0 +1,14 @@
+language: php
+sudo: false
+dist: trusty
+
+php:
+- 7.1
+- 7.2
+
+before_script:
+- phpenv config-rm xdebug.ini
+
+# Install composer dependencies
+- composer validate
+- composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
