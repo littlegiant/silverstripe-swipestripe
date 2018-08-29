@@ -10,6 +10,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\HasManyList;
+use SwipeStripe\Customer\Customer;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\Price\DBPrice;
@@ -21,8 +22,10 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  * @package SwipeStripe\Order
  * @property bool $IsCart
  * @property bool $CartLocked
- * @property int $PaymentID
  * @property string $GuestToken
+ * @property int $CustomerID
+ * @method null|Customer Customer()
+ * @property int $PaymentID
  * @property null|Payment Payment()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
@@ -50,7 +53,8 @@ class Order extends DataObject
      * @var array
      */
     private static $has_one = [
-        'Payment' => Payment::class,
+        'Customer' => Customer::class,
+        'Payment'  => Payment::class,
     ];
 
     /**

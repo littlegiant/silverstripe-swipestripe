@@ -1,0 +1,8 @@
+---
+After:
+- framework/*
+---
+
+SilverStripe\Security\Member:
+  extensions:
+    - SwipeStripe\Customer\MemberExtension
