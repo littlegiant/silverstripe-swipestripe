@@ -92,7 +92,7 @@ class Order extends DataObject
             }
         }
 
-        return DBPrice::create_field(DBPrice::class, $runningTotal);
+        return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $runningTotal);
     }
 
     /**
@@ -118,7 +118,7 @@ class Order extends DataObject
                 : $money->add($itemAmount);
         }
 
-        return DBPrice::create_field(DBPrice::class, $money);
+        return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
     }
 
     /**

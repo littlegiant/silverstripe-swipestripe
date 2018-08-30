@@ -65,7 +65,7 @@ trait Payable
             }
         }
 
-        return DBPrice::create_field(DBPrice::class, $paidMoney);
+        return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $paidMoney);
     }
 
     /**
@@ -92,7 +92,7 @@ trait Payable
             }
         }
 
-        return DBPrice::create_field(DBPrice::class, $paidMoney);
+        return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $paidMoney);
     }
 
     /**

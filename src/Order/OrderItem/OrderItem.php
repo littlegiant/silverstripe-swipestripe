@@ -85,7 +85,7 @@ class OrderItem extends DataObject
             $money = $money->add($addOn->getAmount()->getMoney());
         }
 
-        return DBPrice::create_field(DBPrice::class, $money);
+        return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
     }
 
     /**
@@ -95,7 +95,7 @@ class OrderItem extends DataObject
     public function getSubTotal(): DBPrice
     {
         $money = $this->getPrice()->getMoney()->multiply($this->getQuantity());
-        return DBPrice::create_field(DBPrice::class, $money);
+        return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
     }
 
     /**

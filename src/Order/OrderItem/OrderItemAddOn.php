@@ -47,7 +47,7 @@ class OrderItemAddOn extends DataObject
         $baseAmount = $this->BaseAmount;
 
         return $this->ApplyPerUnit
-            ? DBPrice::create_field(DBPrice::class, $baseAmount->getMoney()->multiply($this->OrderItem()->getQuantity()))
+            ? DBPrice::create_field(DBPrice::INJECTOR_SPEC, $baseAmount->getMoney()->multiply($this->OrderItem()->getQuantity()))
             : $baseAmount;
     }
 }
