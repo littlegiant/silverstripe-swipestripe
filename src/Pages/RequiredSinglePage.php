@@ -6,6 +6,7 @@ namespace SwipeStripe\Pages;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
 use SilverStripe\Security\Member;
 
 /**
@@ -45,7 +46,10 @@ trait RequiredSinglePage
         parent::requireDefaultRecords();
 
         if (DataObject::get_one(static::class) === null) {
-            $this->getRequiredSinglePage()->write();
+            $page = $this->getRequiredSinglePage();
+            $page->write();
+
+            DB::alteration_message(ClassInfo::shortName($page) . ' created', 'created');
         }
     }
 
