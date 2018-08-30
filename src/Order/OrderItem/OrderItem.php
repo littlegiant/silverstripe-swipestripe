@@ -135,13 +135,17 @@ class OrderItem extends DataObject
     public function setQuantity(int $quantity, bool $writeImmediately = true): self
     {
         if ($quantity > 0 && $this->getQuantity() !== $quantity) {
-            $this->Quantity = $quantity;
+            $this->setField('Quantity', $quantity);
 
             if ($writeImmediately) {
                 $this->write();
             }
-        } elseif ($quantity <= 0 && $this->isInDB()) {
-            $this->delete();
+        } elseif ($quantity <= 0) {
+            $this->setField('Quantity', 0);
+
+            if ($this->isInDB()) {
+                $this->delete();
+            }
         }
 
         return $this;
