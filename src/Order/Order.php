@@ -147,9 +147,9 @@ class Order extends DataObject
         }
 
         $orderItem = OrderItem::create();
-        $orderItem->setPurchasable($item);
-        $orderItem->Quantity = 0;
         $orderItem->OrderID = $this->ID;
+        $orderItem->setPurchasable($item)
+            ->setQuantity(0);
 
         return $orderItem;
     }
@@ -163,6 +163,10 @@ class Order extends DataObject
         $orderItem = $this->getOrderItem($item, false);
 
         if ($orderItem !== null) {
+            if (!$orderItem->IsMutable()) {
+                throw new \BadMethodCallException("Can't change add-ons on locked OrderItem {$orderItem->ID}.");
+            }
+
             $orderItem->OrderItemAddOns()->add($addOn);
         }
     }
@@ -176,6 +180,10 @@ class Order extends DataObject
         $orderItem = $this->getOrderItem($item, false);
 
         if ($orderItem !== null) {
+            if (!$orderItem->IsMutable()) {
+                throw new \BadMethodCallException("Can't change add-ons on locked OrderItem {$orderItem->ID}.");
+            }
+
             $orderItem->OrderItemAddOns()->remove($addOn);
         }
     }

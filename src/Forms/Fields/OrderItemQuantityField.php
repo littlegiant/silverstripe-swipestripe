@@ -44,10 +44,6 @@ class OrderItemQuantityField extends NumericField
     public function saveInto(DataObjectInterface $record)
     {
         if ($record instanceof Order) {
-            if (!$record->IsMutable()) {
-                throw new \InvalidArgumentException('Order passed to ' . __CLASS__ . '::saveInto is not mutable.');
-            }
-
             $orderItemOrderID = intval($this->orderItem->OrderID);
             if ($orderItemOrderID > 0 && $orderItemOrderID === intval($record->ID)) {
                 $record = $this->orderItem;

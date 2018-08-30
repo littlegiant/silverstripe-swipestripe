@@ -121,6 +121,10 @@ class OrderItem extends DataObject
      */
     public function setPurchasable(PurchasableInterface $purchasable): self
     {
+        if (!$this->IsMutable()) {
+            throw new \BadMethodCallException("Cannot set Purchasable on locked OrderItem {$this->ID}.");
+        }
+
         $this->PurchasableClass = $purchasable->ClassName;
         $this->PurchasableID = $purchasable->ID;
 
@@ -134,6 +138,10 @@ class OrderItem extends DataObject
      */
     public function setQuantity(int $quantity, bool $writeImmediately = true): self
     {
+        if (!$this->IsMutable()) {
+            throw new \BadMethodCallException("Cannot set quantity on locked OrderItem {$this->ID}.");
+        }
+
         if ($quantity > 0 && $this->getQuantity() !== $quantity) {
             $this->setField('Quantity', $quantity);
 
@@ -149,5 +157,13 @@ class OrderItem extends DataObject
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function IsMutable(): bool
+    {
+        return $this->Order()->IsMutable();
     }
 }
