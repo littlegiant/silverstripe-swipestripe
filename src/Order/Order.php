@@ -142,7 +142,7 @@ class Order extends DataObject
             OrderItem::PURCHASABLE_ID    => $item->ID,
         ])->first();
 
-        if ($match !== null || !$createIfMissing) {
+        if ($match !== null || !$createIfMissing || !$this->IsMutable()) {
             return $match;
         }
 
