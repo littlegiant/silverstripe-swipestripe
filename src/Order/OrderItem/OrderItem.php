@@ -126,4 +126,24 @@ class OrderItem extends DataObject
 
         return $this;
     }
+
+    /**
+     * @param int $quantity
+     * @param bool $writeImmediately
+     * @return OrderItem
+     */
+    public function setQuantity(int $quantity, bool $writeImmediately = true): self
+    {
+        if ($quantity > 0 && $this->getQuantity() !== $quantity) {
+            $this->Quantity = $quantity;
+
+            if ($writeImmediately) {
+                $this->write();
+            }
+        } elseif ($quantity <= 0 && $this->isInDB()) {
+            $this->delete();
+        }
+
+        return $this;
+    }
 }

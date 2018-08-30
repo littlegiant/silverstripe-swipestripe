@@ -127,20 +127,7 @@ class Order extends DataObject
      */
     public function setPurchasableQuantity(PurchasableInterface $item, int $quantity = 1): void
     {
-        $orderItem = $this->getOrderItem($item);
-
-        if ($quantity <= 0) {
-            if ($orderItem->isInDB()) {
-                $orderItem->delete();
-            }
-
-            return;
-        }
-
-        if ($orderItem->getQuantity() !== $quantity) {
-            $orderItem->Quantity = $quantity;
-            $orderItem->write();
-        }
+        $this->getOrderItem($item)->setQuantity($quantity);
     }
 
     /**
@@ -200,7 +187,7 @@ class Order extends DataObject
      */
     public function canViewOrderPage(?Member $member = null, ?string $guestToken = null): bool
     {
-        if ($this->IsCart) {
+        if ($this->IsMutable()) {
             // No one should be able to view carts as an order
             return false;
         }
@@ -213,6 +200,14 @@ class Order extends DataObject
             ($member !== null && !$this->Customer()->IsGuest() && intval($this->Customer()->MemberID) === intval($member->ID)) ||
             // Allow admins
             Permission::check('ADMIN', 'any', $member);
+    }
+
+    /**
+     * @return bool
+     */
+    public function IsMutable(): bool
+    {
+        return $this->IsCart && !$this->CartLocked;
     }
 
     /**
