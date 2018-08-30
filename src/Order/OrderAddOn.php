@@ -16,10 +16,6 @@ class OrderAddOn extends DataObject
 {
     use AddOn;
 
-    const PRIORITY_EARLY = -1;
-    const PRIORITY_NORMAL = 0;
-    const PRIORITY_LATE = 1;
-
     /**
      * @var string
      */

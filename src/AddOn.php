@@ -6,8 +6,7 @@ namespace SwipeStripe;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Versioned\Versioned;
-use SwipeStripe\Order\OrderAddOn;
-use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\Constants\AddOnPriority;
 use SwipeStripe\Price\DBPrice;
 
 /**
@@ -49,11 +48,7 @@ trait AddOn
      * @var array
      */
     private static $__swipestripe_addon_defaults = [
-        /**
-         * @see OrderAddOn::PRIORITY_NORMAL
-         * @see OrderItemAddOn::PRIORITY_NORMAL
-         */
-        'Priority' => 0,
+        'Priority' => AddOnPriority::NORMAL,
     ];
 
     /**
