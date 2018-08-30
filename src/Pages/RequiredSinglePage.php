@@ -8,6 +8,7 @@ use SilverStripe\Core\ClassInfo;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\Security\Member;
+use SilverStripe\Versioned\Versioned;
 
 /**
  * Trait RequiredSinglePage
@@ -17,6 +18,7 @@ use SilverStripe\Security\Member;
 trait RequiredSinglePage
 {
     /**
+     * No type hints as signature must be compatible with parent definition in DataObject.
      * @see DataObject::canCreate()
      * @param Member|null $member
      * @param array $context
@@ -28,11 +30,22 @@ trait RequiredSinglePage
     }
 
     /**
+     * No type hints as signature must be compatible with parent definition in DataObject.
      * @see DataObject::canDelete()
      * @param Member|null $member
      * @return boolean
      */
     public function canDelete($member = null)
+    {
+        return false;
+    }
+
+    /**
+     * @see Versioned::canUnpublish()
+     * @param Member|null $member
+     * @return bool
+     */
+    public function canUnpublish(?Member $member = null): bool
     {
         return false;
     }
