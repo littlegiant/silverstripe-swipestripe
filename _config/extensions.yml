@@ -5,4 +5,8 @@ After:
 
 SilverStripe\Security\Member:
   extensions:
-    - SwipeStripe\Customer\MemberExtension
+  - SwipeStripe\Customer\MemberExtension
+
+SilverStripe\Omnipay\Model\Payment:
+  extensions:
+  - SwipeStripe\Order\PaymentExtension

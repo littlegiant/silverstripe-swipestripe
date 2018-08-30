@@ -5,6 +5,7 @@ namespace SwipeStripe\Order;
 
 use Money\Money;
 use SilverStripe\Omnipay\Model\Payment;
+use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBVarchar;
@@ -17,7 +18,6 @@ use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Purchasable\PurchasableInterface;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * Class Order
@@ -27,13 +27,13 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  * @property string $GuestToken
  * @property int $CustomerID
  * @method null|Customer Customer()
- * @property int $PaymentID
- * @property null|Payment Payment()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
  */
 class Order extends DataObject
 {
+    use Payable;
+
     const GUEST_TOKEN_BYTES = 16;
 
     /**
@@ -55,7 +55,6 @@ class Order extends DataObject
      */
     private static $has_one = [
         'Customer' => Customer::class,
-        'Payment'  => Payment::class,
     ];
 
     /**
@@ -65,18 +64,6 @@ class Order extends DataObject
         'OrderAddOns' => OrderAddOn::class,
         'OrderItems'  => OrderItem::class,
     ];
-
-    /**
-     * @var array
-     */
-    private static $dependencies = [
-        'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
-    ];
-
-    /**
-     * @var SupportedCurrenciesInterface
-     */
-    public $supportedCurrencies;
 
     /**
      * @inheritDoc
@@ -226,5 +213,14 @@ class Order extends DataObject
             ($member !== null && !$this->Customer()->IsGuest() && intval($this->Customer()->MemberID) === intval($member->ID)) ||
             // Allow admins
             Permission::check('ADMIN', 'any', $member);
+    }
+
+    /**
+     * @param Payment $payment
+     * @param ServiceResponse $response
+     */
+    public function paymentCaptured(Payment $payment, ServiceResponse $response): void
+    {
+        // TODO
     }
 }
