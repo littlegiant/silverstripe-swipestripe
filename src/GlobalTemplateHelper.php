@@ -9,6 +9,7 @@ use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\View\TemplateGlobalProvider;
 use SilverStripe\View\ViewableData;
 use SwipeStripe\Order\Order;
+use SwipeStripe\Pages\HasActiveCart;
 
 /**
  * $SwipeStripe global template helper.
