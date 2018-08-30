@@ -63,7 +63,8 @@ class Customer extends DataObject
         $result = parent::validate();
 
         if (!empty($this->CustomerEmail) && !Email::is_valid_address($this->CustomerEmail)) {
-            $result->addFieldError('Email', 'Email must be a valid email address.');
+            $result->addFieldError('Email',
+                _t(self::class . '.INVALID_EMAIL', 'Email must be a valid email address.'));
         }
 
         return $result;
