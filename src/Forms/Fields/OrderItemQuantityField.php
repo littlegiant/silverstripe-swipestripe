@@ -41,6 +41,29 @@ class OrderItemQuantityField extends NumericField
     /**
      * @inheritDoc
      */
+    public function validate($validator)
+    {
+        if (!parent::validate($validator)) {
+            return false;
+        }
+
+        $availableCount = $this->orderItem->Purchasable()->getAvailableCount();
+        if ($this->value > $availableCount) {
+            $validator->validationError($this->getName(), _t(self::class . '.QUANTITY_EXCEEDS_AVAILABLE',
+                "'{value}' exceeds the available stock ({available_count}).", [
+                    'value'           => $this->value,
+                    'available_count' => $availableCount,
+                ]));
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function saveInto(DataObjectInterface $record)
     {
         if ($record instanceof Order) {
