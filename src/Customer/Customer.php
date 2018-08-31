@@ -36,6 +36,18 @@ class Customer extends DataObject
     /**
      * @var array
      */
+    private static $indexes = [
+        'customer-email-unique' => [
+            'type'    => 'unique',
+            'columns' => [
+                'CustomerEmail',
+            ],
+        ],
+    ];
+
+    /**
+     * @var array
+     */
     private static $has_one = [
         'Member' => Member::class,
     ];
@@ -46,14 +58,6 @@ class Customer extends DataObject
     private static $has_many = [
         'Orders' => Order::class,
     ];
-
-    /**
-     * @return bool
-     */
-    public function IsGuest(): bool
-    {
-        return intval($this->MemberID) <= 0;
-    }
 
     /**
      * @inheritDoc
@@ -78,5 +82,13 @@ class Customer extends DataObject
         return $this->IsGuest()
             ? $this->CustomerEmail
             : $this->Member()->Email;
+    }
+
+    /**
+     * @return bool
+     */
+    public function IsGuest(): bool
+    {
+        return intval($this->MemberID) <= 0;
     }
 }
