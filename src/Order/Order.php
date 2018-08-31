@@ -76,6 +76,18 @@ class Order extends DataObject
     }
 
     /**
+     * Check if a token is a well formed (potentially valid) order token. This should return true for any historic token
+     * generation schemes - i.e. if it's possible $token was generated at any point as a GuestToken, this should return true.
+     * @param null|string $token
+     * @return bool
+     */
+    public function isWellFormedGuestToken(?string $token = null): bool
+    {
+        // bin2hex(GUEST_TOKEN_BYTES) will return 2 characters per byte.
+        return strlen($token) === 2 * static::GUEST_TOKEN_BYTES;
+    }
+
+    /**
      * @param bool $applyOrderAddOns
      * @param bool $applyOrderItemAddOns
      * @return DBPrice
@@ -190,10 +202,10 @@ class Order extends DataObject
 
     /**
      * @param null|Member $member
-     * @param null|string $guestToken
+     * @param string[] $guestTokens
      * @return bool
      */
-    public function canViewOrderPage(?Member $member = null, ?string $guestToken = null): bool
+    public function canViewOrderPage(?Member $member = null, array $guestTokens = []): bool
     {
         if ($this->IsMutable()) {
             // No one should be able to view carts as an order
@@ -203,7 +215,7 @@ class Order extends DataObject
         $member = $member ?? Security::getCurrentUser();
 
         // Allow valid guest token if the customer is a guest
-        return ($guestToken === $this->GuestToken && $this->Customer()->IsGuest()) ||
+        return (in_array($this->GuestToken, $guestTokens, true) && $this->Customer()->IsGuest()) ||
             // Allow if logged in and member owns the customer object
             ($member !== null && !$this->Customer()->IsGuest() && intval($this->Customer()->MemberID) === intval($member->ID)) ||
             // Allow admins
