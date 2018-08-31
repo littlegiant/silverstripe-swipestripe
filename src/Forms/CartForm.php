@@ -7,6 +7,7 @@ use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
+use SilverStripe\ORM\ValidationResult;
 use SwipeStripe\Forms\Fields\OrderItemQuantityField;
 use SwipeStripe\Order\Order;
 
@@ -42,6 +43,12 @@ class CartForm extends BaseForm
         $this->cart = $cart;
 
         parent::__construct($controller, $name);
+
+        if (empty($this->getMessage()) && !$this->cart->IsMutable()) {
+            $this->setMessage(_t(self::class . '.CART_LOCKED',
+                'Your cart is currently locked because there is a checkout in progress. Please complete or cancel the checkout process to modify your cart.'),
+                ValidationResult::TYPE_WARNING);
+        }
     }
 
     /**
