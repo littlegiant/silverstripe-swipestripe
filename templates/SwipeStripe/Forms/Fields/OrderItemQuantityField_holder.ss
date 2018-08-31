@@ -1,8 +1,21 @@
 <div id="$HolderID" class="field<% if $extraClass %> $extraClass<% end_if %>">
     <% with $OrderItem %>
         <div>
-            <h3>{$Title} - {$SubTotal.Nice} [{$Price.Nice} x{$Quantity}]</h3>
+            <h3>{$Title} - {$Total.Nice}</h3>
             <p>{$Description}</p>
+
+            <% if $OrderItemAddOns %>
+                <h4>Base Price: {$SubTotal.Nice} [{$Price.Nice} x{$Quantity}]</h4>
+
+                <h4>Add-ons:</h4>
+                <ul>
+                    <% loop $OrderItemAddOns %>
+                        <li>{$Title} (<strong>{$Amount.Nice}</strong>)</li>
+                    <% end_loop %>
+                </ul>
+            <% else %>
+                <h4>Price: {$SubTotal.Nice} [{$Price.Nice} x{$Quantity}]</h4>
+            <% end_if %>
         </div>
     <% end_with %>
 
