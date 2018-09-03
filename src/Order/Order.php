@@ -160,10 +160,9 @@ class Order extends DataObject
      */
     public function getOrderItem(PurchasableInterface $item, bool $createIfMissing = true): ?OrderItem
     {
-        $match = $this->OrderItems()->filter([
-            OrderItem::PURCHASABLE_CLASS => $item->ClassName,
-            OrderItem::PURCHASABLE_ID    => $item->ID,
-        ])->first();
+        $match = $this->OrderItems()
+            ->filter(OrderItem::PURCHASABLE_CLASS, $item->ClassName)
+            ->find(OrderItem::PURCHASABLE_ID, $item->ID);
 
         if ($match !== null || !$createIfMissing || !$this->IsMutable()) {
             return $match;
@@ -303,6 +302,14 @@ class Order extends DataObject
             $this->CartLocked = false;
             $this->write();
         }, null, false, true);
+    }
+
+    /**
+     * @return bool
+     */
+    public function Empty(): bool
+    {
+        return $this->OrderItems()->count() === 0;
     }
 
     /**

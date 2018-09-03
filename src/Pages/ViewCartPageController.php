@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SwipeStripe\Pages;
 
 use SilverStripe\Forms\Form;
+use SilverStripe\ORM\DataObject;
 use SwipeStripe\Forms\CartForm;
 
 /**
@@ -29,5 +30,15 @@ class ViewCartPageController extends \PageController
     public function CartForm(): Form
     {
         return CartForm::create($this->getActiveCart(), $this);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCheckoutLink(): string
+    {
+        /** @var CheckoutPage $page */
+        $page = DataObject::get_one(CheckoutPage::class);
+        return $page->Link();
     }
 }

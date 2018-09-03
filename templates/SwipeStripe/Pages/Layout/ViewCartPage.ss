@@ -17,4 +17,8 @@
             <td><strong>{$Total.Nice}</strong></td>
         </tr>
     </table>
+
+    <% if not $Empty %>
+        <a href="{$Top.CheckoutLink}">Checkout</a>
+    <% end_if %>
 <% end_with %>

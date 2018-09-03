@@ -82,6 +82,7 @@ class OrderItem extends DataObject
     {
         return !$this->IsMutable() && !empty($this->PurchasableLockedVersion)
             ? Versioned::get_version($this->PurchasableClass, $this->PurchasableID, $this->PurchasableLockedVersion)
+            /** @see OrderItem::$has_one */
             : $this->getComponent('Purchasable');
     }
 
