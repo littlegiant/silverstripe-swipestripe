@@ -20,11 +20,6 @@ class CartForm extends BaseForm
     /**
      *
      */
-    const DEFAULT_NAME = 'CartForm';
-
-    /**
-     *
-     */
     const QUANTITY_FIELD_PATTERN = 'Qty_%d';
 
     /**
