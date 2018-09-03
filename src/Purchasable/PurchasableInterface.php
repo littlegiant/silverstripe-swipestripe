@@ -25,11 +25,6 @@ interface PurchasableInterface extends DataObjectInterface
     public function getDescription(): string;
 
     /**
-     * @return int
-     */
-    public function getAvailableCount(): int;
-
-    /**
      * Unit price.
      * @return DBPrice
      */

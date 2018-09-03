@@ -47,18 +47,9 @@ class OrderItemQuantityField extends NumericField
             return false;
         }
 
-        $availableCount = $this->orderItem->Purchasable()->getAvailableCount();
-        if ($this->value > $availableCount) {
-            $validator->validationError($this->getName(), _t(self::class . '.QUANTITY_EXCEEDS_AVAILABLE',
-                "'{value}' exceeds the available stock ({available_count}).", [
-                    'value'           => $this->value,
-                    'available_count' => $availableCount,
-                ]));
-
-            return false;
-        }
-
-        return true;
+        $valid = true;
+        $this->extend('validate', $valid);
+        return $valid;
     }
 
     /**
@@ -67,12 +58,12 @@ class OrderItemQuantityField extends NumericField
     public function saveInto(DataObjectInterface $record)
     {
         if ($record instanceof Order) {
-            $orderItemOrderID = intval($this->orderItem->OrderID);
+            $orderItemOrderID = intval($this->getOrderItem()->OrderID);
             if ($orderItemOrderID > 0 && $orderItemOrderID === intval($record->ID)) {
-                $record = $this->orderItem;
+                $record = $this->getOrderItem();
             } else {
                 // Order that doesn't contain this order item, can't determine what OrderItem to save to.
-                throw new \InvalidArgumentException("Order passed to " . __CLASS__ . "::saveInto doesn't contain Order item '{$this->orderItem->ID}'.");
+                throw new \InvalidArgumentException("Order passed to " . __CLASS__ . "::saveInto doesn't contain Order item '{$this->getOrderItem()->ID}'.");
             }
         }
 
