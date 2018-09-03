@@ -142,7 +142,7 @@ class OrderItem extends DataObject
             throw new \BadMethodCallException("Cannot set quantity on locked OrderItem {$this->ID}.");
         }
 
-        if ($quantity > 0 && $this->getQuantity() !== $quantity) {
+        if ($quantity > 0 && $this->getQuantity() !== $quantity || !$this->isInDB()) {
             $this->setField('Quantity', $quantity);
 
             if ($writeImmediately) {
