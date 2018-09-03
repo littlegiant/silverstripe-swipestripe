@@ -53,6 +53,16 @@ trait AddOn
 
     /**
      * @internal
+     * @aliasConfig $summary_fields
+     * @var array
+     */
+    private static $__swipestripe_addon_summary_fields = [
+        'Title'       => 'Title',
+        'Amount.Nice' => 'Amount',
+    ];
+
+    /**
+     * @internal
      * @aliasConfig $default_sort
      * @var string
      */

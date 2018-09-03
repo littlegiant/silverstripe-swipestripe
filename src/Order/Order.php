@@ -66,6 +66,14 @@ class Order extends DataObject
     ];
 
     /**
+     * @var array
+     */
+    private static $summary_fields = [
+        'Customer.Email'   => 'Customer Email',
+        'OrderItems.Count' => 'Items',
+    ];
+
+    /**
      * @inheritDoc
      */
     public function populateDefaults()

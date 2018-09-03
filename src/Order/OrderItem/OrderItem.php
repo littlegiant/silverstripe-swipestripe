@@ -58,6 +58,14 @@ class OrderItem extends DataObject
     ];
 
     /**
+     * @var array
+     */
+    private static $summary_fields = [
+        'Title'    => 'Title',
+        'Quantity' => 'Quantity',
+    ];
+
+    /**
      * @inheritDoc
      */
     public function getTitle()
