@@ -13,6 +13,7 @@ use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
+use SwipeStripe\Constants\ShopPermissions;
 use SwipeStripe\Customer\Customer;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
@@ -175,6 +176,14 @@ class Order extends DataObject
     }
 
     /**
+     * @return bool
+     */
+    public function IsMutable(): bool
+    {
+        return $this->IsCart && !$this->CartLocked;
+    }
+
+    /**
      * @param PurchasableInterface $item
      * @param OrderItemAddOn $addOn
      */
@@ -209,6 +218,38 @@ class Order extends DataObject
     }
 
     /**
+     * @inheritDoc
+     */
+    public function canView($member = null)
+    {
+        return parent::canView($member) || Permission::check(ShopPermissions::VIEW_ORDERS, 'any', $member);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canEdit($member = null)
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canDelete($member = null)
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canCreate($member = null, $context = [])
+    {
+        return false;
+    }
+
+    /**
      * @param null|Member $member
      * @param string[] $guestTokens
      * @return bool
@@ -228,14 +269,6 @@ class Order extends DataObject
             ($member !== null && !$this->Customer()->IsGuest() && intval($this->Customer()->MemberID) === intval($member->ID)) ||
             // Allow admins
             Permission::check('ADMIN', 'any', $member);
-    }
-
-    /**
-     * @return bool
-     */
-    public function IsMutable(): bool
-    {
-        return $this->IsCart && !$this->CartLocked;
     }
 
     /**
