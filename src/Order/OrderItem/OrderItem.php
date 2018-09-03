@@ -6,6 +6,7 @@ namespace SwipeStripe\Order\OrderItem;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
+use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Purchasable\PurchasableInterface;
@@ -20,9 +21,9 @@ use SwipeStripe\Purchasable\PurchasableInterface;
  * @property int PurchasableID
  * @property DBPrice $SubTotal
  * @property DBPrice $Total
- * @property string PurchasableClass
+ * @property string $PurchasableClass
+ * @property int $PurchasableLockedVersion
  * @method Order|null Order()
- * @method DataObject|PurchasableInterface Purchasable()
  * @method HasManyList|OrderItemAddOn[] OrderItemAddOns()
  */
 class OrderItem extends DataObject
@@ -39,7 +40,8 @@ class OrderItem extends DataObject
      * @var array
      */
     private static $db = [
-        'Quantity' => DBInt::class,
+        'Quantity'                 => DBInt::class,
+        'PurchasableLockedVersion' => DBInt::class,
     ];
 
     /**
@@ -71,6 +73,16 @@ class OrderItem extends DataObject
     public function getTitle()
     {
         return $this->Purchasable() ? $this->Purchasable()->getTitle() : '';
+    }
+
+    /**
+     * @return DataObject|PurchasableInterface
+     */
+    public function Purchasable(): PurchasableInterface
+    {
+        return !$this->IsMutable() && !empty($this->PurchasableLockedVersion)
+            ? Versioned::get_version($this->PurchasableClass, $this->PurchasableID, $this->PurchasableLockedVersion)
+            : $this->getComponent('Purchasable');
     }
 
     /**
@@ -140,6 +152,14 @@ class OrderItem extends DataObject
     }
 
     /**
+     * @return bool
+     */
+    public function IsMutable(): bool
+    {
+        return $this->Order()->IsMutable();
+    }
+
+    /**
      * @param int $quantity
      * @param bool $writeImmediately
      * @return OrderItem
@@ -165,13 +185,5 @@ class OrderItem extends DataObject
         }
 
         return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function IsMutable(): bool
-    {
-        return $this->Order()->IsMutable();
     }
 }

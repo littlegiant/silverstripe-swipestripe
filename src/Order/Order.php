@@ -7,6 +7,7 @@ use Money\Money;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\HasManyList;
@@ -76,6 +77,7 @@ class Order extends DataObject
 
     /**
      * @inheritDoc
+     * @throws \Exception
      */
     public function populateDefaults()
     {
@@ -269,6 +271,38 @@ class Order extends DataObject
             ($member !== null && !$this->Customer()->IsGuest() && intval($this->Customer()->MemberID) === intval($member->ID)) ||
             // Allow admins
             Permission::check('ADMIN', 'any', $member);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function Lock(): void
+    {
+        DB::get_conn()->withTransaction(function () {
+            foreach ($this->OrderItems() as $item) {
+                $item->PurchasableLockedVersion = $item->Purchasable()->Version;
+                $item->write();
+            }
+
+            $this->CartLocked = true;
+            $this->write();
+        }, null, false, true);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function Unlock(): void
+    {
+        DB::get_conn()->withTransaction(function () {
+            foreach ($this->OrderItems() as $item) {
+                $item->PurchasableLockedVersion = null;
+                $item->write();
+            }
+
+            $this->CartLocked = false;
+            $this->write();
+        }, null, false, true);
     }
 
     /**
