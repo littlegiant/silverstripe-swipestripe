@@ -281,13 +281,25 @@ class Order extends DataObject
 
         DB::get_conn()->withTransaction(function () {
             foreach ($this->OrderItems() as $item) {
-                $item->PurchasableLockedVersion = $item->Purchasable()->Version;
-                $item->write();
+                if ($item->getQuantity() < 1) {
+                    $item->delete();
+                } else {
+                    $item->PurchasableLockedVersion = $item->Purchasable()->Version;
+                    $item->write();
+                }
             }
 
             $this->CartLocked = true;
             $this->write();
         }, null, false, true);
+    }
+
+    /**
+     * @return bool
+     */
+    public function Empty(): bool
+    {
+        return $this->OrderItems()->count() === 0;
     }
 
     /**
@@ -306,14 +318,6 @@ class Order extends DataObject
             $this->CartLocked = false;
             $this->write();
         }, null, false, true);
-    }
-
-    /**
-     * @return bool
-     */
-    public function Empty(): bool
-    {
-        return $this->OrderItems()->count() === 0;
     }
 
     /**
