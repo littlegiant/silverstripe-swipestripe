@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace SwipeStripe\Order;
 
 use SilverStripe\ORM\DataObject;
-use SwipeStripe\AddOn;
 
 /**
  * Class OrderAddOn

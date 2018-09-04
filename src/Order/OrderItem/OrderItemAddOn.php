@@ -5,7 +5,7 @@ namespace SwipeStripe\Order\OrderItem;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
-use SwipeStripe\AddOn;
+use SwipeStripe\Order\AddOn;
 use SwipeStripe\Price\DBPrice;
 
 /**

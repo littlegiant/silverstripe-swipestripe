@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe;
+namespace SwipeStripe\Order;
 
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBVarchar;
@@ -11,7 +11,7 @@ use SwipeStripe\Price\DBPrice;
 
 /**
  * Trait AddOn
- * @package SwipeStripe
+ * @package SwipeStripe\Order
  * @mixin Versioned
  * @property string $Type The type of add-on this is.
  * @property string $Title
