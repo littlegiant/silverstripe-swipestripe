@@ -65,14 +65,8 @@ class CartForm extends BaseForm
         $fields = [];
 
         foreach ($this->cart->OrderItems() as $item) {
-            $qtyField = OrderItemQuantityField::create($item, sprintf(static::QUANTITY_FIELD_PATTERN, $item->ID),
+            $fields[] = OrderItemQuantityField::create($item, sprintf(static::QUANTITY_FIELD_PATTERN, $item->ID),
                 _t(self::class . '.QUANTITY_LABEL', 'Quantity'));
-
-            if (!$item->IsMutable()) {
-                $qtyField->setReadonly(true);
-            }
-
-            $fields[] = $qtyField;
         }
 
         return FieldList::create($fields);

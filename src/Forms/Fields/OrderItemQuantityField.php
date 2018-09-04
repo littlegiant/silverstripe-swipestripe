@@ -28,6 +28,10 @@ class OrderItemQuantityField extends NumericField
     {
         parent::__construct($name, $title, $value ?? $item->getQuantity(), $maxLength, $form);
         $this->orderItem = $item;
+
+        if (!$item->IsMutable()) {
+            $this->setReadonly(true);
+        }
     }
 
     /**
