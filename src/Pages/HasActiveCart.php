@@ -9,6 +9,7 @@ use SwipeStripe\Order\Order;
 
 /**
  * Controller trait to expose active cart.
+ * @property Order $ActiveCart
  * @package SwipeStripe\Pages
  * @mixin Controller
  */

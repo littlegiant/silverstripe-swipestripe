@@ -48,6 +48,6 @@ class GlobalTemplateHelper extends ViewableData implements TemplateGlobalProvide
     {
         /** @var Controller|HasActiveCart $controller */
         $controller = Controller::curr();
-        return $controller->getActiveCart();
+        return $controller->ActiveCart;
     }
 }

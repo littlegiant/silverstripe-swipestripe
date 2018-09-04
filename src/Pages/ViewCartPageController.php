@@ -29,7 +29,7 @@ class ViewCartPageController extends \PageController
      */
     public function CartForm(): Form
     {
-        return CartForm::create($this->getActiveCart(), $this, __FUNCTION__);
+        return CartForm::create($this->ActiveCart, $this, __FUNCTION__);
     }
 
     /**
