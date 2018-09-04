@@ -78,7 +78,7 @@ class OrderItem extends DataObject
     /**
      * @return DataObject|PurchasableInterface
      */
-    public function Purchasable(): PurchasableInterface
+    public function Purchasable(): ?PurchasableInterface
     {
         return !$this->IsMutable() && !empty($this->PurchasableLockedVersion)
             ? Versioned::get_version($this->PurchasableClass, $this->PurchasableID, $this->PurchasableLockedVersion)
