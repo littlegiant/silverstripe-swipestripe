@@ -102,6 +102,17 @@ class Order extends DataObject
     }
 
     /**
+     * @return DBPrice
+     */
+    public function UnpaidTotal(): DBPrice
+    {
+        $cartTotalMoney = $this->Total()->getMoney();
+        $dueMoney = $cartTotalMoney->subtract($this->TotalPaid()->getMoney());
+
+        return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $dueMoney);
+    }
+
+    /**
      * @param bool $applyOrderAddOns
      * @param bool $applyOrderItemAddOns
      * @return DBPrice
