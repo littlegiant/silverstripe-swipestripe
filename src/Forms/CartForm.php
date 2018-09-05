@@ -17,9 +17,6 @@ use SwipeStripe\Order\Order;
  */
 class CartForm extends BaseForm
 {
-    /**
-     *
-     */
     const QUANTITY_FIELD_PATTERN = 'Qty_%d';
 
     /**
@@ -36,25 +33,39 @@ class CartForm extends BaseForm
     public function __construct(Order $cart, ?RequestHandler $controller = null, ?string $name = null)
     {
         $this->cart = $cart;
-
         parent::__construct($controller, $name);
-
-        if (empty($this->getMessage()) && !$this->cart->IsMutable()) {
-            $this->setMessage(_t(self::class . '.CART_LOCKED',
-                'Your cart is currently locked because there is a checkout in progress. Please complete or cancel the checkout process to modify your cart.'),
-                ValidationResult::TYPE_WARNING);
-        }
     }
 
     /**
-     * @param array $data
-     * @param self $form
      * @return HTTPResponse
      */
-    public function UpdateCart(array $data, self $form): HTTPResponse
+    public function UpdateCart(): HTTPResponse
     {
-        $form->saveInto($this->cart);
+        $this->saveInto($this->cart);
         return $this->getController()->redirectBack();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validationResult()
+    {
+        $result = parent::validationResult();
+
+        if (!$this->cart->IsMutable()) {
+            $result->addError(_t(self::class . '.CART_LOCKED',
+                'Your cart is currently locked because there is a checkout in progress. Please complete or cancel the checkout process to modify your cart.'));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return Order
+     */
+    public function getCart(): Order
+    {
+        return $this->cart;
     }
 
     /**
