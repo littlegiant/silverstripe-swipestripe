@@ -341,4 +341,20 @@ class Order extends DataObject
             $this->write();
         }, null, false, true);
     }
+
+    /**
+     * @return string
+     */
+    public function Link(): string
+    {
+        if ($this->IsCart) {
+            /** @var ViewCartPage $page */
+            $page = ViewCartPage::get_one(ViewCartPage::class);
+            return $page->Link();
+        }
+
+        /** @var ViewOrderPage $page */
+        $page = ViewOrderPage::get_one(ViewOrderPage::class);
+        return $page->LinkForOrder($this);
+    }
 }
