@@ -20,8 +20,7 @@
 		"silverstripe/framework": "^4",
 		"silverstripe/versioned": "^1.2",
 		"silverstripe/cms": "^4.2",
-        "silverstripe/silverstripe-omnipay": "dev-feature/omnipay-v3",
-        "hchokshi/silverstripe-trait-config": "^1.0"
+        "silverstripe/silverstripe-omnipay": "dev-feature/omnipay-v3"
     },
     "autoload": {
         "psr-4": {

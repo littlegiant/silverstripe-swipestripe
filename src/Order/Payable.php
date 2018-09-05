@@ -7,41 +7,27 @@ use Money\Currency;
 use Money\Money;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\Omnipay\Model\Payment;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\HasManyList;
 use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Price\DBPrice;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * MoneyPHP alternative of silverstripe-omnipay's Payable extension.
  * @package SwipeStripe\Order
+ * @property Order $owner
  * @see \SilverStripe\Omnipay\Extensions\Payable
  * @method HasManyList|Payment[] Payments()
  */
-trait Payable
+class Payable extends DataExtension
 {
     /**
-     * @internal
-     * @aliasConfig $has_many
      * @var array
      */
-    private static $__swipestripe_payable_has_many = [
+    private static $has_many = [
         'Payments' => Payment::class,
     ];
-
-    /**
-     * @internal
-     * @aliasConfig $dependencies
-     * @var array
-     */
-    private static $__swipestripe_payable_dependencies = [
-        'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
-    ];
-
-    /**
-     * @var SupportedCurrenciesInterface
-     */
-    public $supportedCurrencies;
 
     /**
      * Get the total captured amount
@@ -50,18 +36,19 @@ trait Payable
      */
     public function TotalPaid(): DBPrice
     {
-        $paidMoney = new Money(0, $this->supportedCurrencies->getDefaultCurrency());
+        $paidMoney = new Money(0, $this->owner->supportedCurrencies->getDefaultCurrency());
 
-        if ($this->exists()) {
-            foreach ($this->Payments() as $payment) {
-                if ($payment->Status === PaymentStatus::CAPTURED) {
-                    $paymentMoney = $this->supportedCurrencies->parseDecimal(new Currency($payment->getCurrency()),
-                        $payment->getAmount());
+        if ($this->owner->exists()) {
+            /** @var DataList|Payment[] $payments */
+            $payments = $this->owner->Payments()->filter('Status', PaymentStatus::CAPTURED);
 
-                    $paidMoney = $paidMoney->isZero()
-                        ? $paymentMoney
-                        : $paidMoney->add($paymentMoney);
-                }
+            foreach ($payments as $payment) {
+                $paymentMoney = $this->owner->supportedCurrencies->parseDecimal(new Currency($payment->getCurrency()),
+                    $payment->getAmount());
+
+                $paidMoney = $paidMoney->isZero()
+                    ? $paymentMoney
+                    : $paidMoney->add($paymentMoney);
             }
         }
 
@@ -75,14 +62,21 @@ trait Payable
      */
     public function TotalPaidOrAuthorized(): DBPrice
     {
-        $paidMoney = new Money(0, $this->supportedCurrencies->getDefaultCurrency());
+        $paidMoney = new Money(0, $this->owner->supportedCurrencies->getDefaultCurrency());
 
-        if ($this->exists()) {
-            foreach ($this->Payments() as $payment) {
+        if ($this->owner->exists()) {
+            /** @var DataList|Payment[] $payments */
+            $payments = $this->owner->Payments()->filter([
+                'Status' => [
+                    PaymentStatus::CAPTURED,
+                    PaymentStatus::AUTHORIZED,
+                ],
+            ]);
+
+            foreach ($payments as $payment) {
                 // Captured and non-manual authorized payments count towards the total
-                if ($payment->Status === PaymentStatus::CAPTURED ||
-                    ($payment->Status === PaymentStatus::AUTHORIZED && !GatewayInfo::isManual($payment->Gateway))) {
-                    $paymentMoney = $this->supportedCurrencies->parseDecimal(new Currency($payment->getCurrency()),
+                if ($payment->Status !== PaymentStatus::AUTHORIZED || !GatewayInfo::isManual($payment->Gateway)) {
+                    $paymentMoney = $this->owner->supportedCurrencies->parseDecimal(new Currency($payment->getCurrency()),
                         $payment->getAmount());
 
                     $paidMoney = $paidMoney->isZero()
@@ -103,7 +97,7 @@ trait Payable
      */
     public function HasPendingPayments(): bool
     {
-        return $this->Payments()->filter('Status', [
+        return $this->owner->Payments()->filter('Status', [
             PaymentStatus::PENDING_AUTHORIZATION,
             PaymentStatus::PENDING_PURCHASE,
             PaymentStatus::PENDING_CAPTURE,

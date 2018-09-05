@@ -38,7 +38,7 @@ class OrderTest extends SapphireTest
 
         $addOn = OrderAddOn::create();
         $addOn->OrderID = $order->ID;
-        $addOn->BaseAmount = new Money(10, $this->currency);
+        $addOn->BaseAmount->setValue(new Money(10, $this->currency));
         $addOn->write();
 
         $this->assertTrue($order->Total(false)->getMoney()->equals(new Money(0, $this->currency)));

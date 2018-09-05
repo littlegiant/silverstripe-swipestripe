@@ -22,6 +22,7 @@ use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Purchasable\PurchasableInterface;
+use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * Class Order
@@ -34,11 +35,10 @@ use SwipeStripe\Purchasable\PurchasableInterface;
  * @method null|Customer Customer()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
+ * @mixin Payable
  */
 class Order extends DataObject
 {
-    use Payable;
-
     const GUEST_TOKEN_BYTES = 16;
 
     /**
@@ -73,10 +73,29 @@ class Order extends DataObject
     /**
      * @var array
      */
+    private static $extensions = [
+        Payable::class,
+    ];
+
+    /**
+     * @var array
+     */
     private static $summary_fields = [
         'Customer.Email'   => 'Customer Email',
         'OrderItems.Count' => 'Items',
     ];
+
+    /**
+     * @var array
+     */
+    private static $dependencies = [
+        'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
+    ];
+
+    /**
+     * @var SupportedCurrenciesInterface
+     */
+    public $supportedCurrencies;
 
     /**
      * @inheritDoc
@@ -172,6 +191,14 @@ class Order extends DataObject
     }
 
     /**
+     * @return bool
+     */
+    public function IsMutable(): bool
+    {
+        return $this->IsCart && !$this->CartLocked;
+    }
+
+    /**
      * @param PurchasableInterface $item
      * @param bool $createIfMissing
      * @return null|OrderItem
@@ -229,14 +256,6 @@ class Order extends DataObject
         $this->OrderItems()->removeByID($itemID);
 
         return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function IsMutable(): bool
-    {
-        return $this->IsCart && !$this->CartLocked;
     }
 
     /**

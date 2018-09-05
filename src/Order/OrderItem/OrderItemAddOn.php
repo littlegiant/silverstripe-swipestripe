@@ -5,7 +5,10 @@ namespace SwipeStripe\Order\OrderItem;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
-use SwipeStripe\Order\AddOn;
+use SilverStripe\ORM\FieldType\DBInt;
+use SilverStripe\ORM\FieldType\DBVarchar;
+use SilverStripe\Versioned\Versioned;
+use SwipeStripe\Constants\AddOnPriority;
 use SwipeStripe\Price\DBPrice;
 
 /**
@@ -13,13 +16,17 @@ use SwipeStripe\Price\DBPrice;
  * not to the unit price (i.e. add-on is not applied $quantity times).
  * @package SwipeStripe\Order\OrderItem
  * @property bool $ApplyPerUnit
+ * @property string $Type The type of add-on this is.
+ * @property string $Title
+ * @property int $Priority
+ * @property DBPrice $BaseAmount
+ * @property DBPrice $Amount
  * @property int $OrderItemID
  * @method null|OrderItem OrderItem()
+ * @mixin Versioned
  */
 class OrderItemAddOn extends DataObject
 {
-    use AddOn;
-
     /**
      * @var string
      */
@@ -29,7 +36,11 @@ class OrderItemAddOn extends DataObject
      * @var array
      */
     private static $db = [
+        'Type'         => DBVarchar::class,
+        'Priority'     => DBInt::class,
+        'Title'        => DBVarchar::class,
         'ApplyPerUnit' => DBBoolean::class,
+        'BaseAmount'   => DBPrice::class,
     ];
 
     /**
@@ -38,6 +49,33 @@ class OrderItemAddOn extends DataObject
     private static $has_one = [
         'OrderItem' => OrderItem::class,
     ];
+
+    /**
+     * @var array
+     */
+    private static $extensions = [
+        Versioned::class => Versioned::class . '.versioned',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $defaults = [
+        'Priority' => AddOnPriority::NORMAL,
+    ];
+
+    /**
+     * @var array
+     */
+    private static $summary_fields = [
+        'Title'       => 'Title',
+        'Amount.Nice' => 'Amount',
+    ];
+
+    /**
+     * @var string
+     */
+    private static $default_sort = 'Priority ASC';
 
     /**
      * @inheritDoc
