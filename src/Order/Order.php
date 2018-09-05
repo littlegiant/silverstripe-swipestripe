@@ -30,6 +30,7 @@ use SwipeStripe\Purchasable\PurchasableInterface;
  * @property bool $CartLocked
  * @property string $GuestToken
  * @property int $CustomerID
+ * @property string $Hash
  * @method null|Customer Customer()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
@@ -301,7 +302,7 @@ class Order extends DataObject
      */
     public function Empty(): bool
     {
-        return $this->OrderItems()->count() === 0;
+        return !$this->OrderItems()->exists();
     }
 
     /**
@@ -356,5 +357,42 @@ class Order extends DataObject
         /** @var ViewOrderPage $page */
         $page = ViewOrderPage::get_one(ViewOrderPage::class);
         return $page->LinkForOrder($this);
+    }
+
+    /**
+     * @return string
+     */
+    public function getHash(): string
+    {
+        $data = [
+            $this->ID,
+        ];
+
+        foreach ($this->OrderItems() as $item) {
+            $data[] = [
+                $item->ID,
+                $item->Quantity,
+                $item->Price,
+                $item->Total,
+            ];
+
+            foreach ($item->OrderItemAddOns() as $addOn) {
+                $data[] = [
+                    $addOn->ID,
+                    $addOn->Priority,
+                    $addOn->Amount,
+                ];
+            }
+        }
+
+        foreach ($this->OrderAddOns() as $addOn) {
+            $data[] = [
+                $addOn->ID,
+                $addOn->Priority,
+                $addOn->Amount,
+            ];
+        }
+
+        return md5(json_encode($data));
     }
 }

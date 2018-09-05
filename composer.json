@@ -16,6 +16,7 @@
 	"require": {
 		"php": ">=7.1",
 		"ext-intl": "*",
+		"ext-json": "*",
 		"silverstripe/framework": "^4",
 		"silverstripe/versioned": "^1.2",
 		"silverstripe/cms": "^4.2",
