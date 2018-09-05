@@ -1,8 +1,8 @@
 <% include SwipeStripe/CartTotalSummary Cart=$SwipeStripe.ActiveCart %>
 
 <% with $CheckoutForm %>
-    <% if $HasPaymentError %>
-        <h3><%t SwipeStripe\\Forms\\CheckoutForm.PAYMENT_ERROR 'Sorry, it looks like there was an error processing your payment.' %></h3>
+    <% if $PaymentError %>
+        <h3>{$PaymentError}</h3>
     <% end_if %>
 
     {$Me}

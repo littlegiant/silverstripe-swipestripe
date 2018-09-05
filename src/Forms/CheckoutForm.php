@@ -13,8 +13,12 @@ use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\SingleSelectField;
 use SilverStripe\Omnipay\GatewayFieldsFactory;
 use SilverStripe\Omnipay\GatewayInfo;
+use SilverStripe\Omnipay\Model\Message\CompletePurchaseError;
+use SilverStripe\Omnipay\Model\Message\PaymentMessage;
+use SilverStripe\Omnipay\Model\Message\PurchaseError;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
+use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Pages\OrderConfirmationPage;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
@@ -22,7 +26,7 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 /**
  * Class CheckoutForm
  * @package SwipeStripe\Forms
- * @property string|null $PaymentError
+ * @property Payment|null $PaymentError
  */
 class CheckoutForm extends BaseForm
 {
@@ -48,6 +52,11 @@ class CheckoutForm extends BaseForm
     protected $cart;
 
     /**
+     * @var null|string|false
+     */
+    protected $paymentError = null;
+
+    /**
      * @inheritdoc
      * @throws \Exception
      */
@@ -62,11 +71,43 @@ class CheckoutForm extends BaseForm
     }
 
     /**
-     * @return bool
+     * @return null|string
      */
-    public function HasPaymentError(): bool
+    public function getPaymentError(): ?string
     {
-        return boolval($this->getRequest()->getVar(static::PAYMENT_ID_QUERY_PARAM));
+        if ($this->paymentError !== null) {
+            // paymentError = false means cached result of "no error"
+            return $this->paymentError ?: null;
+        }
+
+        $paymentIdentifier = $this->getRequest()->getVar(static::PAYMENT_ID_QUERY_PARAM);
+
+        if (empty($paymentIdentifier)) {
+            // No payment query param
+            $this->paymentError = false;
+            return null;
+        }
+
+        /** @var Payment|null $payment */
+        $payment = $this->cart->Payments()->find('Identifier', $paymentIdentifier);
+        $defaultMessage = _t(self::class . '.PAYMENT_ERROR', 'There was an error processing your payment. Please try again.');
+
+        if ($payment === null) {
+            // No payment with that identifier for this order, can't show error
+            $errorMessage = false;
+        } elseif ($payment->Status === PaymentStatus::VOID) {
+            // Void status is returned for cancelled or declined card
+            $errorMessage = $defaultMessage;
+        } else {
+            /** @var PaymentMessage|null $message */
+            $message = $payment->Messages()->last();
+            $errorMessage = $message instanceof PurchaseError || $message instanceof CompletePurchaseError
+                ? $message->Message
+                : $defaultMessage;
+        }
+
+        $this->paymentError = $errorMessage;
+        return $errorMessage ?: null;
     }
 
     /**
@@ -148,7 +189,7 @@ class CheckoutForm extends BaseForm
         }
 
         return $this->getController()->Link() . '?' . http_build_query([
-                static::PAYMENT_ID_QUERY_PARAM => $payment->ID,
+                static::PAYMENT_ID_QUERY_PARAM => $payment->Identifier,
             ]);
     }
 
