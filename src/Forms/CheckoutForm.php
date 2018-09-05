@@ -54,15 +54,11 @@ class CheckoutForm extends BaseForm
     public function __construct(Order $cart, ?RequestHandler $controller = null, ?string $name = null)
     {
         $this->cart = $cart;
+        $cart->Unlock();
 
         parent::__construct($controller, $name, RequiredFields::create([
             static::PAYMENT_METHOD_FIELD,
         ]));
-
-        if ($this->HasPaymentError()) {
-            // When redirected back with a payment error, unlock the cart again
-            $cart->Unlock();
-        }
     }
 
     /**

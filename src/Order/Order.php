@@ -382,7 +382,7 @@ class Order extends DataObject
      */
     public function Unlock(): void
     {
-        if (!$this->CartLocked) return;
+        if (!$this->IsCart || !$this->CartLocked) return;
 
         DB::get_conn()->withTransaction(function () {
             foreach ($this->OrderItems() as $item) {
