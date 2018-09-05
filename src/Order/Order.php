@@ -162,8 +162,12 @@ class Order extends DataObject
      * @param PurchasableInterface $item
      * @param int $quantity
      */
-    public function setPurchasableQuantity(PurchasableInterface $item, int $quantity = 1): void
+    public function setItemQuantity(PurchasableInterface $item, int $quantity = 1): void
     {
+        if (!$this->IsMutable()) {
+            throw new \BadMethodCallException("Can't change items on locked Order {$this->ID}.");
+        }
+
         $this->getOrderItem($item)->setQuantity($quantity);
     }
 
@@ -188,6 +192,43 @@ class Order extends DataObject
             ->setQuantity(0);
 
         return $orderItem;
+    }
+
+    /**
+     * @param PurchasableInterface $item
+     * @param int $quantity
+     * @return $this
+     */
+    public function addItem(PurchasableInterface $item, int $quantity = 1): self
+    {
+        if (!$this->IsMutable()) {
+            throw new \BadMethodCallException("Can't change items on locked Order {$this->ID}.");
+        }
+
+        $item = $this->getOrderItem($item);
+        $item->setQuantity($item->getQuantity() + $quantity);
+        return $this;
+    }
+
+    /**
+     * @param int|OrderItem|PurchasableInterface $item OrderItem ID, OrderItem instance or PurchasableInterface instance.
+     * @return $this
+     */
+    public function removeItem($item): self
+    {
+        if (!$this->IsMutable()) {
+            throw new \BadMethodCallException("Can't change items on locked Order {$this->ID}.");
+        }
+
+        if ($item instanceof PurchasableInterface) {
+            $item = $this->getOrderItem($item, false);
+            if ($item === null) return $this;
+        }
+
+        $itemID = is_int($item) ? $item : $item->ID;
+        $this->OrderItems()->removeByID($itemID);
+
+        return $this;
     }
 
     /**

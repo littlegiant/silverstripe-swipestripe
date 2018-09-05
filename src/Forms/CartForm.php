@@ -71,18 +71,14 @@ class CartForm extends BaseForm
     public function RemoveOrderItem(array $data): HTTPResponse
     {
         $orderItemID = intval($data[static::REMOVE_ITEM_ARG] ?? 0);
-        /** @var OrderItem|null $orderItem */
-        $orderItem = $orderItemID > 0
-            ? $this->cart->OrderItems()->byID($orderItemID)
-            : null;
 
-        if ($orderItem !== null) {
-            if (!$orderItem->IsMutable()) {
+        if ($orderItemID > 0) {
+            try {
+                $this->cart->removeItem($orderItemID);
+            } catch (\BadMethodCallException $e) {
                 throw new ValidationException(ValidationResult::create()->addError(_t(self::class . '.CART_LOCKED',
                     'Your cart is currently locked because there is a checkout in progress. Please complete or cancel the checkout process to modify your cart.')));
             }
-
-            $orderItem->delete();
         }
 
         return $this->getController()->redirectBack();
