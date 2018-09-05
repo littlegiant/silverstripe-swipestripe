@@ -18,6 +18,8 @@ use SwipeStripe\Constants\ShopPermissions;
 use SwipeStripe\Customer\Customer;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\Pages\ViewCartPage;
+use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Purchasable\PurchasableInterface;
 
@@ -303,6 +305,26 @@ class Order extends DataObject
     }
 
     /**
+     * @param Payment $payment
+     * @param ServiceResponse $response
+     */
+    public function paymentCaptured(Payment $payment, ServiceResponse $response): void
+    {
+        $this->IsCart = false;
+        $this->write();
+        // TODO - email customer
+    }
+
+    /**
+     * @param null|Payment $payment
+     * @throws \Exception
+     */
+    public function paymentCancelled(?Payment $payment): void
+    {
+        $this->Unlock();
+    }
+
+    /**
      * @throws \Exception
      */
     public function Unlock(): void
@@ -318,14 +340,5 @@ class Order extends DataObject
             $this->CartLocked = false;
             $this->write();
         }, null, false, true);
-    }
-
-    /**
-     * @param Payment $payment
-     * @param ServiceResponse $response
-     */
-    public function paymentCaptured(Payment $payment, ServiceResponse $response): void
-    {
-        // TODO
     }
 }
