@@ -4,14 +4,18 @@ declare(strict_types=1);
 namespace SwipeStripe\Forms\Fields;
 
 use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\ORM\DataObjectInterface;
+use SwipeStripe\Forms\CartForm;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
 
 /**
  * Class OrderItemQuantityField
  * @package SwipeStripe\Forms\Fields
+ * @property CartForm $form
+ * @method CartForm getForm()
  */
 class OrderItemQuantityField extends NumericField
 {
@@ -19,6 +23,11 @@ class OrderItemQuantityField extends NumericField
      * @var OrderItem
      */
     protected $orderItem;
+
+    /**
+     * @var FormAction
+     */
+    protected $removeAction;
 
     /**
      * @inheritDoc
@@ -32,14 +41,6 @@ class OrderItemQuantityField extends NumericField
         if (!$item->IsMutable()) {
             $this->setReadonly(true);
         }
-    }
-
-    /**
-     * @return OrderItem
-     */
-    public function getOrderItem(): OrderItem
-    {
-        return $this->orderItem;
     }
 
     /**
@@ -76,5 +77,31 @@ class OrderItemQuantityField extends NumericField
         } else {
             parent::saveInto($record);
         }
+    }
+
+    /**
+     * @return OrderItem
+     */
+    public function getOrderItem(): OrderItem
+    {
+        return $this->orderItem;
+    }
+
+    /**
+     * @return null|FormAction
+     */
+    public function getRemoveAction(): ?FormAction
+    {
+        return $this->removeAction;
+    }
+
+    /**
+     * @param FormAction $removeAction
+     * return $this
+     */
+    public function setRemoveAction(FormAction $removeAction): self
+    {
+        $this->removeAction = $removeAction;
+        return $this;
     }
 }

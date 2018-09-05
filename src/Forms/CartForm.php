@@ -7,9 +7,11 @@ use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
+use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\ValidationResult;
 use SwipeStripe\Forms\Fields\OrderItemQuantityField;
 use SwipeStripe\Order\Order;
+use SwipeStripe\Order\OrderItem\OrderItem;
 
 /**
  * Class CartForm
@@ -18,6 +20,8 @@ use SwipeStripe\Order\Order;
 class CartForm extends BaseForm
 {
     const QUANTITY_FIELD_PATTERN = 'Qty_%d';
+    const REMOVE_ITEM_ACTION = 'RemoveOrderItem';
+    const REMOVE_ITEM_ARG = 'OrderItemID';
 
     /**
      * @var Order
@@ -61,6 +65,30 @@ class CartForm extends BaseForm
     }
 
     /**
+     * @param array $data
+     * @return HTTPResponse
+     */
+    public function RemoveOrderItem(array $data): HTTPResponse
+    {
+        $orderItemID = intval($data[static::REMOVE_ITEM_ARG] ?? 0);
+        /** @var OrderItem|null $orderItem */
+        $orderItem = $orderItemID > 0
+            ? $this->cart->OrderItems()->byID($orderItemID)
+            : null;
+
+        if ($orderItem !== null) {
+            if (!$orderItem->IsMutable()) {
+                throw new ValidationException(ValidationResult::create()->addError(_t(self::class . '.CART_LOCKED',
+                    'Your cart is currently locked because there is a checkout in progress. Please complete or cancel the checkout process to modify your cart.')));
+            }
+
+            $orderItem->delete();
+        }
+
+        return $this->getController()->redirectBack();
+    }
+
+    /**
      * @return Order
      */
     public function getCart(): Order
@@ -77,10 +105,23 @@ class CartForm extends BaseForm
 
         foreach ($this->cart->OrderItems() as $item) {
             $fields[] = OrderItemQuantityField::create($item, sprintf(static::QUANTITY_FIELD_PATTERN, $item->ID),
-                _t(self::class . '.QUANTITY_LABEL', 'Quantity'));
+                _t(self::class . '.QUANTITY_LABEL', 'Quantity'))
+                ->setRemoveAction($this->getRemoveActionFor($item));
         }
 
         return FieldList::create($fields);
+    }
+
+    /**
+     * @param OrderItem $item
+     * @return FormAction
+     */
+    protected function getRemoveActionFor(OrderItem $item): FormAction
+    {
+        return FormAction::create(static::REMOVE_ITEM_ACTION . '?' . static::REMOVE_ITEM_ARG . "={$item->ID}",
+            _t(self::class . '.REMOVE_ITEM', 'Remove'))
+            // Disable if item is immutable
+            ->setDisabled(!$item->IsMutable());
     }
 
     /**
