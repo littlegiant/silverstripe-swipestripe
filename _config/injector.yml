@@ -1,3 +1,7 @@
+---
+Name: injector
+---
+
 SilverStripe\Core\Injector\Injector:
   Price:
     class: SwipeStripe\Price\DBPrice
