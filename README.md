@@ -1,4 +1,6 @@
 # Swipestripe Ecommerce Module
+[![Build Status](https://travis-ci.org/littlegiant/silverstripe-swipestripe.svg?branch=5.0)](https://travis-ci.org/littlegiant/silverstripe-swipestripe)
+[![Coverage Status](https://coveralls.io/repos/github/littlegiant/silverstripe-swipestripe/badge.svg?branch=5.0)](https://coveralls.io/github/littlegiant/silverstripe-swipestripe?branch=5.0)
 
 ## Maintainer Contact
 SwipeStripe  
