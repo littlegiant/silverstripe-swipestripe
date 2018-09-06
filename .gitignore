@@ -25,7 +25,18 @@ intermediate
 publish
 less
 
+# SilverStripe files
 /vendor
 /resources
 /.env
+
+# Require-dev recipe/cms
+/app
+/.htaccess
+/index.php
+/install.php
+/install-frameworkmissing.html
+/web.config
+
+# Test artifacts
 /build/logs

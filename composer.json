@@ -1,29 +1,36 @@
 {
-	"name": "swipestripe/swipestripe",
-	"description": "Ecommerce module to create online shops using SilverStripe.",
-	"homepage": "http://swipestripe.com",
-	"license": "BSD-3-Clause",
-	"type": "silverstripe-vendormodule",
-	"keywords": ["silverstripe", "ecommerce", "e-commerce", "shop", "swipestripe", "swipe stripe"],
-	"authors": [
-		{
-			"name": "Frank Mullenger",
-			"email": "frankmullenger@gmail.com"
-		},
-		{
-			"name": "Harsh Chokshi",
-			"email": "harsh.chokshi@littlegiant.co.nz"
-		}
-	],
-	"minimum-stability": "dev",
-	"prefer-stable": true,
-	"require": {
-		"php": ">=7.1",
-		"ext-intl": "*",
-		"ext-json": "*",
-		"silverstripe/framework": "^4.2",
-		"silverstripe/versioned": "^1.2",
-		"silverstripe/cms": "^4.2",
+    "name": "swipestripe/swipestripe",
+    "description": "Ecommerce module to create online shops using SilverStripe.",
+    "homepage": "http://swipestripe.com",
+    "license": "BSD-3-Clause",
+    "type": "silverstripe-vendormodule",
+    "keywords": [
+        "silverstripe",
+        "ecommerce",
+        "e-commerce",
+        "shop",
+        "swipestripe",
+        "swipe stripe"
+    ],
+    "authors": [
+        {
+            "name": "Frank Mullenger",
+            "email": "frankmullenger@gmail.com"
+        },
+        {
+            "name": "Harsh Chokshi",
+            "email": "harsh.chokshi@littlegiant.co.nz"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.1",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "silverstripe/framework": "^4.2",
+        "silverstripe/versioned": "^1.2",
+        "silverstripe/cms": "^4.2",
         "silverstripe/silverstripe-omnipay": "dev-feature/omnipay-v3"
     },
     "autoload": {
@@ -34,18 +41,14 @@
     "autoload-dev": {
         "psr-4": {
             "SwipeStripe\\Tests\\": "tests/"
-        },
-		"classmap": [
-			"tests/Page.php",
-			"tests/PageController.php"
-		]
-	},
-	"support": {
-		"email": "info@swipestripe.com",
-		"irc": "irc://irc.freenode.org/silverstripe",
-		"forum": "http://www.silverstripe.org/e-commerce-modules/",
-		"issues": "https://github.com/frankmullenger/silverstripe-swipestripe/issues"
-	},
+        }
+    },
+    "support": {
+        "email": "info@swipestripe.com",
+        "irc": "irc://irc.freenode.org/silverstripe",
+        "forum": "http://www.silverstripe.org/e-commerce-modules/",
+        "issues": "https://github.com/frankmullenger/silverstripe-swipestripe/issues"
+    },
     "repositories": [
         {
             "type": "vcs",
@@ -55,6 +58,7 @@
     "require-dev": {
         "php-http/guzzle6-adapter": "^1.1",
         "phpunit/phpunit": "^5.7",
-		"php-coveralls/php-coveralls": "^2.1"
+        "php-coveralls/php-coveralls": "^2.1",
+        "silverstripe/recipe-cms": "^4.2"
     }
 }
