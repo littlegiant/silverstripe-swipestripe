@@ -7,6 +7,10 @@
 	"keywords": ["silverstripe", "ecommerce", "e-commerce", "shop", "swipestripe", "swipe stripe"],
 	"authors": [
 		{
+			"name": "Frank Mullenger",
+			"email": "frankmullenger@gmail.com"
+		},
+		{
 			"name": "Harsh Chokshi",
 			"email": "harsh.chokshi@littlegiant.co.nz"
 		}
