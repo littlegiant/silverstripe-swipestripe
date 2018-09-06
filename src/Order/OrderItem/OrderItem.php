@@ -8,8 +8,8 @@ use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Order\Order;
+use SwipeStripe\Order\PurchasableInterface;
 use SwipeStripe\Price\DBPrice;
-use SwipeStripe\Purchasable\PurchasableInterface;
 
 /**
  * Class OrderItem

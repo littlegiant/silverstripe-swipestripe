@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Purchasable;
+namespace SwipeStripe\Order;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
@@ -10,7 +10,7 @@ use SwipeStripe\Price\DBPrice;
 
 /**
  * Interface PurchasableInterface
- * @package SwipeStripe\Purchasable
+ * @package SwipeStripe\Order
  * @mixin DataObject
  * @mixin Versioned
  */
