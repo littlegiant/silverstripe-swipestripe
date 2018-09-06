@@ -1,0 +1,13 @@
+---
+Name: extensions
+After:
+- framework/*
+---
+
+SilverStripe\Security\Member:
+  extensions:
+  - SwipeStripe\Customer\MemberExtension
+
+SilverStripe\Omnipay\Model\Payment:
+  extensions:
+  - SwipeStripe\Order\PaymentExtension

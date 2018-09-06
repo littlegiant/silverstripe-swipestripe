@@ -1,0 +1,13 @@
+---
+Name: injector
+---
+
+SilverStripe\Core\Injector\Injector:
+  Price:
+    class: SwipeStripe\Price\DBPrice
+
+  SwipeStripe\SupportedCurrencies\AbstractSupportedCurrencies.DefaultSubUnitSource:
+    class: Money\Currencies\ISOCurrencies
+
+  SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface:
+    class: SwipeStripe\SupportedCurrencies\SingleSupportedCurrency
