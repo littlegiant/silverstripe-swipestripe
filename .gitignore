@@ -37,6 +37,3 @@ less
 /install.php
 /install-frameworkmissing.html
 /web.config
-
-# Test artifacts
-/build/logs
