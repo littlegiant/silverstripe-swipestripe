@@ -4,7 +4,7 @@ Standard module phpunit configuration.
 Requires PHPUnit ^5.7
 -->
 <phpunit bootstrap="vendor/silverstripe/framework/tests/bootstrap.php" colors="true">
-    <testsuite name="Default">
+    <testsuite name="SwipeStripe Core">
         <directory>tests/</directory>
     </testsuite>
     <filter>
