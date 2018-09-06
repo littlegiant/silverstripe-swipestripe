@@ -17,7 +17,7 @@
 		"php": ">=7.1",
 		"ext-intl": "*",
 		"ext-json": "*",
-		"silverstripe/framework": "^4",
+		"silverstripe/framework": "^4.2",
 		"silverstripe/versioned": "^1.2",
 		"silverstripe/cms": "^4.2",
         "silverstripe/silverstripe-omnipay": "dev-feature/omnipay-v3"
