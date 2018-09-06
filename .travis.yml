@@ -1,0 +1,15 @@
+language: php
+sudo: false
+dist: trusty
+
+php:
+- 7.1
+- 7.2
+
+before_script:
+# Install composer dependencies
+- composer validate
+- composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
+
+after_success:
+- travis_retry php vendor/bin/php-coveralls -v
