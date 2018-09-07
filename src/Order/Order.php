@@ -140,7 +140,7 @@ class Order extends DataObject
         $subTotal = $this->SubTotal($applyOrderItemAddOns)->getMoney();
         $runningTotal = $subTotal;
 
-        if ($applyOrderAddOns) {
+        if ($applyOrderAddOns && !$this->Empty()) {
             /** @var OrderAddOn $addOn */
             foreach ($this->OrderAddOns() as $addOn) {
                 $runningTotal = $runningTotal->add($addOn->getAmount()->getMoney());

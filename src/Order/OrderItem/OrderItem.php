@@ -102,8 +102,10 @@ class OrderItem extends DataObject
     {
         $money = $this->getSubTotal()->getMoney();
 
-        foreach ($this->OrderItemAddOns() as $addOn) {
-            $money = $money->add($addOn->getAmount()->getMoney());
+        if ($this->getQuantity() > 0) {
+            foreach ($this->OrderItemAddOns() as $addOn) {
+                $money = $money->add($addOn->getAmount()->getMoney());
+            }
         }
 
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
