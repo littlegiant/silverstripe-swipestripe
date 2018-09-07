@@ -12,6 +12,7 @@ use SilverStripe\Omnipay\Model\Payment;
 use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
+use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
@@ -68,8 +69,24 @@ class OrderTest extends SapphireTest
         $addOn->BaseAmount->setValue(new Money(10, $this->currency));
         $addOn->write();
 
+        // Not applied for empty cart
         $this->assertTrue($order->Total(false)->getMoney()->equals(new Money(0, $this->currency)));
-        $this->assertTrue($order->Total()->getMoney()->equals(new Money(10, $this->currency)));
+        $this->assertTrue($order->Total()->getMoney()->isZero());
+
+        $product = TestProduct::create();
+        $product->write();
+
+        // Not applied for cart with quantity 0
+        $order->setItemQuantity($product, 0);
+        $this->assertTrue($order->Total(false)->getMoney()->equals(new Money(0, $this->currency)));
+        $this->assertTrue($order->Total()->getMoney()->isZero());
+
+        // Applied for item in cart
+        $order->setItemQuantity($product, 1);
+        $this->assertTrue($order->Total(false)->getMoney()->equals($product->getPrice()->getMoney()));
+        $this->assertTrue($order->Total()->getMoney()->equals(
+            $product->getPrice()->getMoney()->add($addOn->Amount->getMoney())
+        ));
     }
 
     /**
@@ -110,6 +127,56 @@ class OrderTest extends SapphireTest
         $this->assertTrue($order->Total()->getMoney()->equals($fullTotalMoney));
         $this->assertTrue($order->TotalPaid()->getMoney()->equals($fullTotalMoney));
         $this->assertTrue($order->UnpaidTotal()->getMoney()->isZero());
+    }
+
+    /**
+     * @throws \SilverStripe\ORM\ValidationException
+     */
+    public function testOrderItemAddOnTotal()
+    {
+        $order = $this->order;
+        $product = TestProduct::create();
+        $product->write();
+
+        $fullPrice = $product->getPrice()->getMoney();
+        $halfPrice = $fullPrice->divide(2);
+
+        $addOn = OrderItemAddOn::create();
+        $addOn->BaseAmount->setValue($halfPrice->multiply(-1));
+        $addOn->write();
+        $order->setItemQuantity($product, 0);
+        $order->attachPurchasableAddOn($product, $addOn);
+
+        // Add-on applied once, quantity is 0
+        $this->assertCount(1, $order->OrderItems());
+        $this->assertEquals(0, $order->OrderItems()->sum('Quantity'));
+        $this->assertTrue($order->Total()->getMoney()->isZero());
+
+        // Add-on applied once, quantity is 1
+        $order->addItem($product);
+        $this->assertEquals(1, $order->OrderItems()->sum('Quantity'));
+        $this->assertTrue($halfPrice->equals($order->Total()->getMoney()));
+
+        // Add-on applied once, quantity is 2
+        $order->addItem($product);
+        $this->assertEquals(2, $order->OrderItems()->sum('Quantity'));
+        $this->assertTrue($order->Total()->getMoney()->equals($fullPrice->add($halfPrice)));
+
+        // Add-on applied per unit, quantity is 2
+        $addOn->ApplyPerUnit = true;
+        $addOn->write();
+        $this->assertEquals(2, $order->OrderItems()->sum('Quantity'));
+        $this->assertTrue($order->Total()->getMoney()->equals($fullPrice));
+
+        // Add-on applied per unit, quantity is 1
+        $order->setItemQuantity($product, 1);
+        $this->assertEquals(1, $order->OrderItems()->sum('Quantity'));
+        $this->assertTrue($order->Total()->getMoney()->equals($halfPrice));
+
+        // Add-on applied per unit, quantity is 0
+        $order->setItemQuantity($product, 0);
+        $this->assertEquals(0, $order->OrderItems()->sum('Quantity'));
+        $this->assertTrue($order->Total()->getMoney()->isZero());
     }
 
     /**
