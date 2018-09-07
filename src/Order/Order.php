@@ -215,7 +215,7 @@ class Order extends DataObject
         $orderItem = OrderItem::create();
         $orderItem->OrderID = $this->ID;
         $orderItem->setPurchasable($item)
-            ->setQuantity(0);
+            ->setQuantity(0, false);
 
         return $orderItem;
     }
