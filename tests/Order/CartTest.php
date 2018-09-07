@@ -246,6 +246,9 @@ class CartTest extends SapphireTest
         $this->assertSame($originalHash, $order->getHash());
     }
 
+    /**
+     *
+     */
     public function testEmpty()
     {
        $order = $this->order;
