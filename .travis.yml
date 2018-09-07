@@ -12,7 +12,7 @@ before_script:
 
 # Install composer dependencies
 - composer validate
-- composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
+- composer install --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
 script:
 # Use phpdbg for coverage
