@@ -372,7 +372,7 @@ class Order extends DataObject
      */
     public function Empty(): bool
     {
-        return !$this->OrderItems()->exists();
+        return !boolval($this->OrderItems()->sum('Quantity'));
     }
 
     /**
