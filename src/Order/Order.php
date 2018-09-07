@@ -21,7 +21,6 @@ use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
-use SwipeStripe\Purchasable\PurchasableInterface;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
