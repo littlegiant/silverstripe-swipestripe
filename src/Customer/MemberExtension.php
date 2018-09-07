@@ -29,7 +29,7 @@ class MemberExtension extends DataExtension
      */
     public function Orders(): DataList
     {
-        $customerIds = $this->Customers()->column('ID');
+        $customerIds = $this->owner->Customers()->column('ID');
         return Order::get()->filter('CustomerID', $customerIds);
     }
 }
