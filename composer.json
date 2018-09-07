@@ -41,7 +41,11 @@
     "autoload-dev": {
         "psr-4": {
             "SwipeStripe\\Tests\\": "tests/"
-        }
+        },
+        "classmap": [
+            "app/src/Page.php",
+            "app/src/PageController.php"
+        ]
     },
     "support": {
         "email": "info@swipestripe.com",
