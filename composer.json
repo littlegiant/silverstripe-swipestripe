@@ -41,7 +41,11 @@
     "autoload-dev": {
         "psr-4": {
             "SwipeStripe\\Tests\\": "tests/"
-        }
+        },
+        "classmap": [
+            "app/src/Page.php",
+            "app/src/PageController.php"
+        ]
     },
     "support": {
         "email": "info@swipestripe.com",
@@ -59,6 +63,13 @@
         "php-http/guzzle6-adapter": "^1.1",
         "phpunit/phpunit": "^5.7",
         "php-coveralls/php-coveralls": "^2.1",
-        "silverstripe/recipe-cms": "^4.2"
+        "silverstripe/recipe-cms": "^4.2",
+        "omnipay/dummy": "^3.0"
+    },
+    "config": {
+        "preferred-install": {
+            "silverstripe/framework": "source",
+            "silverstripe/cms": "source"
+        }
     }
 }

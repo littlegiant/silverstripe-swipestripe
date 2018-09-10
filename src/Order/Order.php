@@ -140,7 +140,7 @@ class Order extends DataObject
         $subTotal = $this->SubTotal($applyOrderItemAddOns)->getMoney();
         $runningTotal = $subTotal;
 
-        if ($applyOrderAddOns) {
+        if ($applyOrderAddOns && !$this->Empty()) {
             /** @var OrderAddOn $addOn */
             foreach ($this->OrderAddOns() as $addOn) {
                 $runningTotal = $runningTotal->add($addOn->getAmount()->getMoney());
@@ -215,7 +215,7 @@ class Order extends DataObject
         $orderItem = OrderItem::create();
         $orderItem->OrderID = $this->ID;
         $orderItem->setPurchasable($item)
-            ->setQuantity(0);
+            ->setQuantity(0, false);
 
         return $orderItem;
     }
@@ -372,7 +372,7 @@ class Order extends DataObject
      */
     public function Empty(): bool
     {
-        return !$this->OrderItems()->exists();
+        return !boolval($this->OrderItems()->sum('Quantity'));
     }
 
     /**
@@ -425,7 +425,7 @@ class Order extends DataObject
         }
 
         /** @var ViewOrderPage $page */
-        $page = ViewOrderPage::get_one(ViewOrderPage::class);
+        $page = ViewOrderPage::get_one(ViewOrderPage::class, ['ClassName' => ViewOrderPage::class]);
         return $page->LinkForOrder($this);
     }
 

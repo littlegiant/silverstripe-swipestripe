@@ -18,7 +18,7 @@ use SwipeStripe\Price\DBPrice;
  * @property DBPrice $Price
  * @property int $Quantity
  * @property int $OrderID
- * @property int PurchasableID
+ * @property int $PurchasableID
  * @property DBPrice $SubTotal
  * @property DBPrice $Total
  * @property string $PurchasableClass
@@ -102,8 +102,10 @@ class OrderItem extends DataObject
     {
         $money = $this->getSubTotal()->getMoney();
 
-        foreach ($this->OrderItemAddOns() as $addOn) {
-            $money = $money->add($addOn->getAmount()->getMoney());
+        if ($this->getQuantity() > 0) {
+            foreach ($this->OrderItemAddOns() as $addOn) {
+                $money = $money->add($addOn->getAmount()->getMoney());
+            }
         }
 
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
@@ -173,7 +175,7 @@ class OrderItem extends DataObject
 
         $this->setField('Quantity', max($quantity, 0));
 
-        if ($writeImmediately && $this->isChanged('Quantity', static::CHANGE_VALUE)) {
+        if ($writeImmediately && !$this->isInDB() || $this->isChanged('Quantity', static::CHANGE_VALUE)) {
             $this->write();
         }
 

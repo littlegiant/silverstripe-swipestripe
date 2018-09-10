@@ -118,6 +118,10 @@ class CheckoutForm extends BaseForm
     {
         $result = parent::validationResult();
 
+        if ($this->cart->Empty()) {
+            $result->addError(_t(self::class . '.CART_EMPTY', 'It looks like your cart is empty. Please add some items before attempting to checkout.'));
+        }
+
         if ($this->Fields()->dataFieldByName(static::ORDER_HASH_FIELD)->dataValue() !== $this->cart->Hash) {
             $result->addError(_t(self::class . '.ORDER_HASH_CHANGED',
                 'It looks like your cart has changed since you last loaded the checkout page. Please refresh, re-check your cart and try again.'));
