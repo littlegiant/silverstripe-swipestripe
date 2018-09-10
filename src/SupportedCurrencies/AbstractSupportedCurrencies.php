@@ -5,6 +5,7 @@ namespace SwipeStripe\SupportedCurrencies;
 
 use Money\Currencies;
 use Money\Currency;
+use Money\Exception\UnknownCurrencyException;
 use Money\Formatter\DecimalMoneyFormatter;
 use Money\Money;
 use Money\MoneyFormatter;
@@ -68,6 +69,10 @@ abstract class AbstractSupportedCurrencies implements SupportedCurrenciesInterfa
      */
     public function parseDecimal(Currency $currency, string $value): Money
     {
+        if (!$this->contains($currency)) {
+            throw new UnknownCurrencyException("{$currency->getCode()} is not a supported currency.");
+        }
+
         return $this->decimalParser->parse($value, $currency);
     }
 
@@ -76,6 +81,10 @@ abstract class AbstractSupportedCurrencies implements SupportedCurrenciesInterfa
      */
     public function subunitFor(Currency $currency): int
     {
+        if (!$this->contains($currency)) {
+            throw new UnknownCurrencyException("{$currency->getCode()} is not a supported currency.");
+        }
+
         return $this->subUnitSource->subunitFor($currency);
     }
 
