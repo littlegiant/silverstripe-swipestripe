@@ -51,6 +51,11 @@ class OrderTest extends SapphireTest
     protected $order;
 
     /**
+     * @var TestProduct
+     */
+    protected $product;
+
+    /**
      * @var Currency
      */
     private $currency;
@@ -71,6 +76,7 @@ class OrderTest extends SapphireTest
     public function testOrderAddOnTotal()
     {
         $order = $this->order;
+        $product = $this->product;
 
         $addOn = OrderAddOn::create();
         $addOn->OrderID = $order->ID;
@@ -80,9 +86,6 @@ class OrderTest extends SapphireTest
         // Not applied for empty cart
         $this->assertTrue($order->Total(false)->getMoney()->equals(new Money(0, $this->currency)));
         $this->assertTrue($order->Total()->getMoney()->isZero());
-
-        /** @var TestProduct $product */
-        $product = $this->objFromFixture(TestProduct::class, 'product');
 
         // Not applied for cart with quantity 0
         $order->setItemQuantity($product, 0);
@@ -103,9 +106,7 @@ class OrderTest extends SapphireTest
     public function testUnpaidTotal()
     {
         $order = $this->order;
-
-        /** @var TestProduct $product */
-        $product = $this->objFromFixture(TestProduct::class, 'product');
+        $product = $this->product;
         $order->addItem($product);
 
         $this->assertTrue($order->Total()->getMoney()->equals($product->getPrice()->getMoney()));
@@ -143,8 +144,7 @@ class OrderTest extends SapphireTest
     public function testOrderItemAddOnTotal()
     {
         $order = $this->order;
-        /** @var TestProduct $product */
-        $product = $this->objFromFixture(TestProduct::class, 'product');
+        $product = $this->product;
 
         $fullPrice = $product->getPrice()->getMoney();
         $halfPrice = $fullPrice->divide(2);
@@ -200,5 +200,7 @@ class OrderTest extends SapphireTest
         $this->order = Order::create();
         $this->order->IsCart = true;
         $this->order->write();
+
+        $this->product = $this->objFromFixture(TestProduct::class, 'product');
     }
 }
