@@ -8,6 +8,8 @@ use SilverStripe\Security\Member;
 use SwipeStripe\Customer\Customer;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Pages\ViewOrderPage;
+use SwipeStripe\Tests\Fixtures;
+use SwipeStripe\Tests\PublishesFixtures;
 
 /**
  * Class ViewOrderPageTest
@@ -15,10 +17,19 @@ use SwipeStripe\Pages\ViewOrderPage;
  */
 class ViewOrderPageTest extends FunctionalTest
 {
+    use PublishesFixtures;
+
     /**
      * @var bool
      */
     protected $usesDatabase = true;
+
+    /**
+     * @var array
+     */
+    protected static $fixture_file = [
+        Fixtures::BASE_COMMERCE_PAGES,
+    ];
 
     /**
      * @var ViewOrderPage
@@ -143,14 +154,11 @@ class ViewOrderPageTest extends FunctionalTest
      */
     protected function setUp()
     {
+        $this->registerPublishingBlueprint(ViewOrderPage::class);
+
         parent::setUp();
 
-        ViewOrderPage::singleton()->requireDefaultRecords();
-        $this->viewOrderPage = ViewOrderPage::get()->first();
-
-        if (!$this->viewOrderPage->isPublished()) {
-            $this->viewOrderPage->publishRecursive();
-        }
+        $this->viewOrderPage = $this->objFromFixture(ViewOrderPage::class, 'view-order');
 
         $this->adminMember = $this->createMemberWithPermission('ADMIN');
         $this->customerMember = $this->createMemberWithPermission('');
