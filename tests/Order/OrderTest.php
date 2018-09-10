@@ -36,6 +36,7 @@ class OrderTest extends SapphireTest
      */
     protected static $fixture_file = [
         Fixtures::BASE_COMMERCE_PAGES,
+        Fixtures::CUSTOMERS,
         Fixtures::PRODUCTS,
     ];
 
@@ -212,19 +213,15 @@ class OrderTest extends SapphireTest
         $this->assertStringStartsWith($orderPage->Link(), $order->Link());
         $this->assertContains($order->GuestToken, $order->Link());
 
-        $customer = Customer::create();
-        $customer->write();
-
-        $order->CustomerID = $customer->ID;
+        $order->CustomerID = $this->idFromFixture(Customer::class, 'guest');
         $order->write();
 
         $this->assertStringStartsWith($orderPage->Link(), $order->Link());
         $this->assertContains($order->GuestToken, $order->Link());
 
-        $customer->MemberID = $this->createMemberWithPermission('')->ID;
-        $customer->write();
+        $order->CustomerID = $this->idFromFixture(Customer::class, 'account');
+        $order->write();
 
-        $order->flushCache();
         $this->assertStringStartsWith($orderPage->Link(), $order->Link());
         $this->assertNotContains($order->GuestToken, $order->Link());
     }

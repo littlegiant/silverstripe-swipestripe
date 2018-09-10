@@ -29,6 +29,7 @@ class ViewOrderPageTest extends FunctionalTest
      */
     protected static $fixture_file = [
         Fixtures::BASE_COMMERCE_PAGES,
+        Fixtures::CUSTOMERS,
     ];
 
     /**
@@ -161,10 +162,7 @@ class ViewOrderPageTest extends FunctionalTest
         $this->viewOrderPage = $this->objFromFixture(ViewOrderPage::class, 'view-order');
 
         $this->adminMember = $this->createMemberWithPermission('ADMIN');
-        $this->customerMember = $this->createMemberWithPermission('');
-
-        $this->customer = Customer::create();
-        $this->customer->MemberID = $this->customerMember->ID;
-        $this->customer->write();
+        $this->customer = $this->objFromFixture(Customer::class, 'account');
+        $this->customerMember = $this->customer->Member();
     }
 }

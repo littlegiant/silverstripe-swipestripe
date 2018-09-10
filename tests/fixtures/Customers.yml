@@ -1,0 +1,11 @@
+SilverStripe\Security\Member:
+  customer:
+    Email: customer@example.org
+
+SwipeStripe\Customer\Customer:
+  guest:
+    Email: guest@example.org
+
+  account:
+    Email: customer@example.org
+    Member: =>SilverStripe\Security\Member.customer
