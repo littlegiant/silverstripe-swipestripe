@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Tests\DataObjects;
 
-use Money\Money;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Order\PurchasableInterface;
 use SwipeStripe\Price\DBPrice;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * Class TestPurchasable
@@ -16,7 +15,14 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  */
 class TestProduct extends DataObject implements PurchasableInterface
 {
-    const TEST_PRODUCT_PRICE = '1000';
+    /**
+     * @var array
+     */
+    private static $db = [
+        'Title'       => DBVarchar::class,
+        'Description' => DBVarchar::class,
+        'Price'       => DBPrice::class,
+    ];
 
     /**
      * @var array
@@ -26,33 +32,11 @@ class TestProduct extends DataObject implements PurchasableInterface
     ];
 
     /**
-     * @var array
-     */
-    private static $dependencies = [
-        'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
-    ];
-
-    /**
-     * @var SupportedCurrenciesInterface
-     */
-    public $supportedCurrencies;
-
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
-    {
-        return $this->isInDB()
-            ? "Test Product {$this->ID}"
-            : "New Test Product";
-    }
-
-    /**
      * @inheritdoc
      */
     public function getDescription(): string
     {
-        return "Description for {$this->getTitle()}";
+        return $this->getField('Description');
     }
 
     /**
@@ -60,7 +44,6 @@ class TestProduct extends DataObject implements PurchasableInterface
      */
     public function getPrice(): DBPrice
     {
-        return DBPrice::create_field(DBPrice::INJECTOR_SPEC,
-            new Money(static::TEST_PRODUCT_PRICE, $this->supportedCurrencies->getDefaultCurrency()));
+        return $this->getField('Price');
     }
 }

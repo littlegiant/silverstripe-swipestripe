@@ -7,6 +7,7 @@ use SilverStripe\Dev\SapphireTest;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Tests\DataObjects\TestProduct;
+use SwipeStripe\Tests\Fixtures;
 use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
 
 /**
@@ -20,14 +21,16 @@ class CartTest extends SapphireTest
     /**
      * @var array
      */
-    protected static $extra_dataobjects = [
-        TestProduct::class,
+    protected static $fixture_file = [
+        Fixtures::PRODUCTS,
     ];
 
     /**
-     * @var TestProduct
+     * @var array
      */
-    protected static $product;
+    protected static $extra_dataobjects = [
+        TestProduct::class,
+    ];
 
     /**
      * @var bool
@@ -40,15 +43,17 @@ class CartTest extends SapphireTest
     protected $order;
 
     /**
+     * @var TestProduct
+     */
+    protected $product;
+
+    /**
      * @inheritDoc
      */
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
         static::setupSupportedCurrencies();
-
-        static::$product = TestProduct::create();
-        static::$product->write();
     }
 
     /**
@@ -58,6 +63,8 @@ class CartTest extends SapphireTest
     protected function setUp()
     {
         parent::setUp();
+
+        $this->product = $this->objFromFixture(TestProduct::class, 'product');
 
         $this->order = Order::create();
         $this->order->IsCart = true;
@@ -74,17 +81,17 @@ class CartTest extends SapphireTest
         $this->assertTrue($order->Empty());
         $this->assertTrue($order->IsMutable());
 
-        $order->addItem(static::$product);
+        $order->addItem($this->product);
         $this->assertCount(1, $order->OrderItems());
-        $this->assertSame(1, $order->getOrderItem(static::$product)->getQuantity());
+        $this->assertSame(1, $order->getOrderItem($this->product)->getQuantity());
 
-        $order->addItem(static::$product);
+        $order->addItem($this->product);
         $this->assertCount(1, $order->OrderItems());
-        $this->assertSame(2, $order->getOrderItem(static::$product)->getQuantity());
+        $this->assertSame(2, $order->getOrderItem($this->product)->getQuantity());
 
-        $order->addItem(static::$product, 3);
+        $order->addItem($this->product, 3);
         $this->assertCount(1, $order->OrderItems());
-        $this->assertSame(5, $order->getOrderItem(static::$product)->getQuantity());
+        $this->assertSame(5, $order->getOrderItem($this->product)->getQuantity());
     }
 
     /**
@@ -97,20 +104,20 @@ class CartTest extends SapphireTest
         $this->assertTrue($order->Empty());
         $this->assertTrue($order->IsMutable());
 
-        $order->addItem(static::$product);
+        $order->addItem($this->product);
         $this->assertCount(1, $order->OrderItems());
-        $this->assertSame(1, $order->getOrderItem(static::$product)->getQuantity());
+        $this->assertSame(1, $order->getOrderItem($this->product)->getQuantity());
 
         $order->Lock();
         $this->assertFalse($order->IsMutable());
 
         try {
-            $order->addItem(static::$product);
+            $order->addItem($this->product);
             $this->fail('Add item on locked order should throw.');
         } catch (\BadMethodCallException $e) {
             // Assert quantity remains the same
             $this->assertCount(1, $order->OrderItems());
-            $this->assertSame(1, $order->getOrderItem(static::$product)->getQuantity());
+            $this->assertSame(1, $order->getOrderItem($this->product)->getQuantity());
         }
     }
 
@@ -124,15 +131,15 @@ class CartTest extends SapphireTest
         $this->assertTrue($order->Empty());
         $this->assertTrue($order->IsMutable());
 
-        $order->addItem(static::$product);
+        $order->addItem($this->product);
         $this->assertCount(1, $order->OrderItems());
-        $this->assertSame(1, $order->getOrderItem(static::$product)->getQuantity());
+        $this->assertSame(1, $order->getOrderItem($this->product)->getQuantity());
 
-        $order->removeItem(static::$product);
+        $order->removeItem($this->product);
         $this->assertTrue($order->Empty());
 
-        $this->assertNull($order->getOrderItem(static::$product, false));
-        $orderItem = $order->getOrderItem(static::$product);
+        $this->assertNull($order->getOrderItem($this->product, false));
+        $orderItem = $order->getOrderItem($this->product);
         $this->assertFalse($orderItem->exists());
         $this->assertSame(0, $orderItem->getQuantity());
     }
@@ -147,20 +154,20 @@ class CartTest extends SapphireTest
         $this->assertTrue($order->Empty());
         $this->assertTrue($order->IsMutable());
 
-        $order->addItem(static::$product, 3);
+        $order->addItem($this->product, 3);
         $this->assertCount(1, $order->OrderItems());
-        $this->assertSame(3, $order->getOrderItem(static::$product)->getQuantity());
+        $this->assertSame(3, $order->getOrderItem($this->product)->getQuantity());
 
         $order->Lock();
         $this->assertFalse($order->IsMutable());
 
         try {
-            $order->removeItem(static::$product);
+            $order->removeItem($this->product);
             $this->fail('Remove item on locked order should throw.');
         } catch (\BadMethodCallException $e) {
             $this->assertCount(1, $order->OrderItems());
 
-            $orderItem = $order->getOrderItem(static::$product);
+            $orderItem = $order->getOrderItem($this->product);
             $this->assertTrue($orderItem->exists());
             $this->assertSame(3, $orderItem->getQuantity());
         }
@@ -176,26 +183,26 @@ class CartTest extends SapphireTest
         $this->assertTrue($order->Empty());
         $this->assertTrue($order->IsMutable());
 
-        $order->addItem(static::$product, 3);
+        $order->addItem($this->product, 3);
         $this->assertCount(1, $order->OrderItems());
-        $this->assertSame(3, $order->getOrderItem(static::$product)->getQuantity());
+        $this->assertSame(3, $order->getOrderItem($this->product)->getQuantity());
 
         $order->Lock();
 
         try {
-            $order->addItem(static::$product);
+            $order->addItem($this->product);
             $this->fail('Add item on locked order should throw.');
         } catch (\BadMethodCallException $e) {
             // Assert quantity remains the same
             $this->assertCount(1, $order->OrderItems());
-            $this->assertSame(3, $order->getOrderItem(static::$product)->getQuantity());
+            $this->assertSame(3, $order->getOrderItem($this->product)->getQuantity());
         }
 
         $order->Unlock();
 
-        $order->addItem(static::$product);
+        $order->addItem($this->product);
         $this->assertCount(1, $order->OrderItems());
-        $this->assertSame(4, $order->getOrderItem(static::$product)->getQuantity());
+        $this->assertSame(4, $order->getOrderItem($this->product)->getQuantity());
     }
 
     /**
@@ -225,20 +232,20 @@ class CartTest extends SapphireTest
         $order->write();
 
         // Adding item changes hash
-        $order->addItem(static::$product);
+        $order->addItem($this->product);
         $this->assertNotEquals($originalHash, $order->getHash());
 
         // Changing quantity changes hash
         $quantity1Hash = $order->getHash();
-        $order->addItem(static::$product);
+        $order->addItem($this->product);
         $this->assertNotEquals($quantity1Hash, $order->getHash());
 
         // Revert to quantity 1 restores hash
-        $order->setItemQuantity(static::$product, 1);
+        $order->setItemQuantity($this->product, 1);
         $this->assertSame($quantity1Hash, $order->getHash());
 
         // Revert to empty restores original empty hash
-        $order->removeItem(static::$product);
+        $order->removeItem($this->product);
         $this->assertSame($originalHash, $order->getHash());
 
         // Locking doesn't change hash
@@ -255,16 +262,16 @@ class CartTest extends SapphireTest
 
        $this->assertTrue($order->Empty());
 
-       $order->setItemQuantity(static::$product, 0);
+       $order->setItemQuantity($this->product, 0);
        $this->assertCount(1, $order->OrderItems());
-       $this->assertInstanceOf(OrderItem::class, $order->getOrderItem(static::$product, false));
-       $this->assertSame(0, $order->getOrderItem(static::$product)->getQuantity());
+       $this->assertInstanceOf(OrderItem::class, $order->getOrderItem($this->product, false));
+       $this->assertSame(0, $order->getOrderItem($this->product)->getQuantity());
        $this->assertTrue($order->Empty());
 
-       $order->addItem(static::$product);
+       $order->addItem($this->product);
        $this->assertFalse($order->Empty());
 
-       $order->removeItem(static::$product);
+       $order->removeItem($this->product);
        $this->assertTrue($order->Empty());
     }
 }

@@ -15,6 +15,7 @@ use SwipeStripe\Order\OrderAddOn;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\DataObjects\TestProduct;
+use SwipeStripe\Tests\Fixtures;
 use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
 
 /**
@@ -24,6 +25,13 @@ use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
 class OrderTest extends SapphireTest
 {
     use NeedsSupportedCurrencies;
+
+    /**
+     * @var array
+     */
+    protected static $fixture_file = [
+        Fixtures::PRODUCTS,
+    ];
 
     /**
      * @var array
@@ -73,8 +81,8 @@ class OrderTest extends SapphireTest
         $this->assertTrue($order->Total(false)->getMoney()->equals(new Money(0, $this->currency)));
         $this->assertTrue($order->Total()->getMoney()->isZero());
 
-        $product = TestProduct::create();
-        $product->write();
+        /** @var TestProduct $product */
+        $product = $this->objFromFixture(TestProduct::class, 'product');
 
         // Not applied for cart with quantity 0
         $order->setItemQuantity($product, 0);
@@ -96,8 +104,8 @@ class OrderTest extends SapphireTest
     {
         $order = $this->order;
 
-        $product = TestProduct::create();
-        $product->write();
+        /** @var TestProduct $product */
+        $product = $this->objFromFixture(TestProduct::class, 'product');
         $order->addItem($product);
 
         $this->assertTrue($order->Total()->getMoney()->equals($product->getPrice()->getMoney()));
@@ -135,8 +143,8 @@ class OrderTest extends SapphireTest
     public function testOrderItemAddOnTotal()
     {
         $order = $this->order;
-        $product = TestProduct::create();
-        $product->write();
+        /** @var TestProduct $product */
+        $product = $this->objFromFixture(TestProduct::class, 'product');
 
         $fullPrice = $product->getPrice()->getMoney();
         $halfPrice = $fullPrice->divide(2);
