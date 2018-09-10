@@ -425,7 +425,7 @@ class Order extends DataObject
         }
 
         /** @var ViewOrderPage $page */
-        $page = ViewOrderPage::get_one(ViewOrderPage::class);
+        $page = ViewOrderPage::get_one(ViewOrderPage::class, ['ClassName' => ViewOrderPage::class]);
         return $page->LinkForOrder($this);
     }
 

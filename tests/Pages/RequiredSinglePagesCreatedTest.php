@@ -35,9 +35,9 @@ class RequiredSinglePagesCreatedTest extends SapphireTest
      */
     public static function assertDefaultRecordForPage(\PHPUnit_Framework_TestCase $test, string $pageClass)
     {
-        $test->assertNull(SiteTree::get_one($pageClass, '', false));
+        $test->assertNull(SiteTree::get_one($pageClass, ['ClassName' => $pageClass], false));
         SiteTree::singleton($pageClass)->requireDefaultRecords();
-        $test->assertInstanceOf($pageClass, SiteTree::get_one($pageClass, '', false));
+        $test->assertInstanceOf($pageClass, SiteTree::get_one($pageClass, ['ClassName' => $pageClass], false));
     }
 
     /**

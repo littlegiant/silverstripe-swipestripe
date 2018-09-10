@@ -58,7 +58,7 @@ trait RequiredSinglePage
     {
         parent::requireDefaultRecords();
 
-        if (DataObject::get_one(static::class) === null) {
+        if (DataObject::get_one(static::class, ['ClassName' => static::class]) === null) {
             $page = $this->getRequiredSinglePage();
             $page->write();
 
