@@ -188,6 +188,28 @@ class OrderTest extends SapphireTest
     }
 
     /**
+     *
+     */
+    public function testDetachPurchasableAddOn()
+    {
+       $order = $this->order;
+       $product = $this->product;
+       $order->addItem($product);
+
+       $this->assertTrue($order->Total()->getMoney()->equals($product->getPrice()->getMoney()));
+
+       $halfPriceAddOn = OrderItemAddOn::create();
+       $halfPriceAddOn->BaseAmount->setValue($product->getPrice()->getMoney()->multiply(-0.5));
+       $halfPriceAddOn->write();
+
+       $order->attachPurchasableAddOn($product, $halfPriceAddOn);
+       $this->assertTrue($order->Total()->getMoney()->equals($product->getPrice()->getMoney()->multiply(0.5)));
+
+       $order->detachPurchasableAddOn($product, $halfPriceAddOn);
+       $this->assertTrue($order->Total()->getMoney()->equals($product->getPrice()->getMoney()));
+    }
+
+    /**
      * @throws \SilverStripe\ORM\ValidationException
      */
     protected function setUp()
