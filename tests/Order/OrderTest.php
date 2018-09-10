@@ -10,13 +10,17 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
 use SwipeStripe\Constants\PaymentStatus;
+use SwipeStripe\Customer\Customer;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\Pages\ViewCartPage;
+use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;
 use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
+use SwipeStripe\Tests\PublishesFixtures;
 
 /**
  * Class OrderTest
@@ -25,11 +29,13 @@ use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
 class OrderTest extends SapphireTest
 {
     use NeedsSupportedCurrencies;
+    use PublishesFixtures;
 
     /**
      * @var array
      */
     protected static $fixture_file = [
+        Fixtures::BASE_COMMERCE_PAGES,
         Fixtures::PRODUCTS,
     ];
 
@@ -190,6 +196,42 @@ class OrderTest extends SapphireTest
     /**
      *
      */
+    public function testLink()
+    {
+        $order = $this->order;
+        /** @var ViewCartPage $cartPage */
+        $cartPage = $this->objFromFixture(ViewCartPage::class, 'view-cart');
+        /** @var ViewOrderPage $orderPage */
+        $orderPage = $this->objFromFixture(ViewOrderPage::class, 'view-order');
+
+        $this->assertEquals($cartPage->Link(), $order->Link());
+
+        $order->IsCart = false;
+        $order->write();
+
+        $this->assertStringStartsWith($orderPage->Link(), $order->Link());
+        $this->assertContains($order->GuestToken, $order->Link());
+
+        $customer = Customer::create();
+        $customer->write();
+
+        $order->CustomerID = $customer->ID;
+        $order->write();
+
+        $this->assertStringStartsWith($orderPage->Link(), $order->Link());
+        $this->assertContains($order->GuestToken, $order->Link());
+
+        $customer->MemberID = $this->createMemberWithPermission('')->ID;
+        $customer->write();
+
+        $order->flushCache();
+        $this->assertStringStartsWith($orderPage->Link(), $order->Link());
+        $this->assertNotContains($order->GuestToken, $order->Link());
+    }
+
+    /**
+     *
+     */
     public function testDetachPurchasableAddOn()
     {
        $order = $this->order;
@@ -214,6 +256,9 @@ class OrderTest extends SapphireTest
      */
     protected function setUp()
     {
+        $this->registerPublishingBlueprint(ViewCartPage::class);
+        $this->registerPublishingBlueprint(ViewOrderPage::class);
+
         parent::setUp();
 
         $this->currency = new Currency('NZD');
