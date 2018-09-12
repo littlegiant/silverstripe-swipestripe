@@ -12,6 +12,10 @@ use SwipeStripe\Price\DBPrice;
 /**
  * Class TestPurchasable
  * @package SwipeStripe\Tests\DataObjects
+ * @property string $Title
+ * @property string $Description
+ * @property DBPrice $Price
+ * @property DBPrice $SettablePrice
  */
 class TestProduct extends DataObject implements PurchasableInterface
 {
@@ -32,6 +36,11 @@ class TestProduct extends DataObject implements PurchasableInterface
     ];
 
     /**
+     * @var DBPrice|null
+     */
+    private $settablePrice = null;
+
+    /**
      * @inheritdoc
      */
     public function getDescription(): string
@@ -45,5 +54,23 @@ class TestProduct extends DataObject implements PurchasableInterface
     public function getPrice(): DBPrice
     {
         return $this->getField('Price');
+    }
+
+    /**
+     * @param null|DBPrice $price
+     * @return $this
+     */
+    public function setSettablePrice(?DBPrice $price): self
+    {
+        $this->settablePrice = $price;
+        return $this;
+    }
+
+    /**
+     * @return null|DBPrice
+     */
+    public function getSettablePrice(): ?DBPrice
+    {
+        return $this->settablePrice;
     }
 }

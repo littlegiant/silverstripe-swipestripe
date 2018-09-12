@@ -16,6 +16,8 @@ use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\ORM\ValidationResult;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
@@ -336,6 +338,7 @@ class PriceField extends FormField
     /**
      * @inheritdoc
      * @param array|string|DBPrice|Money|null $value
+     * @throws ValidationException
      */
     public function setValue($value, $data = null)
     {
@@ -349,8 +352,8 @@ class PriceField extends FormField
         // Convert string to array
         // E.g. `44.00 NZD`
         if (is_string($value) &&
-            preg_match('/^(?<amount>[\\d\\.]+)( (?<currency>\w{3}))?$/i', $value, $matches)
-        ) {
+            preg_match('/^(?<amount>[\\d\\.]+) ?(?<currency>\w{3})?$/i', $value, $matches)) {
+
             $currency = isset($matches['currency']) ? strtoupper($matches['currency']) : null;
             $value = [
                 'Currency' => $currency,
@@ -366,7 +369,8 @@ class PriceField extends FormField
                 'Amount'   => $money !== null ? $this->supportedCurrencies->formatDecimal($money) : null,
             ];
         } elseif (!is_array($value)) {
-            throw new InvalidArgumentException("Invalid currency format");
+            throw new ValidationException(ValidationResult::create()
+                ->addFieldError($this->getName(), 'Invalid currency format'));
         }
 
         $this->setCurrency($value['Currency'], $value)
