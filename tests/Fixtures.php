@@ -9,9 +9,9 @@ namespace SwipeStripe\Tests;
  */
 interface Fixtures
 {
-    const BASE_PATH = __DIR__ . '/fixtures';
+    const FIXTURE_BASE_PATH = __DIR__ . '/fixtures';
 
-    const BASE_COMMERCE_PAGES = self::BASE_PATH . '/BaseCommercePages.yml';
-    const CUSTOMERS = self::BASE_PATH . '/Customers.yml';
-    const PRODUCTS = self::BASE_PATH . '/TestProducts.yml';
+    const BASE_COMMERCE_PAGES = self::FIXTURE_BASE_PATH . '/BaseCommercePages.yml';
+    const CUSTOMERS = self::FIXTURE_BASE_PATH . '/Customers.yml';
+    const PRODUCTS = self::FIXTURE_BASE_PATH . '/TestProducts.yml';
 }
