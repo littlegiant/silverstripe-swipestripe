@@ -8,8 +8,6 @@
         </section>
     </div>
     <div class="row">
-        <% include SwipeStripe/CartTotalSummary Cart=$SwipeStripe.ActiveCart %>
-
         <% with $CheckoutForm %>
             <% if $PaymentError %>
                 <h3>{$PaymentError}</h3>
