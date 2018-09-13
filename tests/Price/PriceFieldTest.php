@@ -7,12 +7,15 @@ use Money\Currency;
 use Money\Money;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\SingleSelectField;
 use SilverStripe\ORM\ValidationException;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\TestValidator;
 
 /**
@@ -22,6 +25,13 @@ use SwipeStripe\Tests\TestValidator;
 class PriceFieldTest extends SapphireTest
 {
     use NeedsSupportedCurrencies;
+
+    /**
+     * @var array
+     */
+    protected static $extra_dataobjects = [
+        TestProduct::class,
+    ];
 
     /**
      * @inheritDoc
@@ -137,7 +147,7 @@ class PriceFieldTest extends SapphireTest
     }
 
     /**
-     *
+     * @throws ValidationException
      */
     public function testSetValue()
     {
@@ -158,5 +168,140 @@ class PriceFieldTest extends SapphireTest
             'Amount'   => '1',
         ]));
         $this->assertTrue($priceField->getMoney()->equals(new Money(1, new Currency('JPY'))));
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function testSetTextValue()
+    {
+        $priceField = PriceField::create('Price');
+
+        $priceField->setValue('2.00 NZD');
+        $this->assertTrue($priceField->getMoney()->equals(
+            new Money(200, new Currency('NZD'))));
+
+        $priceField->setValue('200JPY');
+        $this->assertTrue($priceField->getMoney()->equals(
+            new Money(200, new Currency('JPY'))));
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function testSetInvalidValue()
+    {
+        $priceField = PriceField::create('Price');
+
+        $this->expectException(ValidationException::class);
+        $priceField->setValue('Hello world 123');
+    }
+
+    /**
+     *
+     */
+    public function testSingleCurrencyAssumption()
+    {
+        $priceField = PriceField::create('Price');
+        $priceField->setAllowedCurrencies(['NZD']);
+
+        $priceField->setSubmittedValue([
+            'Amount' => '2.00',
+        ]);
+
+        $this->assertTrue($priceField->getMoney()->equals(
+            new Money(200, new Currency('NZD'))));
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function testSaveInto()
+    {
+        $priceField = PriceField::create('Price');
+
+        // Set value to 200NZD
+        $twoHundred = new Money(20000, new Currency('NZD'));
+        $priceField->setValue($twoHundred);
+
+        // Set fields
+        $product = TestProduct::create();
+        $this->assertFalse($product->Price->getMoney()->equals($twoHundred));
+        $priceField->saveInto($product);
+        $this->assertTrue($product->Price->getMoney()->equals($twoHundred));
+
+        // Call setter
+        $priceField->setName('SettablePrice');
+        $this->assertNull($product->SettablePrice);
+        $priceField->saveInto($product);
+        $this->assertTrue($product->SettablePrice->getMoney()->equals($twoHundred));
+    }
+
+    /**
+     *
+     */
+    public function testReadOnly()
+    {
+        $priceField = PriceField::create('Price');
+        $this->assertFalse($priceField->getAmountField()->isReadonly());
+        $this->assertFalse($priceField->getCurrencyField()->isReadonly());
+
+        $priceField->setReadonly(true);
+        $this->assertTrue($priceField->getAmountField()->isReadonly());
+        $this->assertTrue($priceField->getCurrencyField()->isReadonly());
+
+        $priceField->setReadonly(false);
+        $this->assertFalse($priceField->getAmountField()->isReadonly());
+        $this->assertFalse($priceField->getCurrencyField()->isReadonly());
+    }
+
+    /**
+     *
+     */
+    public function testDisable()
+    {
+        $priceField = PriceField::create('Price');
+        $this->assertFalse($priceField->getAmountField()->isDisabled());
+        $this->assertFalse($priceField->getCurrencyField()->isDisabled());
+
+        $priceField->setDisabled(true);
+        $this->assertTrue($priceField->getAmountField()->isDisabled());
+        $this->assertTrue($priceField->getCurrencyField()->isDisabled());
+
+        $priceField->setDisabled(false);
+        $this->assertFalse($priceField->getAmountField()->isDisabled());
+        $this->assertFalse($priceField->getCurrencyField()->isDisabled());
+    }
+
+    /**
+     *
+     */
+    public function testReadOnlyTransformation()
+    {
+        $priceField = PriceField::create('Price');
+        $this->assertFalse($priceField->getAmountField()->isReadonly());
+        $this->assertFalse($priceField->getCurrencyField()->isReadonly());
+
+        $readOnlyField = $priceField->performReadonlyTransformation();
+        $this->assertTrue($readOnlyField->getAmountField()->isReadonly());
+        $this->assertTrue($readOnlyField->getCurrencyField()->isReadonly());
+    }
+
+    /**
+     *
+     */
+    public function testSetForm()
+    {
+        $priceField = PriceField::create('Price');
+        $form = Form::create(null, Form::DEFAULT_NAME, FieldList::create($priceField), FieldList::create());
+        $this->assertSame($form, $priceField->getForm());
+        $this->assertSame($form, $priceField->getAmountField()->getForm());
+        $this->assertSame($form, $priceField->getCurrencyField()->getForm());
+
+        $form2 = Form::create(null, Form::DEFAULT_NAME, FieldList::create(), FieldList::create());
+        $priceField->setForm($form2);
+        $this->assertSame($form2, $priceField->getForm());
+        $this->assertSame($form2, $priceField->getAmountField()->getForm());
+        $this->assertSame($form2, $priceField->getCurrencyField()->getForm());
     }
 }

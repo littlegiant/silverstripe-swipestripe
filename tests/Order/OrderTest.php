@@ -251,6 +251,29 @@ class OrderTest extends SapphireTest
     /**
      * @throws \SilverStripe\ORM\ValidationException
      */
+    public function testVersionLocking()
+    {
+        $order = $this->order;
+        $product = $this->product;
+        $productOriginalPrice = $product->getPrice()->getMoney();
+
+        $order->addItem($product);
+        $this->assertTrue($order->Total()->getMoney()->equals($productOriginalPrice));
+
+        // Lock and adjust price
+        $order->Lock();
+        $product->Price->setValue($productOriginalPrice->multiply(3));
+        $product->write();
+        $this->assertTrue($order->Total()->getMoney()->equals($productOriginalPrice));
+
+        // Unlock and verify new price is given
+        $order->Unlock();
+        $this->assertTrue($order->Total()->getMoney()->equals($productOriginalPrice->multiply(3)));
+    }
+
+    /**
+     * @throws \SilverStripe\ORM\ValidationException
+     */
     protected function setUp()
     {
         $this->registerPublishingBlueprint(ViewCartPage::class);

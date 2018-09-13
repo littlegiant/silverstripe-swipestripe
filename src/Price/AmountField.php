@@ -20,14 +20,11 @@ class AmountField extends NumericField
         // Save original value in case parse fails
         $this->originalValue = trim($value);
 
-        if (!is_numeric($this->originalValue)) {
-            $this->value = false;
-            return $this;
-        }
-
-        // Empty string is no-number (not 0)
-        if (strlen($this->originalValue) === 0) {
+        if (empty($this->originalValue)) {
             $this->value = null;
+            return $this;
+        } elseif (!is_numeric($this->originalValue)) {
+            $this->value = false;
             return $this;
         }
 
