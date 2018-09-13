@@ -63,9 +63,16 @@ class OrderAddOn extends DataObject
     /**
      * @var array
      */
+    private static $searchable_fields = [
+        'Title',
+    ];
+
+    /**
+     * @var array
+     */
     private static $summary_fields = [
-        'Title'       => 'Title',
-        'Amount.Nice' => 'Amount',
+        'Title'        => 'Title',
+        'Amount.Value' => 'Amount',
     ];
 
     /**

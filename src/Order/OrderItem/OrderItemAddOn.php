@@ -7,6 +7,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBVarchar;
+use SilverStripe\ORM\Filters\GreaterThanOrEqualFilter;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Constants\AddOnPriority;
 use SwipeStripe\Price\DBPrice;
@@ -67,9 +68,18 @@ class OrderItemAddOn extends DataObject
     /**
      * @var array
      */
+    private static $searchable_fields = [
+        'Title',
+        'ApplyPerUnit',
+    ];
+
+    /**
+     * @var array
+     */
     private static $summary_fields = [
-        'Title'       => 'Title',
-        'Amount.Nice' => 'Amount',
+        'Title'             => 'Title',
+        'Amount.Value'      => 'Amount',
+        'ApplyPerUnit.Nice' => 'Apply Per Unit',
     ];
 
     /**
