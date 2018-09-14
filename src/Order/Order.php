@@ -17,6 +17,7 @@ use SilverStripe\Security\Security;
 use SwipeStripe\Constants\ShopPermissions;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\ORM\FieldType\DBAddress;
 use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
@@ -30,6 +31,9 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  * @property string $GuestToken
  * @property int $MemberID
  * @property string $Hash
+ * @property string $CustomerName
+ * @property string $CustomerEmail
+ * @property DBAddress $BillingAddress
  * @method null|Member Member()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
@@ -51,6 +55,10 @@ class Order extends DataObject
         'IsCart'     => DBBoolean::class,
         'CartLocked' => DBBoolean::class,
         'GuestToken' => DBVarchar::class,
+
+        'CustomerName'   => DBVarchar::class,
+        'CustomerEmail'  => DBVarchar::class,
+        'BillingAddress' => DBAddress::class,
     ];
 
     /**
