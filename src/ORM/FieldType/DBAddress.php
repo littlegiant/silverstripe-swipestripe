@@ -6,6 +6,7 @@ namespace SwipeStripe\ORM\FieldType;
 use Dynamic\CountryDropdownField\Fields\CountryDropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\TextField;
+use SilverStripe\i18n\Data\Intl\IntlLocales;
 use SilverStripe\ORM\FieldType\DBComposite;
 use SilverStripe\ORM\FieldType\DBVarchar;
 
@@ -40,12 +41,14 @@ class DBAddress extends DBComposite
      */
     public function Nice(): string
     {
+        $countryName = IntlLocales::singleton()->countryName($this->Country);
+
         return <<<EOT
 {$this->Unit} {$this->Street},
 {$this->Suburb},
 {$this->City},
 {$this->Region},
-{$this->Country} {$this->Postcode}
+{$countryName} {$this->Postcode}
 EOT;
     }
 
