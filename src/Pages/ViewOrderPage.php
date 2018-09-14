@@ -22,7 +22,7 @@ class ViewOrderPage extends \Page
     {
         $link = $this->Link($order->ID);
 
-        if ($forceGuestToken || $order->Customer()->IsGuest()) {
+        if ($forceGuestToken || !$order->Member()->exists()) {
             $link .= "/{$order->GuestToken}";
         }
 
