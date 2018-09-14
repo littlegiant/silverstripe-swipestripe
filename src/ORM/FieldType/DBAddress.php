@@ -41,15 +41,33 @@ class DBAddress extends DBComposite
      */
     public function Nice(): string
     {
-        $countryName = IntlLocales::singleton()->countryName($this->Country);
+        $address = '';
 
-        return <<<EOT
-{$this->Unit} {$this->Street},
-{$this->Suburb},
-{$this->City},
-{$this->Region},
-{$countryName} {$this->Postcode}
-EOT;
+        if (!empty($this->Unit) || !empty($this->Street)) {
+            $address .= trim("{$this->Unit} {$this->Street}") . ",\n";
+        }
+
+        if (!empty($this->Suburb)) {
+            $address .= "{$this->Suburb},\n";
+        }
+
+        if (!empty($this->City)) {
+            $address .= "{$this->City},\n";
+        }
+
+        if (!empty($this->Region)) {
+            $address .= "{$this->Region},\n";
+        }
+
+        if (!empty($this->Country)) {
+            $address .= IntlLocales::singleton()->countryName($this->Country) . ' ';
+        }
+
+        if (!empty($this->Postcode)) {
+            $address .= $this->Postcode;
+        }
+
+        return rtrim($address);
     }
 
     /**
