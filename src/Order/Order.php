@@ -115,6 +115,22 @@ class Order extends DataObject
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+
+        $fields->removeByName([
+            'IsCart',
+            'CartLocked',
+            'GuestToken',
+        ]);
+
+        return $fields;
+    }
+
+    /**
      * Check if a token is a well formed (potentially valid) order token. This should return true for any historic token
      * generation schemes - i.e. if it's possible $token was generated at any point as a GuestToken, this should return true.
      * @param null|string $token
