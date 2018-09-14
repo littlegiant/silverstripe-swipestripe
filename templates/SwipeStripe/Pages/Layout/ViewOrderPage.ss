@@ -3,73 +3,36 @@
         <section class="col-md-10 col-md-offset-1">
             <div class="page-header">
                 {$Breadcrumbs}
-                <h1>{$Title}</h1>
+                <h1>{$Title} - Order #{$Order.ID}</h1>
             </div>
         </section>
     </div>
 
     <div class="row">
-        <% with $Order %>
-            <table>
-                <thead>
-                <tr>
-                    <td><strong>Item</strong></td>
-                    <td><strong>Unit Price</strong></td>
-                    <td><strong>Quantity</strong></td>
-                    <td><strong>Price</strong></td>
-                </tr>
-                </thead>
+        <div class="col-md-8">
+            <% include SwipeStripe/CheckoutSummary Cart=$Order %>
+        </div>
 
-                <% loop $OrderItems %>
-                    <tr>
-                        <td>{$Purchasable.Title}</td>
-                        <td>{$Price.Nice}</td>
-                        <td>{$Quantity}</td>
-                        <td>{$SubTotal.Nice}</td>
-                    </tr>
+        <div class="col-md-4">
+            <% include SwipeStripe/CartTotalSummary Cart=$Order %>
 
-                    <% if $OrderItemAddOns %>
-                        <% loop $OrderItemAddOns %>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td>{$Title}</td>
-                                <td>{$Amount.Nice}</td>
-                            </tr>
-                        <% end_loop %>
+            <h4>Payments</h4>
 
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>{$Total.Nice}</td>
-                        </tr>
-                    <% end_if %>
-                <% end_loop %>
-
-                <tfoot>
-                <tr>
-                    <td><strong>Subtotal</strong></td>
-                    <td></td>
-                    <td></td>
-                    <td>{$SubTotal.Nice}</td>
-                </tr>
-
-                    <% loop $OrderAddOns %>
-                    <td></td>
-                    <td></td>
-                    <td>{$Title}</td>
-                    <td>{$Amount.Nice}</td>
-                    <% end_loop %>
-
-                <tr>
-                    <td><strong>Total</strong></td>
-                    <td></td>
-                    <td></td>
-                    <td>{$Total.Nice}</td>
-                </tr>
-                </tfoot>
-            </table>
-        <% end_with %>
+            <% loop $Order.Payments %>
+                <% if $SwipeStripe.DisplayStatus($Status) %>
+                    <div>
+                        <h5>
+                            {$SwipeStripe.DisplayGateway($Gateway)}
+                            <small>&mdash; {$SwipeStripe.DisplayStatus($Status)}</small>
+                        </h5>
+                        <div class="row">
+                            <div class="col-sm-8">{$Created.Nice}</div>
+                            <div class="col-sm-4">{$Money.Nice}</div>
+                        </div>
+                        <hr>
+                    </div>
+                <% end_if %>
+            <% end_loop %>
+        </div>
     </div>
 </div>

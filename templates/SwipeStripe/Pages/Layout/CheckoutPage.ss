@@ -8,18 +8,22 @@
         </section>
     </div>
     <div class="row">
-        <% include SwipeStripe/CartTotalSummary Cart=$SwipeStripe.ActiveCart %>
+        <% if $CheckoutForm.PaymentError %>
+            <div class="alert alert-warning" role="alert">{$CheckoutForm.PaymentError}</div>
+        <% end_if %>
 
-        <% with $CheckoutForm %>
-            <% if $PaymentError %>
-                <h3>{$PaymentError}</h3>
-            <% end_if %>
+        <div class="col-md-8">
+            <% include SwipeStripe/CheckoutSummary Cart=$SwipeStripe.ActiveCart %>
+        </div>
 
-            {$Me}
-        <% end_with %>
+        <div class="col-md-4">
+            <% include SwipeStripe/CartTotalSummary Cart=$SwipeStripe.ActiveCart %>
 
-        <% with $SwipeStripe.ActiveCart %>
-            <a href="{$Link}"><%t SwipeStripe\\Forms\\CheckoutForm.CANCEL_CHECKOUT 'Return to cart' %></a>
-        <% end_with %>
+            {$CheckoutForm}
+
+            <% with $SwipeStripe.ActiveCart %>
+                <a href="{$Link}"><%t SwipeStripe\\Forms\\CheckoutForm.CANCEL_CHECKOUT 'Return to cart' %></a>
+            <% end_with %>
+        </div>
     </div>
 </div>

@@ -6,8 +6,10 @@ namespace SwipeStripe;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\View\TemplateGlobalProvider;
 use SilverStripe\View\ViewableData;
+use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Pages\HasActiveCart;
 
@@ -49,5 +51,33 @@ class GlobalTemplateHelper extends ViewableData implements TemplateGlobalProvide
         /** @var Controller|HasActiveCart $controller */
         $controller = Controller::curr();
         return $controller->ActiveCart;
+    }
+
+    /**
+     * @param string $internalName
+     * @return string
+     */
+    public function DisplayGateway(string $internalName): string
+    {
+        return GatewayInfo::niceTitle($internalName);
+    }
+
+    /**
+     * @param string $status
+     * @return null|string
+     */
+    public function DisplayStatus(string $status): ?string
+    {
+        $displayStatuses = [
+            PaymentStatus::AUTHORIZED            => PaymentStatus::AUTHORIZED,
+            PaymentStatus::REFUNDED              => PaymentStatus::REFUNDED,
+            PaymentStatus::CAPTURED              => 'Paid',
+            PaymentStatus::PENDING_AUTHORIZATION => 'Pending',
+            PaymentStatus::PENDING_CAPTURE       => 'Pending',
+            PaymentStatus::PENDING_PURCHASE      => 'Pending',
+            PaymentStatus::PENDING_REFUND        => 'Pending refund',
+        ];
+
+        return $displayStatuses[$status] ?? null;
     }
 }

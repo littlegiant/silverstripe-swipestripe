@@ -1,33 +1,39 @@
-<div id="$HolderID" class="field<% if $extraClass %> $extraClass<% end_if %>">
+<div id="$HolderID" class="row field<% if $extraClass %> $extraClass<% end_if %>">
     <% with $OrderItem %>
-        <div>
-            <h3>{$Title} - {$Total.Nice}</h3>
+        <div class="col-md-10">
+            <h3><a href="{$Purchasable.Link}">{$Title}</a> <small>{$Price.Nice}</small></h3>
             <p>{$Description}</p>
 
             <% if $OrderItemAddOns %>
-                <h4>Base Price: {$SubTotal.Nice} [{$Price.Nice} x{$Quantity}]</h4>
-
-                <h4>Add-ons:</h4>
-                <ul>
-                    <% loop $OrderItemAddOns %>
-                        <li>{$Title} (<strong>{$Amount.Nice}</strong>)</li>
-                    <% end_loop %>
-                </ul>
-            <% else %>
-                <h4>Price: {$SubTotal.Nice} [{$Price.Nice} x{$Quantity}]</h4>
+                <div class="col-md-5">
+                    <table class="table">
+                        <% loop $OrderItemAddOns %>
+                            <tr>
+                                <td>{$Title}</td>
+                                <td>{$Amount.Nice}</td>
+                            </tr>
+                        <% end_loop %>
+                    </table>
+                </div>
             <% end_if %>
         </div>
     <% end_with %>
 
-    <div class="middleColumn">
-        <% if $Title %><label class="left" for="$ID">$Title</label><% end_if %>
-        $Field
-    </div>
-    <% if $RightTitle %><label class="right" for="$ID">$RightTitle</label><% end_if %>
-    <% if $Message %><span class="message $MessageType">$Message</span><% end_if %>
-    <% if $Description %><span class="description">$Description</span><% end_if %>
+    <div class="col-md-2">
+        <h4>{$OrderItem.Total.Nice}</h4>
 
-    <% if $RemoveAction && not $RemoveAction.IsDisabled %>
-        {$RemoveAction}
-    <% end_if %>
+        <p>
+            {$Title}
+            {$Field}
+        </p>
+
+        <% if $RemoveAction && not $RemoveAction.IsDisabled %>
+            {$RemoveAction}
+        <% end_if %>
+    </div>
+
+    <% if $RightTitle %><label class="right" for="$ID">{$RightTitle}</label><% end_if %>
+    <% if $Message %><span class="message $MessageType">{$Message}</span><% end_if %>
+    <% if $Description %><span class="description">{$Description}</span><% end_if %>
 </div>
+<hr>
