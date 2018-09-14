@@ -5,12 +5,14 @@ namespace SwipeStripe\Forms;
 
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
+use SilverStripe\Forms\EmailField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\SingleSelectField;
+use SilverStripe\Forms\TextField;
 use SilverStripe\Omnipay\GatewayFieldsFactory;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\Omnipay\Model\Message\CompletePurchaseError;
@@ -67,7 +69,17 @@ class CheckoutForm extends BaseForm
 
         parent::__construct($controller, $name, RequiredFields::create([
             static::PAYMENT_METHOD_FIELD,
+            'CustomerName',
+            'CustomerEmail',
+            'BillingAddressStreet',
+            'BillingAddressCity',
+            'BillingAddressPostCode',
+            'BillingAddressCountry',
         ]));
+
+        if (!$this->getSessionData()) {
+            $this->loadDataFrom($cart);
+        }
     }
 
     /**
@@ -151,6 +163,8 @@ class CheckoutForm extends BaseForm
     public function ConfirmCheckout(array $data): HTTPResponse
     {
         $this->cart->Lock();
+        $this->saveInto($this->cart);
+        $this->cart->write();
 
         $payment = Payment::create();
         $payment->OrderID = $this->cart->ID;
@@ -203,13 +217,19 @@ class CheckoutForm extends BaseForm
      */
     protected function buildFields(): FieldList
     {
+        $fields = FieldList::create([
+            TextField::create('CustomerName', 'Name'),
+            EmailField::create('CustomerEmail', 'Email'),
+            $this->cart->BillingAddress->scaffoldFormField('Billing Address'),
+        ]);
+
         $gateways = GatewayInfo::getSupportedGateways();
         $gatewayField = count($gateways) > 1
             ? OptionsetField::create(static::PAYMENT_METHOD_FIELD, _t(self::class . '.PAYMENT_METHOD', 'Select your payment method'), $gateways)
             : HiddenField::create(static::PAYMENT_METHOD_FIELD, null, key($gateways));
 
-        $fields = $this->buildGatewayFields($gateways);
-        $fields->unshift($gatewayField);
+        $fields->add($gatewayField);
+        $fields->merge($this->buildGatewayFields($gateways));
         $fields->add(HiddenField::create(static::ORDER_HASH_FIELD, null, $this->cart->getHash()));
 
         return $fields;
