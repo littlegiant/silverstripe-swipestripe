@@ -15,6 +15,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use SwipeStripe\Constants\ShopPermissions;
+use SwipeStripe\Emails\OrderConfirmationEmail;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\ORM\FieldType\DBAddress;
@@ -389,7 +390,10 @@ class Order extends DataObject
     {
         $this->IsCart = false;
         $this->write();
-        // TODO - email customer
+
+        if (!$this->UnpaidTotal()->getMoney()->isPositive()) {
+            OrderConfirmationEmail::create($this)->send();
+        }
     }
 
     /**
