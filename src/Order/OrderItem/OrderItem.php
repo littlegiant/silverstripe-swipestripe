@@ -64,8 +64,9 @@ class OrderItem extends DataObject
      * @var array
      */
     private static $summary_fields = [
-        'Title'    => 'Title',
-        'Quantity' => 'Quantity',
+        'Title'       => 'Title',
+        'Quantity'    => 'Quantity',
+        'Total.Value' => 'Amount',
     ];
 
     /**
@@ -207,6 +208,7 @@ class OrderItem extends DataObject
         $fields = parent::getCMSFields();
 
         $fields->removeByName([
+            'OrderID',
             'PurchasableLockedVersion',
         ]);
 

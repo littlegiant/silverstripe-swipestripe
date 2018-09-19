@@ -23,6 +23,7 @@ use SwipeStripe\ORM\FieldType\ReadOnlyGridField;
 use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
+use SwipeStripe\Price\PriceField;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
@@ -92,7 +93,22 @@ class Order extends DataObject
         'CustomerName'     => 'Customer Name',
         'CustomerEmail'    => 'Customer Email',
         'OrderItems.Count' => 'Items',
+        'Total.Value'      => 'Total',
     ];
+
+    /**
+     * @var array
+     */
+    private static $searchable_fields = [
+        'CustomerName',
+        'CustomerEmail',
+        'Member.Email',
+    ];
+
+    /**
+     * @var string
+     */
+    private static $default_sort = 'LastEdited DESC';
 
     /**
      * @var array
@@ -129,6 +145,9 @@ class Order extends DataObject
             'CartLocked',
             'GuestToken',
         ]);
+
+        $fields->insertAfter('BillingAddress', PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
+        $fields->insertAfter('SubTotalValue', PriceField::create('TotalValue', 'Total')->setValue($this->Total()));
 
         return ReadOnlyGridField::replaceFields($fields);
     }
@@ -400,7 +419,7 @@ class Order extends DataObject
      */
     public function Empty(): bool
     {
-        return !boolval($this->OrderItems()->sum('Quantity'));
+        return !$this->exists() || !boolval($this->OrderItems()->sum('Quantity'));
     }
 
     /**
