@@ -7,9 +7,9 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Versioned\Versioned;
+use SwipeStripe\CMSHelper;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\PurchasableInterface;
-use SwipeStripe\ORM\FieldType\ReadOnlyGridField;
 use SwipeStripe\Price\DBPrice;
 
 /**
@@ -68,6 +68,18 @@ class OrderItem extends DataObject
         'Quantity'    => 'Quantity',
         'Total.Value' => 'Amount',
     ];
+
+    /**
+     * @var array
+     */
+    private static $dependencies = [
+        'cmsHelper' => '%$' . CMSHelper::class,
+    ];
+
+    /**
+     * @var CMSHelper
+     */
+    public $cmsHelper;
 
     /**
      * @inheritDoc
@@ -218,6 +230,6 @@ class OrderItem extends DataObject
             $fields->insertBefore('Quantity', $purchasableField);
         }
 
-        return ReadOnlyGridField::replaceFields($fields);
+        return $this->cmsHelper->convertGridFieldsToReadOnly($fields);
     }
 }

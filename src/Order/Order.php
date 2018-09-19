@@ -14,12 +14,12 @@ use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
+use SwipeStripe\CMSHelper;
 use SwipeStripe\Constants\ShopPermissions;
 use SwipeStripe\Emails\OrderConfirmationEmail;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\ORM\FieldType\DBAddress;
-use SwipeStripe\ORM\FieldType\ReadOnlyGridField;
 use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
@@ -115,12 +115,18 @@ class Order extends DataObject
      */
     private static $dependencies = [
         'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
+        'cmsHelper'           => '%$' . CMSHelper::class,
     ];
 
     /**
      * @var SupportedCurrenciesInterface
      */
     public $supportedCurrencies;
+
+    /**
+     * @var CMSHelper
+     */
+    public $cmsHelper;
 
     /**
      * @inheritDoc
@@ -158,7 +164,7 @@ class Order extends DataObject
         $fields->insertAfter('BillingAddress', PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
         $fields->insertAfter('SubTotalValue', PriceField::create('TotalValue', 'Total')->setValue($this->Total()));
 
-        return ReadOnlyGridField::replaceFields($fields);
+        return $this->cmsHelper->convertGridFieldsToReadOnly($fields);
     }
 
     /**

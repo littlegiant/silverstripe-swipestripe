@@ -7,7 +7,6 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBVarchar;
-use SilverStripe\ORM\Filters\GreaterThanOrEqualFilter;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Constants\AddOnPriority;
 use SwipeStripe\Price\DBPrice;
