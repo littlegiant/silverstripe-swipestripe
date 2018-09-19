@@ -88,6 +88,8 @@ class Order extends DataObject
      * @var array
      */
     private static $summary_fields = [
+        'CustomerName'     => 'Customer Name',
+        'CustomerEmail'    => 'Customer Email',
         'OrderItems.Count' => 'Items',
     ];
 
