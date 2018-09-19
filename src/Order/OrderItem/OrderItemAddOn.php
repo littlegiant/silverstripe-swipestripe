@@ -98,4 +98,20 @@ class OrderItemAddOn extends DataObject
             ? DBPrice::create_field(DBPrice::INJECTOR_SPEC, $baseAmount->getMoney()->multiply($this->OrderItem()->getQuantity()))
             : $baseAmount;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function canView($member = null)
+    {
+        return $this->OrderItem()->canView($member);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canEdit($member = null)
+    {
+        return $this->OrderItem()->canEdit($member);
+    }
 }

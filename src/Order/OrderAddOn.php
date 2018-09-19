@@ -87,4 +87,20 @@ class OrderAddOn extends DataObject
     {
         return $this->BaseAmount;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function canView($member = null)
+    {
+        return $this->Order()->canView($member);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canEdit($member = null)
+    {
+        return $this->Order()->canEdit($member);
+    }
 }

@@ -186,6 +186,22 @@ class OrderItem extends DataObject
     /**
      * @inheritDoc
      */
+    public function canView($member = null)
+    {
+        return $this->Order()->canView($member);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canEdit($member = null)
+    {
+        return $this->IsMutable() && $this->Order()->canEdit($member);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();

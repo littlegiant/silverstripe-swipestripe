@@ -6,6 +6,7 @@ namespace SwipeStripe\Order;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\Security\Member;
 
 /**
  * Class PaymentExtension
@@ -41,9 +42,24 @@ class PaymentExtension extends DataExtension
     public function onCancelled(): void
     {
         $order = $this->owner->Order();
-        
+
         if ($order->exists()) {
             $order->paymentCancelled($this->owner);
         }
+    }
+
+    /**
+     * @param null|Member $member
+     * @return bool|null
+     */
+    public function canView(?Member $member = null): ?bool
+    {
+        $order = $this->owner->Order();
+
+        if ($order->exists() && $order->canView($member)) {
+            return true;
+        }
+
+        return null;
     }
 }
