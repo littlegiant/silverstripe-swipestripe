@@ -40,4 +40,20 @@ class CMSHelper
 
         return $fieldList;
     }
+
+    /**
+     * @param FieldList $fieldList
+     * @param string $moveBefore
+     * @param string $tabToMove
+     * @return FieldList
+     */
+    public function moveTabBefore(FieldList $fieldList, string $moveBefore, string $tabToMove): FieldList
+    {
+        $tab = $fieldList->findOrMakeTab($tabToMove);
+
+        $fieldList->removeByName($tab->getName());
+        $fieldList->insertBefore($moveBefore, $tab);
+
+        return $fieldList;
+    }
 }

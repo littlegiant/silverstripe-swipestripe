@@ -164,6 +164,9 @@ class Order extends DataObject
         $fields->insertAfter('BillingAddress', PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
         $fields->insertAfter('SubTotalValue', PriceField::create('TotalValue', 'Total')->setValue($this->Total()));
 
+        $this->cmsHelper->moveTabBefore($fields, 'Payments', 'Root.OrderItems');
+        $this->cmsHelper->moveTabBefore($fields, 'Payments', 'Root.OrderAddOns');
+
         return $this->cmsHelper->convertGridFieldsToReadOnly($fields);
     }
 
