@@ -189,6 +189,17 @@ class OrderItem extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+
+        $fields->removeByName([
+            'PurchasableLockedVersion',
+        ]);
+
+        foreach ($this->Purchasable()->getOrderInlineCMSFields() as $purchasableField) {
+            $purchasableField->setName("Purchasable_Inline_{$purchasableField->getName()}");
+            $purchasableField->setReadonly(true);
+            $fields->insertBefore('Quantity', $purchasableField);
+        }
+
         return ReadOnlyGridField::replaceFields($fields);
     }
 }

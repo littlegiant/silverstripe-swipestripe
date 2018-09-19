@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order;
 
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\Versioned\Versioned;
@@ -31,4 +32,9 @@ interface PurchasableInterface extends DataObjectInterface
      * @return DBPrice
      */
     public function getPrice(): DBPrice;
+
+    /**
+     * @return FieldList
+     */
+    public function getOrderInlineCMSFields(): FieldList;
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Tests\DataObjects;
 
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Versioned\Versioned;
@@ -72,5 +73,13 @@ class TestProduct extends DataObject implements PurchasableInterface
     public function getSettablePrice(): ?DBPrice
     {
         return $this->settablePrice;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getOrderInlineCMSFields(): FieldList
+    {
+        return FieldList::create();
     }
 }
