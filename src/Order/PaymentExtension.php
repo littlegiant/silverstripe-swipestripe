@@ -3,10 +3,14 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order;
 
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\MoneyField;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Security\Member;
+use SwipeStripe\GlobalTemplateHelper;
 
 /**
  * Class PaymentExtension
@@ -61,5 +65,18 @@ class PaymentExtension extends DataExtension
         }
 
         return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateCMSFields(FieldList $fields)
+    {
+        $fields->replaceField('MoneyValue', MoneyField::create('Money')->setReadonly(true));
+
+        $displayStatus = GlobalTemplateHelper::singleton()->DisplayStatus($this->owner->Status);
+        $fields->insertAfter('GatewayTitle', ReadonlyField::create('StatusNice', 'Status')->setValue($displayStatus));
+
+        $fields->insertAfter('StatusNice', ReadonlyField::create('TransactionReference'));
     }
 }
