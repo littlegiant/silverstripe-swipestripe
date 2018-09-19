@@ -129,7 +129,16 @@ class Order extends DataObject
     public function populateDefaults()
     {
         parent::populateDefaults();
+
         $this->GuestToken = bin2hex(random_bytes(static::GUEST_TOKEN_BYTES));
+
+        if (!$this->MemberID && $member = Security::getCurrentUser()) {
+            $this->MemberID = $member->ID;
+            $this->CustomerName = trim("{$member->FirstName} {$member->Surname}");
+            $this->CustomerEmail = $member->Email;
+            $this->BillingAddress = $member->DefaultBillingAddress;
+        }
+
         return $this;
     }
 
