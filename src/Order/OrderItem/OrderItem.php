@@ -9,6 +9,7 @@ use SilverStripe\ORM\HasManyList;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\PurchasableInterface;
+use SwipeStripe\ORM\FieldType\ReadOnlyGridField;
 use SwipeStripe\Price\DBPrice;
 
 /**
@@ -180,5 +181,14 @@ class OrderItem extends DataObject
         }
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+        return ReadOnlyGridField::replaceFields($fields);
     }
 }

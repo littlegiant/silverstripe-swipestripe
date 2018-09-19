@@ -19,6 +19,7 @@ use SwipeStripe\Emails\OrderConfirmationEmail;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\ORM\FieldType\DBAddress;
+use SwipeStripe\ORM\FieldType\ReadOnlyGridField;
 use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
@@ -129,7 +130,7 @@ class Order extends DataObject
             'GuestToken',
         ]);
 
-        return $fields;
+        return ReadOnlyGridField::replaceFields($fields);
     }
 
     /**
