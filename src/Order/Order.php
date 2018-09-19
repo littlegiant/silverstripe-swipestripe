@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SwipeStripe\Order;
 
 use Money\Money;
+use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataObject;
@@ -94,6 +95,7 @@ class Order extends DataObject
         'CustomerEmail'    => 'Customer Email',
         'OrderItems.Count' => 'Items',
         'Total.Value'      => 'Total',
+        'LastEdited'       => 'Last Edited',
     ];
 
     /**
@@ -160,6 +162,11 @@ class Order extends DataObject
             'CartLocked',
             'GuestToken',
         ]);
+
+        $fields->insertBefore('CustomerName', FieldGroup::create([
+            $this->dbObject('Created')->scaffoldFormField(),
+            $this->dbObject('LastEdited')->scaffoldFormField(),
+        ]));
 
         $fields->insertAfter('BillingAddress', PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
         $fields->insertAfter('SubTotalValue', PriceField::create('TotalValue', 'Total')->setValue($this->Total()));
