@@ -71,6 +71,23 @@ class DBAddress extends DBComposite
     }
 
     /**
+     * @param DBAddress $other
+     * @return $this
+     */
+    public function copyFrom(DBAddress $other): self
+    {
+        $this->Unit = $other->Unit;
+        $this->Street = $other->Street;
+        $this->Suburb = $other->Suburb;
+        $this->City = $other->City;
+        $this->Region = $other->Region;
+        $this->Postcode = $other->Postcode;
+        $this->Country = $other->Country;
+
+        return $this;
+    }
+
+    /**
      * @inheritDoc
      */
     public function scaffoldFormField($title = null, $params = null)

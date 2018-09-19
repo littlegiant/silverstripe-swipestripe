@@ -142,7 +142,7 @@ class Order extends DataObject
             $this->MemberID = $member->ID;
             $this->CustomerName = trim("{$member->FirstName} {$member->Surname}");
             $this->CustomerEmail = $member->Email;
-            $this->BillingAddress = $member->DefaultBillingAddress;
+            $this->BillingAddress->copyFrom($member->DefaultBillingAddress);
         }
 
         return $this;
