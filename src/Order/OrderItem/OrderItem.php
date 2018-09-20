@@ -11,6 +11,7 @@ use SwipeStripe\CMSHelper;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\PurchasableInterface;
 use SwipeStripe\Price\DBPrice;
+use SwipeStripe\Price\PriceField;
 
 /**
  * Class OrderItem
@@ -237,6 +238,8 @@ class OrderItem extends DataObject
             $purchasableField->setReadonly(true);
             $fields->insertBefore('Quantity', $purchasableField);
         }
+
+        $fields->insertBefore('Quantity', PriceField::create('Price'));
 
         return $this->cmsHelper->convertGridFieldsToReadOnly($fields);
     }
