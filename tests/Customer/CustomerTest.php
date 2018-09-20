@@ -50,7 +50,11 @@ class CustomerTest extends SapphireTest
         $order4ID = Order::create()->write();
 
         $memberOrderIDs = $member->Orders()->column('ID');
-        $this->assertEquals([$order->ID, $order2->ID, $order3->ID], $memberOrderIDs);
+        $expectedOrderIDs = [$order->ID, $order2->ID, $order3->ID];
+        sort($memberOrderIDs);
+        sort($expectedOrderIDs);
+
+        $this->assertEquals($expectedOrderIDs, $memberOrderIDs);
         $this->assertNotContains($order4ID, $memberOrderIDs);
     }
 }
