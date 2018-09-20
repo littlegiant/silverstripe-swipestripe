@@ -72,6 +72,14 @@ class OrderItem extends DataObject
     /**
      * @var array
      */
+    private static $searchable_fields = [
+        'Purchasable.Title',
+        'Quantity',
+    ];
+
+    /**
+     * @var array
+     */
     private static $dependencies = [
         'cmsHelper' => '%$' . CMSHelper::class,
     ];
