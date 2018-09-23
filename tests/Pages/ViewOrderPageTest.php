@@ -5,7 +5,6 @@ namespace SwipeStripe\Tests\Pages;
 
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\Security\Member;
-use SwipeStripe\Customer\Customer;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Tests\Fixtures;
@@ -48,11 +47,6 @@ class ViewOrderPageTest extends FunctionalTest
     private $customerMember;
 
     /**
-     * @var Customer
-     */
-    private $customer;
-
-    /**
      * No one should be able to view order for cart
      */
     public function testCantViewCartAsOrder()
@@ -79,7 +73,7 @@ class ViewOrderPageTest extends FunctionalTest
         $this->assertSame(404, $this->get($orderUrlWithToken)->getStatusCode());
 
         // Customer, owns order
-        $order->CustomerID = $this->customer->ID;
+        $order->MemberID = $this->customerMember->ID;
         $order->write();
         $this->assertSame(404, $this->get($orderUrlWithoutToken)->getStatusCode());
         $this->assertSame(404, $this->get($orderUrlWithToken)->getStatusCode());
@@ -101,7 +95,7 @@ class ViewOrderPageTest extends FunctionalTest
         $this->assertSame(404, $this->get($orderUrlWithoutToken)->getStatusCode());
         $this->assertSame(200, $this->get($orderUrlWithToken)->getStatusCode());
 
-        $order->CustomerID = $this->customer->ID;
+        $order->MemberID = $this->customerMember->ID;
         $order->write();
 
         // Can't view account order with or without token
@@ -116,7 +110,7 @@ class ViewOrderPageTest extends FunctionalTest
     {
         $order = Order::create();
         $order->IsCart = false;
-        $order->CustomerID = $this->customer->ID;
+        $order->MemberID = $this->customerMember->ID;
         $order->write();
 
         $orderUrlWithoutToken = $this->viewOrderPage->Link("{$order->ID}");
@@ -143,7 +137,7 @@ class ViewOrderPageTest extends FunctionalTest
         $this->assertSame(200, $this->get($orderUrlWithoutToken)->getStatusCode());
         $this->assertSame(200, $this->get($orderUrlWithToken)->getStatusCode());
 
-        $order->CustomerID = $this->customer->ID;
+        $order->MemberID = $this->customerMember->ID;
         $order->write();
 
         $this->assertSame(200, $this->get($orderUrlWithoutToken)->getStatusCode());
@@ -162,7 +156,6 @@ class ViewOrderPageTest extends FunctionalTest
         $this->viewOrderPage = $this->objFromFixture(ViewOrderPage::class, 'view-order');
 
         $this->adminMember = $this->createMemberWithPermission('ADMIN');
-        $this->customer = $this->objFromFixture(Customer::class, 'account');
-        $this->customerMember = $this->customer->Member();
+        $this->customerMember = $this->objFromFixture(Member::class, 'customer');
     }
 }

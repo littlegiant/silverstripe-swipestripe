@@ -9,8 +9,8 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
+use SilverStripe\Security\Member;
 use SwipeStripe\Constants\PaymentStatus;
-use SwipeStripe\Customer\Customer;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
@@ -213,13 +213,7 @@ class OrderTest extends SapphireTest
         $this->assertStringStartsWith($orderPage->Link(), $order->Link());
         $this->assertContains($order->GuestToken, $order->Link());
 
-        $order->CustomerID = $this->idFromFixture(Customer::class, 'guest');
-        $order->write();
-
-        $this->assertStringStartsWith($orderPage->Link(), $order->Link());
-        $this->assertContains($order->GuestToken, $order->Link());
-
-        $order->CustomerID = $this->idFromFixture(Customer::class, 'account');
+        $order->MemberID = $this->idFromFixture(Member::class, 'customer');
         $order->write();
 
         $this->assertStringStartsWith($orderPage->Link(), $order->Link());

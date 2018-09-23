@@ -9,19 +9,10 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
-use SilverStripe\Omnipay\Tests\PaymentTest;
 use SwipeStripe\Constants\PaymentStatus;
-use SwipeStripe\Customer\Customer;
 use SwipeStripe\Order\Order;
-use SwipeStripe\Order\OrderAddOn;
-use SwipeStripe\Order\OrderItem\OrderItemAddOn;
-use SwipeStripe\Pages\ViewCartPage;
-use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
-use SwipeStripe\Tests\DataObjects\TestProduct;
-use SwipeStripe\Tests\Fixtures;
 use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
-use SwipeStripe\Tests\PublishesFixtures;
 
 /**
  * Class PayableTest

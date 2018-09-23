@@ -15,9 +15,10 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use SwipeStripe\Constants\ShopPermissions;
-use SwipeStripe\Customer\Customer;
+use SwipeStripe\Emails\OrderConfirmationEmail;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\ORM\FieldType\DBAddress;
 use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
@@ -29,9 +30,12 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  * @property bool $IsCart
  * @property bool $CartLocked
  * @property string $GuestToken
- * @property int $CustomerID
+ * @property int $MemberID
  * @property string $Hash
- * @method null|Customer Customer()
+ * @property string $CustomerName
+ * @property string $CustomerEmail
+ * @property DBAddress $BillingAddress
+ * @method null|Member Member()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
  * @mixin Payable
@@ -52,13 +56,17 @@ class Order extends DataObject
         'IsCart'     => DBBoolean::class,
         'CartLocked' => DBBoolean::class,
         'GuestToken' => DBVarchar::class,
+
+        'CustomerName'   => DBVarchar::class,
+        'CustomerEmail'  => DBVarchar::class,
+        'BillingAddress' => DBAddress::class,
     ];
 
     /**
      * @var array
      */
     private static $has_one = [
-        'Customer' => Customer::class,
+        'Member' => Member::class,
     ];
 
     /**
@@ -80,7 +88,6 @@ class Order extends DataObject
      * @var array
      */
     private static $summary_fields = [
-        'Customer.Email'   => 'Customer Email',
         'OrderItems.Count' => 'Items',
     ];
 
@@ -105,6 +112,22 @@ class Order extends DataObject
         parent::populateDefaults();
         $this->GuestToken = bin2hex(random_bytes(static::GUEST_TOKEN_BYTES));
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+
+        $fields->removeByName([
+            'IsCart',
+            'CartLocked',
+            'GuestToken',
+        ]);
+
+        return $fields;
     }
 
     /**
@@ -338,9 +361,9 @@ class Order extends DataObject
         $member = $member ?? Security::getCurrentUser();
 
         // Allow valid guest token if the customer is a guest
-        return (in_array($this->GuestToken, $guestTokens, true) && $this->Customer()->IsGuest()) ||
-            // Allow if logged in and member owns the customer object
-            ($member !== null && !$this->Customer()->IsGuest() && intval($this->Customer()->MemberID) === intval($member->ID)) ||
+        return (in_array($this->GuestToken, $guestTokens, true) && !$this->Member()->exists()) ||
+            // Allow if logged in and member is the customer
+            ($member !== null && intval($this->Member()->ID) === intval($member->ID)) ||
             // Allow admins
             Permission::check('ADMIN', 'any', $member);
     }
@@ -383,7 +406,10 @@ class Order extends DataObject
     {
         $this->IsCart = false;
         $this->write();
-        // TODO - email customer
+
+        if (!$this->UnpaidTotal()->getMoney()->isPositive()) {
+            OrderConfirmationEmail::create($this)->send();
+        }
     }
 
     /**
