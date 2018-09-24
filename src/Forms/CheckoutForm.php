@@ -20,6 +20,7 @@ use SilverStripe\Omnipay\Model\Message\PaymentMessage;
 use SilverStripe\Omnipay\Model\Message\PurchaseError;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
+use SilverStripe\Security\Security;
 use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Pages\OrderConfirmationPage;
@@ -163,7 +164,9 @@ class CheckoutForm extends BaseForm
     public function ConfirmCheckout(array $data): HTTPResponse
     {
         $this->cart->Lock();
+
         $this->saveInto($this->cart);
+        $this->cart->MemberID = Security::getCurrentUser() ? Security::getCurrentUser()->ID : 0;
         $this->cart->write();
 
         $payment = Payment::create();

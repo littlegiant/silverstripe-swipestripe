@@ -7,10 +7,10 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBVarchar;
-use SilverStripe\ORM\Filters\GreaterThanOrEqualFilter;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Constants\AddOnPriority;
 use SwipeStripe\Price\DBPrice;
+use SwipeStripe\Price\PriceField;
 
 /**
  * Add on applied to on order item on a purchase. The add-on is applied once to the item's subtotal (unit price x quantity),
@@ -97,5 +97,39 @@ class OrderItemAddOn extends DataObject
         return $this->ApplyPerUnit
             ? DBPrice::create_field(DBPrice::INJECTOR_SPEC, $baseAmount->getMoney()->multiply($this->OrderItem()->getQuantity()))
             : $baseAmount;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+
+        $fields->removeByName([
+            'Type',
+            'Priority',
+            'OrderItemID',
+        ]);
+
+        $fields->insertAfter('BaseAmount', PriceField::create('AppliedAmount')->setValue($this->Amount));
+
+        return $fields;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canView($member = null)
+    {
+        return $this->OrderItem()->canView($member);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canEdit($member = null)
+    {
+        return $this->OrderItem()->canEdit($member);
     }
 }

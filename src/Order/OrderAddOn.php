@@ -9,6 +9,7 @@ use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Constants\AddOnPriority;
 use SwipeStripe\Price\DBPrice;
+use SwipeStripe\Price\PriceField;
 
 /**
  * Class OrderAddOn
@@ -86,5 +87,39 @@ class OrderAddOn extends DataObject
     public function getAmount(): DBPrice
     {
         return $this->BaseAmount;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+
+        $fields->removeByName([
+            'Type',
+            'Priority',
+            'OrderID',
+        ]);
+
+        $fields->insertAfter('BaseAmount', PriceField::create('AppliedAmount')->setValue($this->Amount));
+
+        return $fields;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canView($member = null)
+    {
+        return $this->Order()->canView($member);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canEdit($member = null)
+    {
+        return $this->Order()->canEdit($member);
     }
 }

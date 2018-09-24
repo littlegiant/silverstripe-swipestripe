@@ -7,9 +7,11 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Versioned\Versioned;
+use SwipeStripe\CMSHelper;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\PurchasableInterface;
 use SwipeStripe\Price\DBPrice;
+use SwipeStripe\Price\PriceField;
 
 /**
  * Class OrderItem
@@ -63,9 +65,30 @@ class OrderItem extends DataObject
      * @var array
      */
     private static $summary_fields = [
-        'Title'    => 'Title',
-        'Quantity' => 'Quantity',
+        'Title'       => 'Title',
+        'Quantity'    => 'Quantity',
+        'Total.Value' => 'Amount',
     ];
+
+    /**
+     * @var array
+     */
+    private static $searchable_fields = [
+        'Purchasable.Title',
+        'Quantity',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $dependencies = [
+        'cmsHelper' => '%$' . CMSHelper::class,
+    ];
+
+    /**
+     * @var CMSHelper
+     */
+    public $cmsHelper;
 
     /**
      * @inheritDoc
@@ -180,5 +203,44 @@ class OrderItem extends DataObject
         }
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canView($member = null)
+    {
+        return $this->Order()->canView($member);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canEdit($member = null)
+    {
+        return $this->IsMutable() && $this->Order()->canEdit($member);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+
+        $fields->removeByName([
+            'OrderID',
+            'PurchasableLockedVersion',
+        ]);
+
+        foreach ($this->Purchasable()->getOrderInlineCMSFields() as $purchasableField) {
+            $purchasableField->setName("Purchasable_Inline_{$purchasableField->getName()}");
+            $purchasableField->setReadonly(true);
+            $fields->insertBefore('Quantity', $purchasableField);
+        }
+
+        $fields->insertBefore('Quantity', PriceField::create('Price'));
+
+        return $this->cmsHelper->convertGridFieldsToReadOnly($fields);
     }
 }

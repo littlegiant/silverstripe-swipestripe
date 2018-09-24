@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SwipeStripe\Order;
 
 use Money\Money;
+use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataObject;
@@ -14,6 +15,7 @@ use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
+use SwipeStripe\CMSHelper;
 use SwipeStripe\Constants\ShopPermissions;
 use SwipeStripe\Emails\OrderConfirmationEmail;
 use SwipeStripe\Order\OrderItem\OrderItem;
@@ -22,6 +24,7 @@ use SwipeStripe\ORM\FieldType\DBAddress;
 use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
+use SwipeStripe\Price\PriceField;
 use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
@@ -88,14 +91,33 @@ class Order extends DataObject
      * @var array
      */
     private static $summary_fields = [
+        'CustomerName'     => 'Customer Name',
+        'CustomerEmail'    => 'Customer Email',
         'OrderItems.Count' => 'Items',
+        'Total.Value'      => 'Total',
+        'LastEdited'       => 'Last Edited',
     ];
+
+    /**
+     * @var array
+     */
+    private static $searchable_fields = [
+        'CustomerName',
+        'CustomerEmail',
+        'Member.Email',
+    ];
+
+    /**
+     * @var string
+     */
+    private static $default_sort = 'LastEdited DESC';
 
     /**
      * @var array
      */
     private static $dependencies = [
         'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
+        'cmsHelper'           => '%$' . CMSHelper::class,
     ];
 
     /**
@@ -104,13 +126,27 @@ class Order extends DataObject
     public $supportedCurrencies;
 
     /**
+     * @var CMSHelper
+     */
+    public $cmsHelper;
+
+    /**
      * @inheritDoc
      * @throws \Exception
      */
     public function populateDefaults()
     {
         parent::populateDefaults();
+
         $this->GuestToken = bin2hex(random_bytes(static::GUEST_TOKEN_BYTES));
+
+        if (!$this->MemberID && $member = Security::getCurrentUser()) {
+            $this->MemberID = $member->ID;
+            $this->CustomerName = trim("{$member->FirstName} {$member->Surname}");
+            $this->CustomerEmail = $member->Email;
+            $this->BillingAddress->copyFrom($member->DefaultBillingAddress);
+        }
+
         return $this;
     }
 
@@ -127,7 +163,18 @@ class Order extends DataObject
             'GuestToken',
         ]);
 
-        return $fields;
+        $fields->insertBefore('CustomerName', FieldGroup::create([
+            $this->dbObject('Created')->scaffoldFormField(),
+            $this->dbObject('LastEdited')->scaffoldFormField(),
+        ]));
+
+        $fields->insertAfter('BillingAddress', PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
+        $fields->insertAfter('SubTotalValue', PriceField::create('TotalValue', 'Total')->setValue($this->Total()));
+
+        $this->cmsHelper->moveTabBefore($fields, 'Payments', 'Root.OrderItems');
+        $this->cmsHelper->moveTabBefore($fields, 'Payments', 'Root.OrderAddOns');
+
+        return $this->cmsHelper->convertGridFieldsToReadOnly($fields);
     }
 
     /**
@@ -319,7 +366,8 @@ class Order extends DataObject
      */
     public function canView($member = null)
     {
-        return parent::canView($member) || Permission::check(ShopPermissions::VIEW_ORDERS, 'any', $member);
+        return $this->extendedCan(__FUNCTION__, $member) ??
+            Permission::check(ShopPermissions::VIEW_ORDERS, 'any', $member);
     }
 
     /**
@@ -327,7 +375,8 @@ class Order extends DataObject
      */
     public function canEdit($member = null)
     {
-        return false;
+        return $this->extendedCan(__FUNCTION__, $member) ??
+            ($this->IsMutable() && Permission::check(ShopPermissions::EDIT_ORDERS, 'any', $member));
     }
 
     /**
@@ -395,7 +444,7 @@ class Order extends DataObject
      */
     public function Empty(): bool
     {
-        return !boolval($this->OrderItems()->sum('Quantity'));
+        return !$this->exists() || !boolval($this->OrderItems()->sum('Quantity'));
     }
 
     /**
