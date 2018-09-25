@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SwipeStripe\Order;
 
 use Money\Money;
+use SilverStripe\Control\Director;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Omnipay\Model\Payment;
@@ -504,6 +505,14 @@ class Order extends DataObject
         /** @var ViewOrderPage $page */
         $page = ViewOrderPage::get_one(ViewOrderPage::class, ['ClassName' => ViewOrderPage::class]);
         return $page->LinkForOrder($this);
+    }
+
+    /**
+     * @return string
+     */
+    public function AbsoluteLink(): string
+    {
+        return Director::absoluteURL($this->Link());
     }
 
     /**
