@@ -12,6 +12,7 @@ use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
@@ -40,6 +41,7 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  * @property string $CustomerName
  * @property string $CustomerEmail
  * @property DBAddress $BillingAddress
+ * @property string $ConfirmationTime
  * @method null|Member Member()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
@@ -58,9 +60,10 @@ class Order extends DataObject
      * @var array
      */
     private static $db = [
-        'IsCart'     => DBBoolean::class,
-        'CartLocked' => DBBoolean::class,
-        'GuestToken' => DBVarchar::class,
+        'IsCart'           => DBBoolean::class,
+        'CartLocked'       => DBBoolean::class,
+        'GuestToken'       => DBVarchar::class,
+        'ConfirmationTime' => DBDatetime::class,
 
         'CustomerName'   => DBVarchar::class,
         'CustomerEmail'  => DBVarchar::class,
@@ -456,6 +459,7 @@ class Order extends DataObject
      */
     public function paymentCaptured(Payment $payment, ServiceResponse $response): void
     {
+        $this->ConfirmationTime = DBDatetime::now();
         $this->IsCart = false;
         $this->write();
 

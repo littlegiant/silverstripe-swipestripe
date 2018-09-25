@@ -12,6 +12,7 @@
         <% with $Order %>
             <div class="col-md-4">
                 <h3>Details</h3>
+                <p>{$ConfirmationTime.Nice}</p>
                 <p>{$CustomerName}</p>
                 <p>{$CustomerEmail}</p>
             </div>
