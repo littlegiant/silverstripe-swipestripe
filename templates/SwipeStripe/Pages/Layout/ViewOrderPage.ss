@@ -25,11 +25,11 @@
 
     <div class="row">
         <div class="col-md-8">
-            <% include SwipeStripe/CheckoutSummary Cart=$Order %>
+            <% include SwipeStripe/Order/CheckoutSummary Cart=$Order %>
         </div>
 
         <div class="col-md-4">
-            <% include SwipeStripe/CartTotalSummary Cart=$Order %>
+            <% include SwipeStripe/Order/CartTotalSummary Cart=$Order %>
 
             <h4>Payments</h4>
 

@@ -13,11 +13,11 @@
         <% end_if %>
 
         <div class="col-md-8">
-            <% include SwipeStripe/CheckoutSummary Cart=$SwipeStripe.ActiveCart %>
+            <% include SwipeStripe/Order/CheckoutSummary Cart=$SwipeStripe.ActiveCart %>
         </div>
 
         <div class="col-md-4">
-            <% include SwipeStripe/CartTotalSummary Cart=$SwipeStripe.ActiveCart %>
+            <% include SwipeStripe/Order/CartTotalSummary Cart=$SwipeStripe.ActiveCart %>
 
             {$CheckoutForm}
 

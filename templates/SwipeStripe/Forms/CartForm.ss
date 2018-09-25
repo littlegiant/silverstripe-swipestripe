@@ -11,7 +11,7 @@
         </div>
 <% end_if %>
 
-<% include SwipeStripe/CartTotalSummary %>
+<% include SwipeStripe/Order/CartTotalSummary %>
 
 <% if $Actions %>
         <div class="actions">
