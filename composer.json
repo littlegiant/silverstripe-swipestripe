@@ -31,7 +31,7 @@
         "silverstripe/framework": "^4.2",
         "silverstripe/versioned": "^1.2",
         "silverstripe/cms": "^4.2",
-        "silverstripe/silverstripe-omnipay": "dev-feature/omnipay-v3",
+        "silverstripe/silverstripe-omnipay": "^3",
         "dynamic/silverstripe-country-dropdown-field": "^1.2"
     },
     "autoload": {
@@ -54,12 +54,6 @@
         "forum": "http://www.silverstripe.org/e-commerce-modules/",
         "issues": "https://github.com/frankmullenger/silverstripe-swipestripe/issues"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/hchokshi/silverstripe-omnipay.git"
-        }
-    ],
     "require-dev": {
         "php-http/guzzle6-adapter": "^1.1",
         "phpunit/phpunit": "^5.7",

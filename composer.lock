@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8a5831ba74943de69dce1948f00c9b1f",
+    "content-hash": "b132630912e850d369b229a00f98a48d",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -2486,16 +2486,16 @@
         },
         {
             "name": "silverstripe/silverstripe-omnipay",
-            "version": "dev-feature/omnipay-v3",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/hchokshi/silverstripe-omnipay.git",
-                "reference": "9e81fed04b7717cb0f5668d164decbfb748c2ad2"
+                "url": "https://github.com/silverstripe/silverstripe-omnipay.git",
+                "reference": "7d62a31202aad381509a4e1cccb1be88536ca95a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hchokshi/silverstripe-omnipay/zipball/9e81fed04b7717cb0f5668d164decbfb748c2ad2",
-                "reference": "9e81fed04b7717cb0f5668d164decbfb748c2ad2",
+                "url": "https://api.github.com/repos/silverstripe/silverstripe-omnipay/zipball/7d62a31202aad381509a4e1cccb1be88536ca95a",
+                "reference": "7d62a31202aad381509a4e1cccb1be88536ca95a",
                 "shasum": ""
             },
             "require": {
@@ -2526,11 +2526,7 @@
                     "SilverStripe\\Omnipay\\Tests\\": "tests/"
                 }
             },
-            "scripts": {
-                "lint": [
-                    "phpcs -s src/ tests/"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -2540,10 +2536,7 @@
                 "payment",
                 "silverstripe"
             ],
-            "support": {
-                "source": "https://github.com/hchokshi/silverstripe-omnipay/tree/feature/omnipay-v3"
-            },
-            "time": "2018-09-05T04:42:35+00:00"
+            "time": "2018-09-24T08:02:51+00:00"
         },
         {
             "name": "silverstripe/siteconfig",
@@ -4902,9 +4895,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "silverstripe/silverstripe-omnipay": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
