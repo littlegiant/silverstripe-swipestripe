@@ -67,15 +67,30 @@ class ViewOrderPageController extends \PageController
     /**
      * @param HTTPRequest $request
      * @return array
+     * @throws \SilverStripe\Control\HTTPResponse_Exception
      */
     public function ViewOrder(HTTPRequest $request): array
     {
-        $orderId = $request->param('OrderID');
+        return [
+            'Order' => $this->getOrderOr404($request),
+        ];
+    }
+
+    /**
+     * @param HTTPRequest $request
+     * @param string $orderIdParam
+     * @return Order
+     * @throws \SilverStripe\Control\HTTPResponse_Exception
+     */
+    protected function getOrderOr404(HTTPRequest $request, string $orderIdParam = 'OrderID'): Order
+    {
+        $orderId = $request->param($orderIdParam);
         if (!is_numeric($orderId) || intval($orderId) <= 0) {
             $this->httpError(404);
         }
 
         $order = Order::get_by_id(intval($orderId));
+
         /** @var string[] $guestTokens */
         $guestTokens = $request->getSession()->get(SessionData::ACTIVE_GUEST_TOKENS) ?? [];
         if ($order === null || !$order->canViewOrderPage(null, $guestTokens)) {
@@ -83,8 +98,6 @@ class ViewOrderPageController extends \PageController
             $this->httpError(404);
         }
 
-        return [
-            'Order' => $order,
-        ];
+        return $order;
     }
 }
