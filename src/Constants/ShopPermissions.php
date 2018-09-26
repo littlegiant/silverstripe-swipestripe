@@ -5,7 +5,6 @@ namespace SwipeStripe\Constants;
 
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
-use SwipeStripe\Order\Order;
 
 /**
  * Class ShopPermissions
@@ -25,12 +24,12 @@ class ShopPermissions implements PermissionProvider
 
         return [
             self::VIEW_ORDERS => [
-                'name'     => _t(self::VIEW_ORDERS, 'View {orders}', ['orders' => Order::singleton()->i18n_plural_name()]),
+                'name'     => _t(self::VIEW_ORDERS, 'View orders'),
                 'category' => $permissionCategory,
                 'help'     => _t(self::VIEW_ORDERS . '_HELP', 'View orders in the CMS.'),
             ],
             self::EDIT_ORDERS => [
-                'name'     => _t(self::EDIT_ORDERS, 'Edit {orders}', ['orders' => Order::singleton()->i18n_plural_name()]),
+                'name'     => _t(self::EDIT_ORDERS, 'Edit orders'),
                 'category' => $permissionCategory,
                 'help'     => _t(self::EDIT_ORDERS . '_HELP', 'Edit orders in the CMS.'),
             ],
