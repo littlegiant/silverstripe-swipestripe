@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\OrderItem;
 
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBInt;
@@ -104,17 +105,17 @@ class OrderItemAddOn extends DataObject
      */
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
+        $this->beforeUpdateCMSFields(function (FieldList $fields) {
+            $fields->removeByName([
+                'Type',
+                'Priority',
+                'OrderItemID',
+            ]);
 
-        $fields->removeByName([
-            'Type',
-            'Priority',
-            'OrderItemID',
-        ]);
+            $fields->insertAfter('BaseAmount', PriceField::create('AppliedAmount')->setValue($this->Amount));
+        });
 
-        $fields->insertAfter('BaseAmount', PriceField::create('AppliedAmount')->setValue($this->Amount));
-
-        return $fields;
+        return parent::getCMSFields();
     }
 
     /**
