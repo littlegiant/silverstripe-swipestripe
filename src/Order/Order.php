@@ -5,6 +5,7 @@ namespace SwipeStripe\Order;
 
 use Money\Money;
 use SilverStripe\Forms\FieldGroup;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataObject;
@@ -155,26 +156,27 @@ class Order extends DataObject
      */
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
+        $this->beforeUpdateCMSFields(function (FieldList $fields) {
+            $fields->removeByName([
+                'IsCart',
+                'CartLocked',
+                'GuestToken',
+            ]);
 
-        $fields->removeByName([
-            'IsCart',
-            'CartLocked',
-            'GuestToken',
-        ]);
+            $fields->insertBefore('CustomerName', FieldGroup::create([
+                $this->dbObject('Created')->scaffoldFormField(),
+                $this->dbObject('LastEdited')->scaffoldFormField(),
+            ]));
 
-        $fields->insertBefore('CustomerName', FieldGroup::create([
-            $this->dbObject('Created')->scaffoldFormField(),
-            $this->dbObject('LastEdited')->scaffoldFormField(),
-        ]));
+            $fields->insertAfter('BillingAddress', PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
+            $fields->insertAfter('SubTotalValue', PriceField::create('TotalValue', 'Total')->setValue($this->Total()));
 
-        $fields->insertAfter('BillingAddress', PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
-        $fields->insertAfter('SubTotalValue', PriceField::create('TotalValue', 'Total')->setValue($this->Total()));
+            $this->cmsHelper->moveTabBefore($fields, 'Payments', 'Root.OrderItems');
+            $this->cmsHelper->moveTabBefore($fields, 'Payments', 'Root.OrderAddOns');
+            $this->cmsHelper->convertGridFieldsToReadOnly($fields);
+        });
 
-        $this->cmsHelper->moveTabBefore($fields, 'Payments', 'Root.OrderItems');
-        $this->cmsHelper->moveTabBefore($fields, 'Payments', 'Root.OrderAddOns');
-
-        return $this->cmsHelper->convertGridFieldsToReadOnly($fields);
+        return parent::getCMSFields();
     }
 
     /**

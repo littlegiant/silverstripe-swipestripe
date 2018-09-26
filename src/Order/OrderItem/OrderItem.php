@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\OrderItem;
 
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
@@ -226,21 +227,22 @@ class OrderItem extends DataObject
      */
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
+        $this->beforeUpdateCMSFields(function (FieldList $fields) {
+            $fields->removeByName([
+                'OrderID',
+                'PurchasableLockedVersion',
+            ]);
 
-        $fields->removeByName([
-            'OrderID',
-            'PurchasableLockedVersion',
-        ]);
+            foreach ($this->Purchasable()->getOrderInlineCMSFields() as $purchasableField) {
+                $purchasableField->setName("Purchasable_Inline_{$purchasableField->getName()}");
+                $purchasableField->setReadonly(true);
+                $fields->insertBefore('Quantity', $purchasableField);
+            }
 
-        foreach ($this->Purchasable()->getOrderInlineCMSFields() as $purchasableField) {
-            $purchasableField->setName("Purchasable_Inline_{$purchasableField->getName()}");
-            $purchasableField->setReadonly(true);
-            $fields->insertBefore('Quantity', $purchasableField);
-        }
-
-        $fields->insertBefore('Quantity', PriceField::create('Price'));
-
-        return $this->cmsHelper->convertGridFieldsToReadOnly($fields);
+            $fields->insertBefore('Quantity', PriceField::create('Price'));
+            $this->cmsHelper->convertGridFieldsToReadOnly($fields);
+        });
+        
+        return parent::getCMSFields();
     }
 }
