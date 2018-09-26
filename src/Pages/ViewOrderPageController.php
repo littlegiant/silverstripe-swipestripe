@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Pages;
 
+use Heyday\SilverStripe\WkHtml\Generator;
+use Heyday\SilverStripe\WkHtml\Input\Template;
+use Heyday\SilverStripe\WkHtml\Output\Browser;
+use Knp\Snappy\Pdf;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SwipeStripe\Constants\SessionData;
@@ -20,6 +24,7 @@ class ViewOrderPageController extends \PageController
      * @var array
      */
     private static $url_handlers = [
+        '$OrderID!/receipt'      => 'ViewReceipt',
         '$OrderID!/$GuestToken!' => 'RedirectGuestToken',
         '$OrderID!'              => 'ViewOrder',
     ];
@@ -30,7 +35,20 @@ class ViewOrderPageController extends \PageController
     private static $allowed_actions = [
         'RedirectGuestToken',
         'ViewOrder',
+        'ViewReceipt',
     ];
+
+    /**
+     * @var array
+     */
+    private static $dependencies = [
+        'receiptPdfGenerator' => '%$' . Pdf::class . '.SwipeStripe_Receipt',
+    ];
+
+    /**
+     * @var Pdf
+     */
+    public $receiptPdfGenerator;
 
     /**
      *
@@ -99,5 +117,26 @@ class ViewOrderPageController extends \PageController
         }
 
         return $order;
+    }
+
+    /**
+     * @param HTTPRequest $request
+     * @return mixed
+     * @throws \SilverStripe\Control\HTTPResponse_Exception
+     */
+    public function ViewReceipt(HTTPRequest $request)
+    {
+        $order = $this->getOrderOr404($request);
+
+        $templates = array_merge(
+            $order->getViewerTemplates('_Receipt'),
+            $order->getViewerTemplates()
+        );
+
+        return Generator::create(
+            $this->receiptPdfGenerator,
+            Template::create($templates, $order),
+            Browser::create("{$this->SiteConfig()->Title} - Order #{$order->ID}", 'application/pdf', true)
+        )->process();
     }
 }

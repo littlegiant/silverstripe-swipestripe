@@ -11,3 +11,6 @@ SilverStripe\Core\Injector\Injector:
 
   SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface:
     class: SwipeStripe\SupportedCurrencies\SingleSupportedCurrency
+
+  Knp\Snappy\Pdf.SwipeStripe_Receipt:
+    class: Knp\Snappy\Pdf
