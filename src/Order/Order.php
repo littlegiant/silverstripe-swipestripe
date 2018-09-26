@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace SwipeStripe\Order;
 
 use Money\Money;
+use SilverStripe\Control\Director;
+use SilverStripe\Core\CoreKernel;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Omnipay\Model\Payment;
@@ -11,6 +13,8 @@ use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\FieldType\DBEnum;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
@@ -39,6 +43,8 @@ use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
  * @property string $CustomerName
  * @property string $CustomerEmail
  * @property DBAddress $BillingAddress
+ * @property string $ConfirmationTime
+ * @property string $Environment
  * @method null|Member Member()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
@@ -57,9 +63,11 @@ class Order extends DataObject
      * @var array
      */
     private static $db = [
-        'IsCart'     => DBBoolean::class,
-        'CartLocked' => DBBoolean::class,
-        'GuestToken' => DBVarchar::class,
+        'IsCart'           => DBBoolean::class,
+        'CartLocked'       => DBBoolean::class,
+        'GuestToken'       => DBVarchar::class,
+        'ConfirmationTime' => DBDatetime::class,
+        'Environment'      => DBEnum::class . '(array("' . CoreKernel::DEV . '", "' . CoreKernel::TEST . '", "' . CoreKernel::LIVE . '"), "' . CoreKernel::DEV . '")',
 
         'CustomerName'   => DBVarchar::class,
         'CustomerEmail'  => DBVarchar::class,
@@ -96,7 +104,8 @@ class Order extends DataObject
         'CustomerEmail'    => 'Customer Email',
         'OrderItems.Count' => 'Items',
         'Total.Value'      => 'Total',
-        'LastEdited'       => 'Last Edited',
+        'ConfirmationTime' => 'Confirmation Time',
+        'Environment'      => 'Environment',
     ];
 
     /**
@@ -106,12 +115,13 @@ class Order extends DataObject
         'CustomerName',
         'CustomerEmail',
         'Member.Email',
+        'Environment',
     ];
 
     /**
      * @var string
      */
-    private static $default_sort = 'LastEdited DESC';
+    private static $default_sort = 'ConfirmationTime DESC, LastEdited DESC';
 
     /**
      * @var array
@@ -140,6 +150,7 @@ class Order extends DataObject
         parent::populateDefaults();
 
         $this->GuestToken = bin2hex(random_bytes(static::GUEST_TOKEN_BYTES));
+        $this->Environment = Director::get_environment_type();
 
         if (!$this->MemberID && $member = Security::getCurrentUser()) {
             $this->MemberID = $member->ID;
@@ -161,11 +172,13 @@ class Order extends DataObject
                 'IsCart',
                 'CartLocked',
                 'GuestToken',
+                'ConfirmationTime',
+                'Environment',
             ]);
 
             $fields->insertBefore('CustomerName', FieldGroup::create([
-                $this->dbObject('Created')->scaffoldFormField(),
-                $this->dbObject('LastEdited')->scaffoldFormField(),
+                $this->dbObject('Environment')->scaffoldFormField(),
+                $this->dbObject('ConfirmationTime')->scaffoldFormField(),
             ]));
 
             $fields->insertAfter('BillingAddress', PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
@@ -455,6 +468,8 @@ class Order extends DataObject
      */
     public function paymentCaptured(Payment $payment, ServiceResponse $response): void
     {
+        $this->ConfirmationTime = DBDatetime::now();
+        $this->Environment = Director::get_environment_type();
         $this->IsCart = false;
         $this->write();
 
@@ -504,6 +519,14 @@ class Order extends DataObject
         /** @var ViewOrderPage $page */
         $page = ViewOrderPage::get_one(ViewOrderPage::class, ['ClassName' => ViewOrderPage::class]);
         return $page->LinkForOrder($this);
+    }
+
+    /**
+     * @return string
+     */
+    public function AbsoluteLink(): string
+    {
+        return Director::absoluteURL($this->Link());
     }
 
     /**

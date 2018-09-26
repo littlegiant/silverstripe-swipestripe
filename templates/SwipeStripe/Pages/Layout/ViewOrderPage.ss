@@ -12,41 +12,31 @@
         <% with $Order %>
             <div class="col-md-4">
                 <h3>Details</h3>
+                <p>{$ConfirmationTime.Nice}</p>
                 <p>{$CustomerName}</p>
                 <p>{$CustomerEmail}</p>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-4">
                 <h3>Billing Address</h3>
                 <address>{$BillingAddress.Nice}</address>
             </div>
         <% end_with %>
+
+        <div class="col-md-4">
+            <h3>Receipt & Invoice</h3>
+            <a href="{$Link($Order.ID)}/receipt">Download receipt (PDF)</a>
+        </div>
     </div>
 
     <div class="row">
         <div class="col-md-8">
-            <% include SwipeStripe/CheckoutSummary Cart=$Order %>
+            <% include SwipeStripe/Order/CheckoutSummary Cart=$Order %>
         </div>
 
         <div class="col-md-4">
-            <% include SwipeStripe/CartTotalSummary Cart=$Order %>
+            <% include SwipeStripe/Order/CartTotalSummary Cart=$Order %>
 
-            <h4>Payments</h4>
-
-            <% loop $Order.Payments %>
-                <% if $SwipeStripe.DisplayStatus($Status) %>
-                    <div>
-                        <h5>
-                            {$SwipeStripe.DisplayGateway($Gateway)}
-                            <small>&mdash; {$SwipeStripe.DisplayStatus($Status)}</small>
-                        </h5>
-                        <div class="row">
-                            <div class="col-sm-8">{$Created.Nice}</div>
-                            <div class="col-sm-4">{$Money.Nice}</div>
-                        </div>
-                        <hr>
-                    </div>
-                <% end_if %>
-            <% end_loop %>
+            <% include SwipeStripe/Order/PaymentSummary %>
         </div>
     </div>
 </div>
