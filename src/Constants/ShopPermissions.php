@@ -15,6 +15,11 @@ class ShopPermissions implements PermissionProvider
     const VIEW_ORDERS = self::class . '.VIEW_ORDERS';
     const EDIT_ORDERS = self::class . '.EDIT_ORDERS';
 
+    const VIEW_PRODUCTS = self::class . '.VIEW_PRODUCTS';
+    const EDIT_PRODUCTS = self::class . '.EDIT_PRODUCTS';
+    const CREATE_PRODUCTS = self::class . '.CREATE_PRODUCTS';
+    const DELETE_PRODUCTS = self::class . '.DELETE_PRODUCTS';
+
     /**
      * @inheritDoc
      */
@@ -32,6 +37,27 @@ class ShopPermissions implements PermissionProvider
                 'name'     => _t(self::EDIT_ORDERS, 'Edit orders'),
                 'category' => $permissionCategory,
                 'help'     => _t(self::EDIT_ORDERS . '_HELP', 'Edit orders in the CMS.'),
+            ],
+
+            self::VIEW_PRODUCTS   => [
+                'name'     => _t(self::VIEW_PRODUCTS, 'View products'),
+                'category' => $permissionCategory,
+                'help'     => _t(self::VIEW_PRODUCTS . '_HELP', 'View products in the CMS.'),
+            ],
+            self::EDIT_PRODUCTS   => [
+                'name'     => _t(self::EDIT_PRODUCTS, 'Edit products'),
+                'category' => $permissionCategory,
+                'help'     => _t(self::EDIT_PRODUCTS . '_HELP', 'Edit products in the CMS.'),
+            ],
+            self::CREATE_PRODUCTS => [
+                'name'     => _t(self::CREATE_PRODUCTS, 'Create products'),
+                'category' => $permissionCategory,
+                'help'     => _t(self::CREATE_PRODUCTS . '_HELP', 'Create new products in the CMS.'),
+            ],
+            self::DELETE_PRODUCTS => [
+                'name'     => _t(self::DELETE_PRODUCTS, 'Delete products'),
+                'category' => $permissionCategory,
+                'help'     => _t(self::DELETE_PRODUCTS . '_HELP', 'Delete products in the CMS.'),
             ],
         ];
     }
