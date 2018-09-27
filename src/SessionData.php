@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe;
 
-use SwipeStripe\Pages\ViewOrderPageController;
+use SwipeStripe\Order\ViewOrderPageController;
 
 /**
  * Interface SessionData

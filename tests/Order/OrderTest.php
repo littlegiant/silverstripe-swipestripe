@@ -15,7 +15,7 @@ use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\Order\PaymentStatus;
-use SwipeStripe\Pages\ViewOrderPage;
+use SwipeStripe\Order\ViewOrderPage;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;

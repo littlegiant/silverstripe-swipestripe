@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Pages;
+namespace SwipeStripe\Order;
 
 /**
  * Class OrderConfirmationPage
- * @package SwipeStripe\Pages
+ * @package SwipeStripe\Order
  */
 class OrderConfirmationPage extends ViewOrderPage
 {
-    use RequiredSinglePage;
+    use SwipeStripe\RequiredSinglePage;
 }

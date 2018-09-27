@@ -25,7 +25,6 @@ use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\ORM\FieldType\DBAddress;
-use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;

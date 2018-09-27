@@ -7,8 +7,8 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Dev\SapphireTest;
 use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\Checkout\CheckoutPage;
-use SwipeStripe\Pages\OrderConfirmationPage;
-use SwipeStripe\Pages\ViewOrderPage;
+use SwipeStripe\Order\OrderConfirmationPage;
+use SwipeStripe\Order\ViewOrderPage;
 
 /**
  * Class RequiredSinglePagesCreatedTest

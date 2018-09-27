@@ -23,8 +23,8 @@ use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
 use SilverStripe\Security\Security;
 use SwipeStripe\Order\Order;
+use SwipeStripe\Order\OrderConfirmationPage;
 use SwipeStripe\Order\PaymentStatus;
-use SwipeStripe\Pages\OrderConfirmationPage;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
