@@ -11,8 +11,8 @@ use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
 use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Order\Order;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
-use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
+use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
 
 /**
  * Class PayableTest

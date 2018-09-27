@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\SupportedCurrencies;
+namespace SwipeStripe\Price\SupportedCurrencies;
 
 use Money\Currencies;
 use Money\Currencies\CurrencyList;
@@ -10,7 +10,7 @@ use SilverStripe\Core\Config\Configurable;
 
 /**
  * Private static configurable supported currencies.
- * @package SwipeStripe\SupportedCurrencies
+ * @package SwipeStripe\Price\SupportedCurrencies
  * @see CurrencyList
  */
 class SingleSupportedCurrency extends AbstractSupportedCurrencies

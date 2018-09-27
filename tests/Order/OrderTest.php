@@ -16,10 +16,10 @@ use SwipeStripe\Order\OrderAddOn;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;
-use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
+use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
 use SwipeStripe\Tests\PublishesFixtures;
 
 /**

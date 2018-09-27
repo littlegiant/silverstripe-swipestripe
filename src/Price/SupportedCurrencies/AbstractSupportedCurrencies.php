@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\SupportedCurrencies;
+namespace SwipeStripe\Price\SupportedCurrencies;
 
 use Money\Currencies;
 use Money\Currency;
@@ -15,7 +15,7 @@ use SilverStripe\Core\Injector\Injector;
 
 /**
  * Class AbstractSupportedCurrencies
- * @package SwipeStripe\SupportedCurrencies
+ * @package SwipeStripe\Price\SupportedCurrencies
  */
 abstract class AbstractSupportedCurrencies implements SupportedCurrenciesInterface
 {

@@ -6,11 +6,11 @@ SilverStripe\Core\Injector\Injector:
   Price:
     class: SwipeStripe\Price\DBPrice
 
-  SwipeStripe\SupportedCurrencies\AbstractSupportedCurrencies.DefaultSubUnitSource:
+  SwipeStripe\Price\SupportedCurrencies\AbstractSupportedCurrencies.DefaultSubUnitSource:
     class: Money\Currencies\ISOCurrencies
 
-  SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface:
-    class: SwipeStripe\SupportedCurrencies\SingleSupportedCurrency
+  SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface:
+    class: SwipeStripe\Price\SupportedCurrencies\SingleSupportedCurrency
 
   Knp\Snappy\Pdf.SwipeStripe_Receipt:
     class: Knp\Snappy\Pdf

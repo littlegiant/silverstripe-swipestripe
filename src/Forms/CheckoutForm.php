@@ -24,7 +24,7 @@ use SilverStripe\Security\Security;
 use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Pages\OrderConfirmationPage;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * Class CheckoutForm

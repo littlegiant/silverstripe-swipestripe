@@ -30,7 +30,7 @@ use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * Class Order

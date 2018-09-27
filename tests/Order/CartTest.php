@@ -8,7 +8,7 @@ use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;
-use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
+use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
 
 /**
  * Class CartTest

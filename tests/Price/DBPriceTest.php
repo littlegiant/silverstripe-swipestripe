@@ -8,6 +8,7 @@ use Money\Money;
 use SilverStripe\Dev\SapphireTest;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
+use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
 
 /**
  * Class DBPriceTest
