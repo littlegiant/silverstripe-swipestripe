@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace SwipeStripe\Pages;
 
 use SilverStripe\Forms\Form;
-use SwipeStripe\Forms\CheckoutForm;
+use SwipeStripe\Order\CheckoutForm;
 
 /**
  * Class CheckoutPageController

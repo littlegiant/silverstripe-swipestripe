@@ -5,7 +5,7 @@ namespace SwipeStripe\Pages;
 
 use SilverStripe\Forms\Form;
 use SilverStripe\ORM\DataObject;
-use SwipeStripe\Forms\CartForm;
+use SwipeStripe\Order\CartForm;
 
 /**
  * Class ViewCartPageController
