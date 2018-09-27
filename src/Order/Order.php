@@ -21,7 +21,6 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use SwipeStripe\CMSHelper;
-use SwipeStripe\Constants\ShopPermissions;
 use SwipeStripe\Emails\OrderConfirmationEmail;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
@@ -31,6 +30,7 @@ use SwipeStripe\Pages\ViewOrderPage;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\ShopPermissions;
 
 /**
  * Class Order

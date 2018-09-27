@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace SwipeStripe\Order;
 
 use SilverStripe\Admin\ModelAdmin;
-use SwipeStripe\Constants\ShopPermissions;
+use SwipeStripe\ShopPermissions;
 
 /**
  * Class OrderAdmin

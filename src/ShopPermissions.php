@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Constants;
+namespace SwipeStripe;
 
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 
 /**
  * Class ShopPermissions
- * @package SwipeStripe\Constants
+ * @package SwipeStripe
  */
 class ShopPermissions implements PermissionProvider
 {
