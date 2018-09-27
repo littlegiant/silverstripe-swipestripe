@@ -7,6 +7,7 @@ use SilverStripe\Forms\Form;
 use SilverStripe\ORM\DataObject;
 use SwipeStripe\Order\CartForm;
 use SwipeStripe\HasActiveCart;
+use SwipeStripe\Order\Checkout\CheckoutPage;
 
 /**
  * Class ViewCartPageController

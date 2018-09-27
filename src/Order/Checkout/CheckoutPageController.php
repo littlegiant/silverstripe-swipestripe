@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Pages;
+namespace SwipeStripe\Order\Checkout;
 
 use SilverStripe\Forms\Form;
-use SwipeStripe\Order\CheckoutForm;
 use SwipeStripe\HasActiveCart;
+use SwipeStripe\Pages\ViewCartPage;
 
 /**
  * Class CheckoutPageController
- * @package SwipeStripe\Pages
+ * @package SwipeStripe\Order\Checkout
  */
 class CheckoutPageController extends \PageController
 {

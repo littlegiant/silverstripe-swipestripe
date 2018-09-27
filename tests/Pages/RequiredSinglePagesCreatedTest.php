@@ -5,7 +5,7 @@ namespace SwipeStripe\Tests\Pages;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Dev\SapphireTest;
-use SwipeStripe\Pages\CheckoutPage;
+use SwipeStripe\Order\Checkout\CheckoutPage;
 use SwipeStripe\Pages\OrderConfirmationPage;
 use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;

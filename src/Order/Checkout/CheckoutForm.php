@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Order;
+namespace SwipeStripe\Order\Checkout;
 
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
@@ -22,12 +22,14 @@ use SilverStripe\Omnipay\Model\Message\PurchaseError;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
 use SilverStripe\Security\Security;
+use SwipeStripe\Order\Order;
+use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Pages\OrderConfirmationPage;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * Class CheckoutForm
- * @package SwipeStripe\Order
+ * @package SwipeStripe\Order\Checkout
  * @property Payment|null $PaymentError
  */
 class CheckoutForm extends Form
