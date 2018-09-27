@@ -1,17 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Pages;
+namespace SwipeStripe\Order\Cart;
 
 use SilverStripe\Forms\Form;
 use SilverStripe\ORM\DataObject;
-use SwipeStripe\Order\CartForm;
 use SwipeStripe\HasActiveCart;
 use SwipeStripe\Order\Checkout\CheckoutPage;
 
 /**
  * Class ViewCartPageController
- * @package SwipeStripe\Pages
+ * @package SwipeStripe\Order\Cart
  * @property ViewCartPage $dataRecord
  * @method ViewCartPage data()
  */

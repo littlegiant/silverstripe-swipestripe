@@ -5,7 +5,7 @@ namespace SwipeStripe\Order\Checkout;
 
 use SilverStripe\Forms\Form;
 use SwipeStripe\HasActiveCart;
-use SwipeStripe\Pages\ViewCartPage;
+use SwipeStripe\Order\Cart\ViewCartPage;
 
 /**
  * Class CheckoutPageController

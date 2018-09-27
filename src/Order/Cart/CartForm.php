@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Order;
+namespace SwipeStripe\Order\Cart;
 
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
@@ -10,12 +10,13 @@ use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\ValidationResult;
+use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemQuantityField;
 
 /**
  * Class CartForm
- * @package SwipeStripe\Order
+ * @package SwipeStripe\Order\Cart
  */
 class CartForm extends Form
 {
