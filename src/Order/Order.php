@@ -21,7 +21,6 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use SwipeStripe\CMSHelper;
-use SwipeStripe\Emails\OrderConfirmationEmail;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\ORM\FieldType\DBAddress;
