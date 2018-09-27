@@ -6,7 +6,7 @@ namespace SwipeStripe\Tests\Pages;
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\Security\Member;
 use SwipeStripe\Order\Order;
-use SwipeStripe\Pages\ViewOrderPage;
+use SwipeStripe\Order\ViewOrderPage;
 use SwipeStripe\Tests\Fixtures;
 use SwipeStripe\Tests\PublishesFixtures;
 

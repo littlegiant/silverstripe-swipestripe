@@ -5,10 +5,10 @@ namespace SwipeStripe\Tests\Pages;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Dev\SapphireTest;
-use SwipeStripe\Pages\CheckoutPage;
-use SwipeStripe\Pages\OrderConfirmationPage;
-use SwipeStripe\Pages\ViewCartPage;
-use SwipeStripe\Pages\ViewOrderPage;
+use SwipeStripe\Order\Cart\ViewCartPage;
+use SwipeStripe\Order\Checkout\CheckoutPage;
+use SwipeStripe\Order\OrderConfirmationPage;
+use SwipeStripe\Order\ViewOrderPage;
 
 /**
  * Class RequiredSinglePagesCreatedTest

@@ -11,7 +11,6 @@ use SilverStripe\View\TemplateGlobalProvider;
 use SilverStripe\View\ViewableData;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\PaymentStatus;
-use SwipeStripe\Pages\HasActiveCart;
 
 /**
  * $SwipeStripe global template helper.

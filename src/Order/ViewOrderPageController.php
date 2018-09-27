@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Pages;
+namespace SwipeStripe\Order;
 
 use Heyday\SilverStripe\WkHtml\Generator;
 use Heyday\SilverStripe\WkHtml\Input\Template;
@@ -9,12 +9,11 @@ use Heyday\SilverStripe\WkHtml\Output\Browser;
 use Knp\Snappy\Pdf;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SwipeStripe\Order\Order;
 use SwipeStripe\SessionData;
 
 /**
  * Class ViewOrderPageController
- * @package SwipeStripe\Pages
+ * @package SwipeStripe\Order
  * @property ViewOrderPage $dataRecord
  * @method ViewOrderPage data()
  */
@@ -51,7 +50,7 @@ class ViewOrderPageController extends \PageController
     public $receiptPdfGenerator;
 
     /**
-     *
+     * @throws \SilverStripe\Control\HTTPResponse_Exception
      */
     public function index()
     {

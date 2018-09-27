@@ -1,16 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Pages;
+namespace SwipeStripe;
 
 use SilverStripe\Control\Controller;
 use SwipeStripe\Order\Order;
-use SwipeStripe\SessionData;
 
 /**
  * Controller trait to expose active cart.
  * @property Order $ActiveCart
- * @package SwipeStripe\Pages
+ * @package SwipeStripe
  * @mixin Controller
  */
 trait HasActiveCart
