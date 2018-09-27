@@ -10,7 +10,6 @@ use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\HasManyList;
-use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Price\DBPrice;
 
 /**

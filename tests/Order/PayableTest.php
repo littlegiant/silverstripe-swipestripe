@@ -9,8 +9,8 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
-use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Order\Order;
+use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
 

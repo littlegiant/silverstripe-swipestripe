@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Constants;
+namespace SwipeStripe\Order;
 
 /**
  * Interface AddOnPriority
- * @package SwipeStripe\Constants
+ * @package SwipeStripe\Order
  */
 interface AddOnPriority
 {

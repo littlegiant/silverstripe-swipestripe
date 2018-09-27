@@ -9,8 +9,8 @@ use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\View\TemplateGlobalProvider;
 use SilverStripe\View\ViewableData;
-use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Order\Order;
+use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Pages\HasActiveCart;
 
 /**
