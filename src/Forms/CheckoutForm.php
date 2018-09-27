@@ -7,6 +7,7 @@ use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\EmailField;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\OptionsetField;
@@ -31,7 +32,7 @@ use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
  * @package SwipeStripe\Forms
  * @property Payment|null $PaymentError
  */
-class CheckoutForm extends BaseForm
+class CheckoutForm extends Form
 {
     const ORDER_HASH_FIELD = 'OrderContents';
     const PAYMENT_METHOD_FIELD = 'PaymentMethod';
@@ -68,15 +69,19 @@ class CheckoutForm extends BaseForm
         $this->cart = $cart;
         $cart->Unlock();
 
-        parent::__construct($controller, $name, RequiredFields::create([
-            static::PAYMENT_METHOD_FIELD,
-            'CustomerName',
-            'CustomerEmail',
-            'BillingAddressStreet',
-            'BillingAddressCity',
-            'BillingAddressPostCode',
-            'BillingAddressCountry',
-        ]));
+        parent::__construct($controller,
+            $name ?? static::DEFAULT_NAME,
+            $this->buildFields(),
+            $this->buildActions(),
+            RequiredFields::create([
+                static::PAYMENT_METHOD_FIELD,
+                'CustomerName',
+                'CustomerEmail',
+                'BillingAddressStreet',
+                'BillingAddressCity',
+                'BillingAddressPostCode',
+                'BillingAddressCountry',
+            ]));
 
         if (!$this->getSessionData()) {
             $this->loadDataFrom($cart);
