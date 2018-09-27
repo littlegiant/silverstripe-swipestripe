@@ -9,7 +9,7 @@ use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Versioned\Versioned;
-use SwipeStripe\Constants\AddOnPriority;
+use SwipeStripe\Order\AddOnPriority;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
 

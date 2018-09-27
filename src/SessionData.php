@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Constants;
+namespace SwipeStripe;
 
 use SwipeStripe\Pages\ViewOrderPageController;
 
 /**
  * Interface SessionData
- * @package SwipeStripe\Constants
+ * @package SwipeStripe
  */
 interface SessionData
 {

@@ -18,7 +18,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\ValidationResult;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * A field for storing money values into the database via DBPrice, while minimising potential for float errors.

@@ -9,8 +9,8 @@ use Heyday\SilverStripe\WkHtml\Output\Browser;
 use Knp\Snappy\Pdf;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SwipeStripe\Constants\SessionData;
 use SwipeStripe\Order\Order;
+use SwipeStripe\SessionData;
 
 /**
  * Class ViewOrderPageController

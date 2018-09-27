@@ -1,23 +1,23 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Forms;
+namespace SwipeStripe\Order;
 
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\ValidationResult;
-use SwipeStripe\Forms\Fields\OrderItemQuantityField;
-use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
+use SwipeStripe\Order\OrderItem\OrderItemQuantityField;
 
 /**
  * Class CartForm
- * @package SwipeStripe\Forms
+ * @package SwipeStripe\Order
  */
-class CartForm extends BaseForm
+class CartForm extends Form
 {
     const QUANTITY_FIELD_PATTERN = 'Qty_%d';
     const REMOVE_ITEM_ACTION = 'RemoveOrderItem';
@@ -37,7 +37,8 @@ class CartForm extends BaseForm
     public function __construct(Order $cart, ?RequestHandler $controller = null, ?string $name = null)
     {
         $this->cart = $cart;
-        parent::__construct($controller, $name);
+
+        parent::__construct($controller, $name ?? static::DEFAULT_NAME, $this->buildFields(), $this->buildActions());
     }
 
     /**

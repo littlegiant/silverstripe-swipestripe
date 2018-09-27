@@ -14,8 +14,9 @@ use SilverStripe\Forms\SingleSelectField;
 use SilverStripe\ORM\ValidationException;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\DataObjects\TestProduct;
+use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
 use SwipeStripe\Tests\TestValidator;
 
 /**

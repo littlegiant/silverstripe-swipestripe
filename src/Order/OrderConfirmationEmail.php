@@ -1,15 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Emails;
+namespace SwipeStripe\Order;
 
 use SilverStripe\Control\Email\Email;
 use SilverStripe\SiteConfig\SiteConfig;
-use SwipeStripe\Order\Order;
 
 /**
  * Class OrderConfirmationEmail
- * @package SwipeStripe\Emails
+ * @package SwipeStripe\Order
  */
 class OrderConfirmationEmail extends Email
 {

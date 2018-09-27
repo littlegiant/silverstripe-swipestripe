@@ -1,18 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Tests\SupportedCurrencies;
+namespace SwipeStripe\Tests\Price\SupportedCurrencies;
 
 use Money\Currency;
 use Money\Exception\UnknownCurrencyException;
 use Money\Money;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\SapphireTest;
-use SwipeStripe\SupportedCurrencies\MultipleSupportedCurrencies;
+use SwipeStripe\Price\SupportedCurrencies\MultipleSupportedCurrencies;
 
 /**
  * Class MultipleSupportedCurrenciesTest
- * @package SwipeStripe\Tests\SupportedCurrencies
+ * @package SwipeStripe\Tests\Price\SupportedCurrencies
  */
 class MultipleSupportedCurrenciesTest extends SapphireTest
 {

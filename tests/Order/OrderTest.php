@@ -10,16 +10,16 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Security\Member;
-use SwipeStripe\Constants\PaymentStatus;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Pages\ViewCartPage;
 use SwipeStripe\Pages\ViewOrderPage;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;
-use SwipeStripe\Tests\Price\NeedsSupportedCurrencies;
+use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
 use SwipeStripe\Tests\PublishesFixtures;
 
 /**

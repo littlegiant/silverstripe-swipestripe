@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace SwipeStripe\Pages;
 
 use SilverStripe\Control\Controller;
-use SwipeStripe\Constants\SessionData;
 use SwipeStripe\Order\Order;
+use SwipeStripe\SessionData;
 
 /**
  * Controller trait to expose active cart.

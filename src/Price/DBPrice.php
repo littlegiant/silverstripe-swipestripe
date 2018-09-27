@@ -10,7 +10,7 @@ use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\FieldType\DBComposite;
 use SilverStripe\ORM\FieldType\DBMoney;
 use SilverStripe\ORM\FieldType\DBVarchar;
-use SwipeStripe\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * A monetary value database object that's currency aware, and explicitly designed to use MoneyPHP to avoid potential
