@@ -6,7 +6,7 @@ namespace SwipeStripe;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
-use SwipeStripe\ORM\FieldType\ReadOnlyGridField;
+use SwipeStripe\Forms\Fields\ReadOnlyGridField;
 
 /**
  * Class CMSHelper

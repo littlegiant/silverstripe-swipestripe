@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\ORM\FieldType;
+namespace SwipeStripe\Forms\Fields;
 
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
@@ -11,7 +11,7 @@ use SilverStripe\Forms\GridField\GridFieldImportButton;
 
 /**
  * Class ReadOnlyGridField
- * @package SwipeStripe\ORM\FieldType
+ * @package SwipeStripe\Forms\Fields
  */
 class ReadOnlyGridField extends GridField
 {
