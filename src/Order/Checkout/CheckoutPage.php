@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\Checkout;
 
-use SwipeStripe\Pages\RequiredSinglePage;
+use SwipeStripe\RequiredSinglePage;
 
 /**
  * Class CheckoutPage

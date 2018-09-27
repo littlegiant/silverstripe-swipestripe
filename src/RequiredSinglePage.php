@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Pages;
+namespace SwipeStripe;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\ClassInfo;
@@ -12,7 +12,7 @@ use SilverStripe\Versioned\Versioned;
 
 /**
  * Trait RequiredSinglePage
- * @package SwipeStripe\Pages
+ * @package SwipeStripe
  * @mixin \Page
  */
 trait RequiredSinglePage

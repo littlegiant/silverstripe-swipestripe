@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order;
 
-use SwipeStripe\Pages\RequiredSinglePage;
+use SwipeStripe\RequiredSinglePage;
 
 /**
  * Class ViewOrderPage
