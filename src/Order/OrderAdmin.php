@@ -1,15 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Admin;
+namespace SwipeStripe\Order;
 
 use SilverStripe\Admin\ModelAdmin;
 use SwipeStripe\Constants\ShopPermissions;
-use SwipeStripe\Order\Order;
 
 /**
  * Class OrderAdmin
- * @package SwipeStripe\Admin
+ * @package SwipeStripe\Order
  */
 class OrderAdmin extends ModelAdmin
 {
