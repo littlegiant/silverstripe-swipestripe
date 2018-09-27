@@ -9,9 +9,9 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\ValidationResult;
-use SwipeStripe\Forms\Fields\OrderItemQuantityField;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
+use SwipeStripe\Order\OrderItem\OrderItemQuantityField;
 
 /**
  * Class CartForm

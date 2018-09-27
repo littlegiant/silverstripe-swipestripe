@@ -1,21 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Forms\Fields;
+namespace SwipeStripe\Order\OrderItem;
 
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\ORM\DataObjectInterface;
-use SwipeStripe\Forms\CartForm;
 use SwipeStripe\Order\Order;
-use SwipeStripe\Order\OrderItem\OrderItem;
 
 /**
  * Class OrderItemQuantityField
- * @package SwipeStripe\Forms\Fields
- * @property CartForm $form
- * @method CartForm getForm()
+ * @package SwipeStripe\Order\OrderItem
  */
 class OrderItemQuantityField extends NumericField
 {
@@ -97,7 +93,7 @@ class OrderItemQuantityField extends NumericField
 
     /**
      * @param FormAction $removeAction
-     * return $this
+     * @return $this
      */
     public function setRemoveAction(FormAction $removeAction): self
     {
