@@ -182,10 +182,13 @@ class CheckoutForm extends Form
     /**
      * @param Payment $payment
      * @return string
+     * @throws \SilverStripe\ORM\ValidationException
      */
     protected function getFailureUrl(Payment $payment): string
     {
-        if (!$payment->isInDB()) {
+        if (!$payment->Identifier) {
+            // Force identifier to be generated
+            /** @see Payment::onBeforeWrite() */
             $payment->write();
         }
 
