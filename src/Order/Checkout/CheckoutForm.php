@@ -11,8 +11,6 @@ use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\OptionsetField;
-use SilverStripe\Forms\RequiredFields;
-use SilverStripe\Forms\SingleSelectField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Omnipay\GatewayFieldsFactory;
 use SilverStripe\Omnipay\GatewayInfo;
@@ -69,23 +67,31 @@ class CheckoutForm extends Form
         $this->cart = $cart;
         $cart->Unlock();
 
-        parent::__construct($controller,
+        parent::__construct(
+            $controller,
             $name ?? static::DEFAULT_NAME,
             $this->buildFields(),
             $this->buildActions(),
-            RequiredFields::create([
-                static::PAYMENT_METHOD_FIELD,
-                'CustomerName',
-                'CustomerEmail',
-                'BillingAddressStreet',
-                'BillingAddressCity',
-                'BillingAddressPostCode',
-                'BillingAddressCountry',
-            ]));
+            CheckoutFormValidator::create()
+        );
 
         if (!$this->getSessionData()) {
+            // If cart started as guest and they've logged in after
+            $currentUser = Security::getCurrentUser();
+            if (!$cart->Member()->exists() && $currentUser !== null) {
+                $cart->populateCustomerDefaults($currentUser);
+            }
+
             $this->loadDataFrom($cart);
         }
+    }
+
+    /**
+     * @return Order
+     */
+    public function getCart(): Order
+    {
+        return $this->cart;
     }
 
     /**
@@ -126,37 +132,6 @@ class CheckoutForm extends Form
 
         $this->paymentError = $errorMessage;
         return $errorMessage ?: null;
-    }
-
-    /**
-     * @inheritDoc
-     * @throws \SilverStripe\Omnipay\Exception\InvalidConfigurationException
-     */
-    public function validationResult()
-    {
-        $result = parent::validationResult();
-
-        if ($this->cart->Empty()) {
-            $result->addError(_t(self::class . '.CART_EMPTY', 'It looks like your cart is empty. Please add some items before attempting to checkout.'));
-        }
-
-        if ($this->Fields()->dataFieldByName(static::ORDER_HASH_FIELD)->dataValue() !== $this->cart->Hash) {
-            $result->addError(_t(self::class . '.ORDER_HASH_CHANGED',
-                'It looks like your cart has changed since you last loaded the checkout page. Please refresh, re-check your cart and try again.'));
-        }
-
-        $paymentMethodField = $this->Fields()->dataFieldByName(static::PAYMENT_METHOD_FIELD);
-        if (!$paymentMethodField instanceof SingleSelectField) {
-            // Validate gateway if it's not a single select (hidden for single payment method) - single select does its own validation
-            $gateways = GatewayInfo::getSupportedGateways(false);
-            $selectedGateway = $paymentMethodField->dataValue();
-
-            if (!isset($gateways[$selectedGateway])) {
-                $result->addError(_t(self::class . '.INVALID_PAYMENT_METHOD', 'The requested payment method is not available.'));
-            }
-        }
-
-        return $result;
     }
 
     /**

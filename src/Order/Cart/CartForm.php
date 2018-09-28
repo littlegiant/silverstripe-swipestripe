@@ -8,8 +8,6 @@ use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
-use SilverStripe\ORM\ValidationException;
-use SilverStripe\ORM\ValidationResult;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemQuantityField;
@@ -39,7 +37,13 @@ class CartForm extends Form
     {
         $this->cart = $cart;
 
-        parent::__construct($controller, $name ?? static::DEFAULT_NAME, $this->buildFields(), $this->buildActions());
+        parent::__construct(
+            $controller,
+            $name ?? static::DEFAULT_NAME,
+            $this->buildFields(),
+            $this->buildActions(),
+            CartFormValidator::create()
+        );
     }
 
     /**
@@ -52,37 +56,13 @@ class CartForm extends Form
     }
 
     /**
-     * @inheritDoc
-     */
-    public function validationResult()
-    {
-        $result = parent::validationResult();
-
-        if (!$this->cart->IsMutable()) {
-            $result->addError(_t(self::class . '.CART_LOCKED',
-                'Your cart is currently locked because there is a checkout in progress. Please complete or cancel the checkout process to modify your cart.'));
-        }
-
-        return $result;
-    }
-
-    /**
      * @param array $data
      * @return HTTPResponse
      */
     public function RemoveOrderItem(array $data): HTTPResponse
     {
         $orderItemID = intval($data[static::REMOVE_ITEM_ARG] ?? 0);
-
-        if ($orderItemID > 0) {
-            try {
-                $this->cart->removeItem($orderItemID);
-            } catch (\BadMethodCallException $e) {
-                throw new ValidationException(ValidationResult::create()->addError(_t(self::class . '.CART_LOCKED',
-                    'Your cart is currently locked because there is a checkout in progress. Please complete or cancel the checkout process to modify your cart.')));
-            }
-        }
-
+        $this->cart->removeItem($orderItemID);
         return $this->getController()->redirectBack();
     }
 
