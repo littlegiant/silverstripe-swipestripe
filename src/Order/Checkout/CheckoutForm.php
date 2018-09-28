@@ -37,6 +37,9 @@ class CheckoutForm extends Form
     const PAYMENT_METHOD_FIELD = 'PaymentMethod';
     const PAYMENT_ID_QUERY_PARAM = 'payment';
 
+    const CHECKOUT_GUEST = 'Guest';
+    const CHECKOUT_CREATE_ACCOUNT = 'Account';
+
     /**
      * @var array
      */
@@ -115,7 +118,8 @@ class CheckoutForm extends Form
 
         /** @var Payment|null $payment */
         $payment = $this->cart->Payments()->find('Identifier', $paymentIdentifier);
-        $defaultMessage = _t(self::class . '.PAYMENT_ERROR', 'There was an error processing your payment. Please try again.');
+        $defaultMessage = _t(self::class . '.PAYMENT_ERROR',
+            'There was an error processing your payment. Please try again.');
 
         if ($payment === null) {
             // No payment with that identifier for this order, can't show error
@@ -155,7 +159,8 @@ class CheckoutForm extends Form
 
         $paymentMethod = $data[static::PAYMENT_METHOD_FIELD];
         $dueMoney = $this->cart->UnpaidTotal()->getMoney();
-        $payment->init($paymentMethod, $this->supportedCurrencies->formatDecimal($dueMoney), $dueMoney->getCurrency()->getCode())
+        $payment->init($paymentMethod, $this->supportedCurrencies->formatDecimal($dueMoney),
+            $dueMoney->getCurrency()->getCode())
             ->setSuccessUrl($this->getSuccessUrl())
             ->setFailureUrl($this->getFailureUrl($payment));
 
@@ -213,12 +218,20 @@ class CheckoutForm extends Form
 
         $gateways = GatewayInfo::getSupportedGateways();
         $gatewayField = count($gateways) > 1
-            ? OptionsetField::create(static::PAYMENT_METHOD_FIELD, _t(self::class . '.PAYMENT_METHOD', 'Select your payment method'), $gateways)
+            ? OptionsetField::create(static::PAYMENT_METHOD_FIELD,
+                _t(self::class . '.PAYMENT_METHOD', 'Select your payment method'), $gateways)
             : HiddenField::create(static::PAYMENT_METHOD_FIELD, null, key($gateways));
 
         $fields->add($gatewayField);
         $fields->merge($this->buildGatewayFields($gateways));
         $fields->add(HiddenField::create(static::ORDER_HASH_FIELD, null, $this->cart->getHash()));
+
+        if (!Security::getCurrentUser()) {
+            $fields->add(OptionsetField::create('GuestOrAccount', '', [
+                static::CHECKOUT_GUEST          => 'Checkout as guest',
+                static::CHECKOUT_CREATE_ACCOUNT => 'Create an account',
+            ]));
+        }
 
         return $fields;
     }
