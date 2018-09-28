@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\Checkout;
 
+use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\EmailField;
@@ -192,9 +193,10 @@ class CheckoutForm extends Form
             $payment->write();
         }
 
-        return $this->getController()->Link() . '?' . http_build_query([
-                static::PAYMENT_ID_QUERY_PARAM => $payment->Identifier,
-            ]);
+        return Controller::join_links(
+            $this->getController()->Link(),
+            sprintf('?%1$s=%2$s', static::PAYMENT_ID_QUERY_PARAM, $payment->Identifier)
+        );
     }
 
     /**

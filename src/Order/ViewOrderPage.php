@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order;
 
+use SilverStripe\Control\Controller;
 use SwipeStripe\RequiredSinglePage;
 
 /**
@@ -23,7 +24,7 @@ class ViewOrderPage extends \Page
         $link = $this->Link($order->ID);
 
         if ($forceGuestToken || !$order->Member()->exists()) {
-            $link .= "/{$order->GuestToken}";
+            $link = Controller::join_links($link, $order->GuestToken);
         }
 
         return $link;
