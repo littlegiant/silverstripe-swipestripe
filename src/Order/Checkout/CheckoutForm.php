@@ -21,6 +21,7 @@ use SilverStripe\Omnipay\Model\Message\PurchaseError;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
 use SilverStripe\Security\Security;
+use SwipeStripe\Forms\Fields\CheckoutPasswordField;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderConfirmationPage;
 use SwipeStripe\Order\PaymentStatus;
@@ -231,6 +232,8 @@ class CheckoutForm extends Form
                 static::CHECKOUT_GUEST          => 'Checkout as guest',
                 static::CHECKOUT_CREATE_ACCOUNT => 'Create an account',
             ]));
+
+            $fields->add(CheckoutPasswordField::create('Password'));
         }
 
         return $fields;

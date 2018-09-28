@@ -10,6 +10,7 @@ use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
+use SwipeStripe\Forms\Fields\CheckoutPasswordField;
 
 /**
  * Class CheckoutFormValidator
@@ -53,6 +54,11 @@ class CheckoutFormValidator extends RequiredFields
      */
     public function php($data)
     {
+        /** @var CheckoutPasswordField $passwordField */
+        $passwordField = $this->form->Fields()->dataFieldByName('Password');
+        $passwordField->canBeEmpty = $data['GuestOrAccount'] !== CheckoutForm::CHECKOUT_CREATE_ACCOUNT; // Allow empty for guest/unselected
+        $passwordField->setMustBeEmpty($data['GuestOrAccount'] === CheckoutForm::CHECKOUT_GUEST); // Must be empty for guest
+
         if (!Security::getCurrentUser()) {
             $this->addRequiredField('GuestOrAccount');
         }
