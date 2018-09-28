@@ -45,8 +45,14 @@ class CheckoutForm extends Form
      * @var array
      */
     private static $dependencies = [
-        'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
+        'paymentServiceFactory' => '%$' . ServiceFactory::class,
+        'supportedCurrencies'   => '%$' . SupportedCurrenciesInterface::class,
     ];
+
+    /**
+     * @var ServiceFactory
+     */
+    public $paymentServiceFactory;
 
     /**
      * @var SupportedCurrenciesInterface
@@ -169,7 +175,7 @@ class CheckoutForm extends Form
             $payment->write();
         }
 
-        $response = ServiceFactory::singleton()
+        $response = $this->paymentServiceFactory
             ->getService($payment, ServiceFactory::INTENT_PURCHASE)
             ->initiate($data);
 
