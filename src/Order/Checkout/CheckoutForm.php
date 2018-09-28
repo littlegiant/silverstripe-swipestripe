@@ -76,6 +76,12 @@ class CheckoutForm extends Form
         );
 
         if (!$this->getSessionData()) {
+            // If cart started as guest and they've logged in after
+            $currentUser = Security::getCurrentUser();
+            if (!$cart->Member()->exists() && $currentUser !== null) {
+                $cart->populateCustomerDefaults($currentUser);
+            }
+
             $this->loadDataFrom($cart);
         }
     }
