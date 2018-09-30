@@ -3,14 +3,9 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\Checkout;
 
-use SilverStripe\Control\Controller;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\SingleSelectField;
 use SilverStripe\Omnipay\GatewayInfo;
-use SilverStripe\ORM\ValidationResult;
-use SilverStripe\Security\Member;
-use SilverStripe\Security\Security;
-use SwipeStripe\Forms\Fields\CheckoutPasswordField;
 
 /**
  * Class CheckoutFormValidator
@@ -54,16 +49,10 @@ class CheckoutFormValidator extends RequiredFields
      */
     public function php($data)
     {
-        /** @var CheckoutPasswordField $passwordField */
-        $passwordField = $this->form->Fields()->dataFieldByName('Password');
-        $passwordField->canBeEmpty = $data['GuestOrAccount'] !== CheckoutForm::CHECKOUT_CREATE_ACCOUNT; // Allow empty for guest/unselected
-        $passwordField->setMustBeEmpty($data['GuestOrAccount'] === CheckoutForm::CHECKOUT_GUEST); // Must be empty for guest
+        $this->extend('beforeRequiredFields', $this->form, $data);
+        $parentValid = parent::php($data);
+        $this->extend('afterRequiredFields', $this->form, $data);
 
-        if (!Security::getCurrentUser()) {
-            $this->addRequiredField('GuestOrAccount');
-        }
-
-        $valid = parent::php($data);
         $cart = $this->form->getCart();
 
         if ($cart->Empty()) {
@@ -78,11 +67,8 @@ class CheckoutFormValidator extends RequiredFields
 
         $this->validatePaymentMethod($data);
 
-        if (!Security::getCurrentUser()) {
-            $this->validateGuestFields($data);
-        }
-
-        return $valid && $this->result->isValid();
+        $this->extend('validate', $this->form, $data);
+        return $parentValid && $this->result->isValid();
     }
 
     /**
@@ -103,24 +89,6 @@ class CheckoutFormValidator extends RequiredFields
             // Could be hidden field for single available payment method, so we must make it a form-level message
             $this->result->addError(_t(self::class . '.INVALID_PAYMENT_METHOD',
                 'The requested payment method is not available.'));
-        }
-    }
-
-    /**
-     * @param array $data
-     */
-    protected function validateGuestFields(array $data): void
-    {
-        if ($data['GuestOrAccount'] === CheckoutForm::CHECKOUT_CREATE_ACCOUNT &&
-            Member::get()->find('Email', $data['CustomerEmail']) !== null) {
-
-            $loginUrl = Controller::join_links(Security::login_url(),
-                sprintf('?BackURL=%1$s', $this->form->getController()->Link()));
-
-            $this->result->addFieldError('CustomerEmail', _t(self::class . '.EMAIL_TAKEN',
-                'An account with that email already exists. Do you want to <a href="{login_url}">login</a> instead?', [
-                    'login_url' => $loginUrl,
-                ]), ValidationResult::TYPE_ERROR, null, ValidationResult::CAST_HTML);
         }
     }
 }

@@ -21,7 +21,6 @@ use SilverStripe\Omnipay\Model\Message\PurchaseError;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
 use SilverStripe\Security\Security;
-use SwipeStripe\Forms\Fields\CheckoutPasswordField;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderConfirmationPage;
 use SwipeStripe\Order\PaymentStatus;
@@ -156,6 +155,7 @@ class CheckoutForm extends Form
     public function ConfirmCheckout(array $data): HTTPResponse
     {
         $this->cart->Lock();
+        $this->extend('beforeInitPayment', $data);
 
         $this->saveInto($this->cart);
         $this->cart->MemberID = Security::getCurrentUser() ? Security::getCurrentUser()->ID : 0;
@@ -179,6 +179,7 @@ class CheckoutForm extends Form
             ->getService($payment, ServiceFactory::INTENT_PURCHASE)
             ->initiate($data);
 
+        $this->extend('afterInitPayment', $data, $payment, $response);
         return $response->redirectOrRespond();
     }
 
@@ -233,15 +234,7 @@ class CheckoutForm extends Form
         $fields->merge($this->buildGatewayFields($gateways));
         $fields->add(HiddenField::create(static::ORDER_HASH_FIELD, null, $this->cart->getHash()));
 
-        if (!Security::getCurrentUser()) {
-            $fields->add(OptionsetField::create('GuestOrAccount', '', [
-                static::CHECKOUT_GUEST          => 'Checkout as guest',
-                static::CHECKOUT_CREATE_ACCOUNT => 'Create an account',
-            ], static::CHECKOUT_CREATE_ACCOUNT));
-
-            $fields->add(CheckoutPasswordField::create('Password'));
-        }
-
+        $this->extend('updateFields', $fields);
         return $fields;
     }
 
