@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace SwipeStripe\ORM\FieldType;
 
-use Dynamic\CountryDropdownField\Fields\CountryDropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\TextField;
 use SilverStripe\i18n\Data\Intl\IntlLocales;
 use SilverStripe\ORM\FieldType\DBComposite;
 use SilverStripe\ORM\FieldType\DBVarchar;
+use SwipeStripe\Forms\Fields\CountryDropdownField;
 
 /**
  * Class DBAddress

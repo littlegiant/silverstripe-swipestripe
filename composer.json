@@ -32,7 +32,6 @@
         "silverstripe/versioned": "^1.2",
         "silverstripe/cms": "^4.2",
         "silverstripe/silverstripe-omnipay": "^3",
-        "dynamic/silverstripe-country-dropdown-field": "^1.2",
         "heyday/silverstripe-wkhtml": "dev-feature/upgrade-to-ss4"
     },
     "repositories": [
