@@ -263,4 +263,12 @@ class CheckoutForm extends Form
             FormAction::create('ConfirmCheckout', _t(self::class . '.CONFIRM_CHECKOUT', 'Confirm Checkout'))
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function buildRequestHandler()
+    {
+        return CheckoutFormRequestHandler::create($this);
+    }
 }
