@@ -237,7 +237,7 @@ class CheckoutForm extends Form
             $fields->add(OptionsetField::create('GuestOrAccount', '', [
                 static::CHECKOUT_GUEST          => 'Checkout as guest',
                 static::CHECKOUT_CREATE_ACCOUNT => 'Create an account',
-            ]));
+            ], static::CHECKOUT_CREATE_ACCOUNT));
 
             $fields->add(CheckoutPasswordField::create('Password'));
         }
