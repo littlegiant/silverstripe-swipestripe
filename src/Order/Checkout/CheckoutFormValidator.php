@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SwipeStripe\Order\Checkout;
 
 use SilverStripe\Forms\RequiredFields;
+use SilverStripe\Forms\SingleSelectField;
 use SilverStripe\Omnipay\GatewayInfo;
 
 /**
@@ -48,29 +49,46 @@ class CheckoutFormValidator extends RequiredFields
      */
     public function php($data)
     {
-        $valid = parent::php($data);
+        $this->extend('beforeRequiredFields', $this->form, $data);
+        $parentValid = parent::php($data);
+        $this->extend('afterRequiredFields', $this->form, $data);
+
         $cart = $this->form->getCart();
-        $fields = $this->form->Fields();
 
         if ($cart->Empty()) {
-            $this->result->addError(_t(self::class . '.CART_EMPTY', 'It looks like your cart is empty. Please add some items before attempting to checkout.'));
+            $this->result->addError(_t(self::class . '.CART_EMPTY',
+                'It looks like your cart is empty. Please add some items before attempting to checkout.'));
         }
 
-        if ($fields->dataFieldByName(CheckoutForm::ORDER_HASH_FIELD)->dataValue() !== $cart->Hash) {
+        if ($data[CheckoutForm::ORDER_HASH_FIELD] !== $cart->Hash) {
             $this->result->addError(_t(self::class . '.ORDER_HASH_CHANGED',
                 'It looks like your cart has changed since you last loaded the checkout page. Please refresh, re-check your cart and try again.'));
         }
 
-        $paymentMethodField = $fields->dataFieldByName(CheckoutForm::PAYMENT_METHOD_FIELD);
-        if ($paymentMethodField->validate($this)) {
-            $gateways = GatewayInfo::getSupportedGateways(false);
-            $selectedGateway = $paymentMethodField->dataValue();
+        $this->validatePaymentMethod($data);
 
-            if (!isset($gateways[$selectedGateway])) {
-                $this->result->addError(_t(self::class . '.INVALID_PAYMENT_METHOD', 'The requested payment method is not available.'));
-            }
+        $this->extend('validate', $this->form, $data);
+        return $parentValid && $this->result->isValid();
+    }
+
+    /**
+     * @param array $data
+     * @throws \SilverStripe\Omnipay\Exception\InvalidConfigurationException
+     */
+    protected function validatePaymentMethod(array $data): void
+    {
+        if ($this->form->Fields()->dataFieldByName(CheckoutForm::PAYMENT_METHOD_FIELD) instanceof SingleSelectField) {
+            // Single select field will validate option is allowed
+            return;
         }
 
-        return $valid && $this->result->isValid();
+        $gateways = GatewayInfo::getSupportedGateways(false);
+        $selectedGateway = $data[CheckoutForm::PAYMENT_METHOD_FIELD];
+
+        if (!isset($gateways[$selectedGateway])) {
+            // Could be hidden field for single available payment method, so we must make it a form-level message
+            $this->result->addError(_t(self::class . '.INVALID_PAYMENT_METHOD',
+                'The requested payment method is not available.'));
+        }
     }
 }

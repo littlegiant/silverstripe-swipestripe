@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\Checkout;
 
+use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\EmailField;
@@ -36,12 +37,21 @@ class CheckoutForm extends Form
     const PAYMENT_METHOD_FIELD = 'PaymentMethod';
     const PAYMENT_ID_QUERY_PARAM = 'payment';
 
+    const CHECKOUT_GUEST = 'Guest';
+    const CHECKOUT_CREATE_ACCOUNT = 'Account';
+
     /**
      * @var array
      */
     private static $dependencies = [
-        'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
+        'paymentServiceFactory' => '%$' . ServiceFactory::class,
+        'supportedCurrencies'   => '%$' . SupportedCurrenciesInterface::class,
     ];
+
+    /**
+     * @var ServiceFactory
+     */
+    public $paymentServiceFactory;
 
     /**
      * @var SupportedCurrenciesInterface
@@ -114,7 +124,8 @@ class CheckoutForm extends Form
 
         /** @var Payment|null $payment */
         $payment = $this->cart->Payments()->find('Identifier', $paymentIdentifier);
-        $defaultMessage = _t(self::class . '.PAYMENT_ERROR', 'There was an error processing your payment. Please try again.');
+        $defaultMessage = _t(self::class . '.PAYMENT_ERROR',
+            'There was an error processing your payment. Please try again.');
 
         if ($payment === null) {
             // No payment with that identifier for this order, can't show error
@@ -144,6 +155,7 @@ class CheckoutForm extends Form
     public function ConfirmCheckout(array $data): HTTPResponse
     {
         $this->cart->Lock();
+        $this->extend('beforeInitPayment', $data);
 
         $this->saveInto($this->cart);
         $this->cart->MemberID = Security::getCurrentUser() ? Security::getCurrentUser()->ID : 0;
@@ -154,7 +166,8 @@ class CheckoutForm extends Form
 
         $paymentMethod = $data[static::PAYMENT_METHOD_FIELD];
         $dueMoney = $this->cart->UnpaidTotal()->getMoney();
-        $payment->init($paymentMethod, $this->supportedCurrencies->formatDecimal($dueMoney), $dueMoney->getCurrency()->getCode())
+        $payment->init($paymentMethod, $this->supportedCurrencies->formatDecimal($dueMoney),
+            $dueMoney->getCurrency()->getCode())
             ->setSuccessUrl($this->getSuccessUrl())
             ->setFailureUrl($this->getFailureUrl($payment));
 
@@ -162,10 +175,11 @@ class CheckoutForm extends Form
             $payment->write();
         }
 
-        $response = ServiceFactory::singleton()
+        $response = $this->paymentServiceFactory
             ->getService($payment, ServiceFactory::INTENT_PURCHASE)
             ->initiate($data);
 
+        $this->extend('afterInitPayment', $data, $payment, $response);
         return $response->redirectOrRespond();
     }
 
@@ -182,16 +196,20 @@ class CheckoutForm extends Form
     /**
      * @param Payment $payment
      * @return string
+     * @throws \SilverStripe\ORM\ValidationException
      */
     protected function getFailureUrl(Payment $payment): string
     {
-        if (!$payment->isInDB()) {
+        if (!$payment->Identifier) {
+            // Force identifier to be generated
+            /** @see Payment::onBeforeWrite() */
             $payment->write();
         }
 
-        return $this->getController()->Link() . '?' . http_build_query([
-                static::PAYMENT_ID_QUERY_PARAM => $payment->Identifier,
-            ]);
+        return Controller::join_links(
+            $this->getController()->Link(),
+            sprintf('?%1$s=%2$s', static::PAYMENT_ID_QUERY_PARAM, $payment->Identifier)
+        );
     }
 
     /**
@@ -208,13 +226,15 @@ class CheckoutForm extends Form
 
         $gateways = GatewayInfo::getSupportedGateways();
         $gatewayField = count($gateways) > 1
-            ? OptionsetField::create(static::PAYMENT_METHOD_FIELD, _t(self::class . '.PAYMENT_METHOD', 'Select your payment method'), $gateways)
+            ? OptionsetField::create(static::PAYMENT_METHOD_FIELD,
+                _t(self::class . '.PAYMENT_METHOD', 'Select your payment method'), $gateways)
             : HiddenField::create(static::PAYMENT_METHOD_FIELD, null, key($gateways));
 
         $fields->add($gatewayField);
         $fields->merge($this->buildGatewayFields($gateways));
         $fields->add(HiddenField::create(static::ORDER_HASH_FIELD, null, $this->cart->getHash()));
 
+        $this->extend('updateFields', $fields);
         return $fields;
     }
 
@@ -242,5 +262,13 @@ class CheckoutForm extends Form
         return FieldList::create(
             FormAction::create('ConfirmCheckout', _t(self::class . '.CONFIRM_CHECKOUT', 'Confirm Checkout'))
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function buildRequestHandler()
+    {
+        return CheckoutFormRequestHandler::create($this);
     }
 }
