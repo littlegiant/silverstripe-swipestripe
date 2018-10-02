@@ -20,9 +20,9 @@ use SilverStripe\Omnipay\Model\Message\PaymentMessage;
 use SilverStripe\Omnipay\Model\Message\PurchaseError;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
-use SilverStripe\Security\Security;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderConfirmationPage;
+use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
@@ -155,6 +155,7 @@ class CheckoutForm extends Form
         $this->saveInto($this->cart);
         $this->cart->write();
 
+        /** @var Payment|PaymentExtension $payment */
         $payment = Payment::create();
         $payment->OrderID = $this->cart->ID;
 

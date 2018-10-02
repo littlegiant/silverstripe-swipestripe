@@ -10,6 +10,7 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
 use SwipeStripe\Order\Order;
+use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
@@ -68,6 +69,7 @@ class PayableTest extends SapphireTest
      */
     private function addPaymentWithStatus(Order $order, Money $amount, string $status): int
     {
+        /** @var Payment|PaymentExtension $payment */
         $payment = Payment::create()->init('Dummy',
             $this->supportedCurrencies->formatDecimal($amount),
             $amount->getCurrency()->getCode());

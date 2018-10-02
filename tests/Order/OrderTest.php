@@ -14,6 +14,7 @@ use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Order\ViewOrderPage;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
@@ -124,6 +125,7 @@ class OrderTest extends SapphireTest
 
         /** @var SupportedCurrenciesInterface $supportedCurrencies */
         $supportedCurrencies = Injector::inst()->get(SupportedCurrenciesInterface::class);
+        /** @var Payment|PaymentExtension $payment */
         $payment = Payment::create()->init('Dummy',
             $supportedCurrencies->formatDecimal($halfTotalMoney), $halfTotalMoney->getCurrency()->getCode());
         $payment->Status = PaymentStatus::CAPTURED;
@@ -134,6 +136,7 @@ class OrderTest extends SapphireTest
         $this->assertTrue($order->TotalPaid()->getMoney()->equals($halfTotalMoney));
         $this->assertTrue($order->UnpaidTotal()->getMoney()->equals($halfTotalMoney));
 
+        /** @var Payment|PaymentExtension $payment2 */
         $payment2 = Payment::create()->init('Dummy',
             $supportedCurrencies->formatDecimal($halfTotalMoney), $halfTotalMoney->getCurrency()->getCode());
         $payment2->Status = PaymentStatus::CAPTURED;
@@ -244,7 +247,7 @@ class OrderTest extends SapphireTest
     }
 
     /**
-     * @throws \SilverStripe\ORM\ValidationException
+     * @throws \Exception
      */
     public function testVersionLocking()
     {

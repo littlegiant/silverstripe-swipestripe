@@ -207,6 +207,7 @@ class CartTest extends SapphireTest
 
     /**
      * @throws \SilverStripe\ORM\ValidationException
+     * @throws \Exception
      */
     public function testHash()
     {
