@@ -88,6 +88,24 @@ class DBAddress extends DBComposite
     }
 
     /**
+     * @param array $data
+     * @param string $fieldName
+     * @return DBAddress
+     */
+    public function copyFromArray(array $data, string $fieldName = ''): self
+    {
+        $this->Unit = $data["{$fieldName}Unit"];
+        $this->Street = $data["{$fieldName}Street"];
+        $this->Suburb = $data["{$fieldName}Suburb"];
+        $this->City = $data["{$fieldName}City"];
+        $this->Region = $data["{$fieldName}Region"];
+        $this->Postcode = $data["{$fieldName}Postcode"];
+        $this->Country = $data["{$fieldName}Country"];
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function Empty(): bool
