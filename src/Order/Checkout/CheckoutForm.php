@@ -86,12 +86,7 @@ class CheckoutForm extends Form
         );
 
         if (!$this->getSessionData()) {
-            // If cart started as guest and they've logged in after
-            $currentUser = Security::getCurrentUser();
-            if (!$cart->Member()->exists() && $currentUser !== null) {
-                $cart->populateCustomerDefaults($currentUser);
-            }
-
+            $this->extend('beforeLoadDataFromCart');
             $this->loadDataFrom($cart);
         }
     }
@@ -158,7 +153,6 @@ class CheckoutForm extends Form
         $this->extend('beforeInitPayment', $data);
 
         $this->saveInto($this->cart);
-        $this->cart->MemberID = Security::getCurrentUser() ? Security::getCurrentUser()->ID : 0;
         $this->cart->write();
 
         $payment = Payment::create();
