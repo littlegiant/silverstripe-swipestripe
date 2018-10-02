@@ -9,7 +9,6 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
-use SilverStripe\Security\Member;
 use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
@@ -37,7 +36,6 @@ class OrderTest extends SapphireTest
      */
     protected static $fixture_file = [
         Fixtures::BASE_COMMERCE_PAGES,
-        Fixtures::CUSTOMERS,
         Fixtures::PRODUCTS,
     ];
 
@@ -211,17 +209,10 @@ class OrderTest extends SapphireTest
         $this->assertEquals($cartPage->Link(), $order->Link());
 
         $order->IsCart = false;
-        $order->MemberID = 0;
         $order->write();
 
         $this->assertStringStartsWith($orderPage->Link(), $order->Link());
         $this->assertContains($order->GuestToken, $order->Link());
-
-        $order->MemberID = $this->idFromFixture(Member::class, 'customer');
-        $order->write();
-
-        $this->assertStringStartsWith($orderPage->Link(), $order->Link());
-        $this->assertNotContains($order->GuestToken, $order->Link());
     }
 
     /**

@@ -35,14 +35,12 @@ use SwipeStripe\ShopPermissions;
  * @property bool $IsCart
  * @property bool $CartLocked
  * @property string $GuestToken
- * @property int $MemberID
  * @property string $Hash
  * @property string $CustomerName
  * @property string $CustomerEmail
  * @property DBAddress $BillingAddress
  * @property string $ConfirmationTime
  * @property string $Environment
- * @method null|Member Member()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
  * @mixin Payable
@@ -69,13 +67,6 @@ class Order extends DataObject
         'CustomerName'   => DBVarchar::class,
         'CustomerEmail'  => DBVarchar::class,
         'BillingAddress' => DBAddress::class,
-    ];
-
-    /**
-     * @var array
-     */
-    private static $has_one = [
-        'Member' => Member::class,
     ];
 
     /**
@@ -111,7 +102,6 @@ class Order extends DataObject
     private static $searchable_fields = [
         'CustomerName',
         'CustomerEmail',
-        'Member.Email',
         'Environment',
     ];
 

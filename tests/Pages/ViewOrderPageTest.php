@@ -28,7 +28,6 @@ class ViewOrderPageTest extends FunctionalTest
      */
     protected static $fixture_file = [
         Fixtures::BASE_COMMERCE_PAGES,
-        Fixtures::CUSTOMERS,
     ];
 
     /**
@@ -40,11 +39,6 @@ class ViewOrderPageTest extends FunctionalTest
      * @var Member
      */
     private $adminMember;
-
-    /**
-     * @var Member
-     */
-    private $customerMember;
 
     /**
      * No one should be able to view order for cart
@@ -66,17 +60,6 @@ class ViewOrderPageTest extends FunctionalTest
         $this->logInAs($this->adminMember);
         $this->assertSame(404, $this->get($orderUrlWithoutToken)->getStatusCode());
         $this->assertSame(404, $this->get($orderUrlWithToken)->getStatusCode());
-
-        // Customer
-        $this->logInAs($this->customerMember);
-        $this->assertSame(404, $this->get($orderUrlWithoutToken)->getStatusCode());
-        $this->assertSame(404, $this->get($orderUrlWithToken)->getStatusCode());
-
-        // Customer, owns order
-        $order->MemberID = $this->customerMember->ID;
-        $order->write();
-        $this->assertSame(404, $this->get($orderUrlWithoutToken)->getStatusCode());
-        $this->assertSame(404, $this->get($orderUrlWithToken)->getStatusCode());
     }
 
     /**
@@ -93,31 +76,6 @@ class ViewOrderPageTest extends FunctionalTest
 
         // Can view guest order with token
         $this->assertSame(404, $this->get($orderUrlWithoutToken)->getStatusCode());
-        $this->assertSame(200, $this->get($orderUrlWithToken)->getStatusCode());
-
-        $order->MemberID = $this->customerMember->ID;
-        $order->write();
-
-        // Can't view account order with or without token
-        $this->assertSame(404, $this->get($orderUrlWithoutToken)->getStatusCode());
-        $this->assertSame(404, $this->get($orderUrlWithToken)->getStatusCode());
-    }
-
-    /**
-     * Customer can view their own order.
-     */
-    public function testCanViewOrderAsCustomer()
-    {
-        $order = Order::create();
-        $order->IsCart = false;
-        $order->MemberID = $this->customerMember->ID;
-        $order->write();
-
-        $orderUrlWithoutToken = $this->viewOrderPage->Link("{$order->ID}");
-        $orderUrlWithToken = $this->viewOrderPage->Link("{$order->ID}/{$order->GuestToken}");
-
-        $this->logInAs($this->customerMember);
-        $this->assertSame(200, $this->get($orderUrlWithoutToken)->getStatusCode());
         $this->assertSame(200, $this->get($orderUrlWithToken)->getStatusCode());
     }
 
@@ -136,12 +94,6 @@ class ViewOrderPageTest extends FunctionalTest
         $this->logInAs($this->adminMember);
         $this->assertSame(200, $this->get($orderUrlWithoutToken)->getStatusCode());
         $this->assertSame(200, $this->get($orderUrlWithToken)->getStatusCode());
-
-        $order->MemberID = $this->customerMember->ID;
-        $order->write();
-
-        $this->assertSame(200, $this->get($orderUrlWithoutToken)->getStatusCode());
-        $this->assertSame(200, $this->get($orderUrlWithToken)->getStatusCode());
     }
 
     /**
@@ -156,6 +108,5 @@ class ViewOrderPageTest extends FunctionalTest
         $this->viewOrderPage = $this->objFromFixture(ViewOrderPage::class, 'view-order');
 
         $this->adminMember = $this->createMemberWithPermission('ADMIN');
-        $this->customerMember = $this->objFromFixture(Member::class, 'customer');
     }
 }
