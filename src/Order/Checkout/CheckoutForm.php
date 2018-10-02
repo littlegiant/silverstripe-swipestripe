@@ -185,7 +185,7 @@ class CheckoutForm extends Form
     {
         /** @var OrderConfirmationPage $orderConfirmationPage */
         $orderConfirmationPage = OrderConfirmationPage::get_one(OrderConfirmationPage::class);
-        return $orderConfirmationPage->LinkForOrder($this->cart, true);
+        return $orderConfirmationPage->LinkForOrder($this->cart);
     }
 
     /**
