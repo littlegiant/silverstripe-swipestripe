@@ -88,6 +88,15 @@ class DBAddress extends DBComposite
     }
 
     /**
+     * @return bool
+     */
+    public function Empty(): bool
+    {
+        return empty($this->Unit) && empty($this->Street) && empty($this->Suburb) && empty($this->City) &&
+            empty($this->Region) && empty($this->Postcode) && empty($this->Country);
+    }
+
+    /**
      * @inheritDoc
      */
     public function scaffoldFormField($title = null, $params = null)

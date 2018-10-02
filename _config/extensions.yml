@@ -5,8 +5,8 @@ After:
 ---
 
 SilverStripe\Security\Member:
-  extensions:
-  - SwipeStripe\Customer\MemberExtension
+  has_many:
+    Orders: SwipeStripe\Order\Order
 
 SilverStripe\Omnipay\Model\Payment:
   extensions:
