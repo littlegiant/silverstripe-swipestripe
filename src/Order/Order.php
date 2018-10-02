@@ -150,24 +150,6 @@ class Order extends DataObject
         $this->GuestToken = bin2hex(random_bytes(static::GUEST_TOKEN_BYTES));
         $this->Environment = Director::get_environment_type();
 
-        if (!$this->MemberID && $member = Security::getCurrentUser()) {
-            $this->populateCustomerDefaults($member);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Member $customer
-     * @return $this
-     */
-    public function populateCustomerDefaults(Member $customer): self
-    {
-        $this->MemberID = $customer->ID;
-        $this->CustomerName = trim("{$customer->FirstName} {$customer->Surname}");
-        $this->CustomerEmail = $customer->Email;
-        $this->BillingAddress->copyFrom($customer->DefaultBillingAddress);
-
         return $this;
     }
 
