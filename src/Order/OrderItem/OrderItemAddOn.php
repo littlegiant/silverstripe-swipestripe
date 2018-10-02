@@ -24,7 +24,7 @@ use SwipeStripe\Price\PriceField;
  * @property DBPrice $BaseAmount
  * @property DBPrice $Amount
  * @property int $OrderItemID
- * @method null|OrderItem OrderItem()
+ * @method OrderItem OrderItem()
  * @mixin Versioned
  */
 class OrderItemAddOn extends DataObject

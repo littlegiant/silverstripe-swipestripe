@@ -26,7 +26,7 @@ use SwipeStripe\Price\PriceField;
  * @property DBPrice $Total
  * @property string $PurchasableClass
  * @property int $PurchasableLockedVersion
- * @method Order|null Order()
+ * @method Order Order()
  * @method HasManyList|OrderItemAddOn[] OrderItemAddOns()
  */
 class OrderItem extends DataObject
@@ -242,7 +242,7 @@ class OrderItem extends DataObject
             $fields->insertBefore('Quantity', PriceField::create('Price'));
             $this->cmsHelper->convertGridFieldsToReadOnly($fields);
         });
-        
+
         return parent::getCMSFields();
     }
 }
