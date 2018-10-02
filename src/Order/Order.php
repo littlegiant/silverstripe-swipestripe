@@ -19,7 +19,6 @@ use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
-use SilverStripe\Security\Security;
 use SwipeStripe\CMSHelper;
 use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\OrderItem\OrderItem;
@@ -36,14 +35,12 @@ use SwipeStripe\ShopPermissions;
  * @property bool $IsCart
  * @property bool $CartLocked
  * @property string $GuestToken
- * @property int $MemberID
  * @property string $Hash
  * @property string $CustomerName
  * @property string $CustomerEmail
  * @property DBAddress $BillingAddress
  * @property string $ConfirmationTime
  * @property string $Environment
- * @method null|Member Member()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
  * @mixin Payable
@@ -70,13 +67,6 @@ class Order extends DataObject
         'CustomerName'   => DBVarchar::class,
         'CustomerEmail'  => DBVarchar::class,
         'BillingAddress' => DBAddress::class,
-    ];
-
-    /**
-     * @var array
-     */
-    private static $has_one = [
-        'Member' => Member::class,
     ];
 
     /**
@@ -112,7 +102,6 @@ class Order extends DataObject
     private static $searchable_fields = [
         'CustomerName',
         'CustomerEmail',
-        'Member.Email',
         'Environment',
     ];
 
@@ -413,14 +402,13 @@ class Order extends DataObject
             return false;
         }
 
-        $member = $member ?? Security::getCurrentUser();
+        $extendedCan = $this->extendedCan('canViewOrderPage', $member, [
+            'guestTokens' => $guestTokens,
+        ]);
 
-        // Allow valid guest token if the customer is a guest
-        return (in_array($this->GuestToken, $guestTokens, true) && !$this->Member()->exists()) ||
-            // Allow if logged in and member is the customer
-            ($member !== null && intval($this->Member()->ID) === intval($member->ID)) ||
-            // Allow admins
-            Permission::check('ADMIN', 'any', $member);
+        // Allow if extendedCan, admin or valid guest token
+        return $extendedCan ?? (in_array($this->GuestToken, $guestTokens, true) ||
+                Permission::checkMember($member, 'ADMIN'));
     }
 
     /**

@@ -20,9 +20,9 @@ use SilverStripe\Omnipay\Model\Message\PaymentMessage;
 use SilverStripe\Omnipay\Model\Message\PurchaseError;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
-use SilverStripe\Security\Security;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderConfirmationPage;
+use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
@@ -86,12 +86,7 @@ class CheckoutForm extends Form
         );
 
         if (!$this->getSessionData()) {
-            // If cart started as guest and they've logged in after
-            $currentUser = Security::getCurrentUser();
-            if (!$cart->Member()->exists() && $currentUser !== null) {
-                $cart->populateCustomerDefaults($currentUser);
-            }
-
+            $this->extend('beforeLoadDataFromCart');
             $this->loadDataFrom($cart);
         }
     }
@@ -158,9 +153,9 @@ class CheckoutForm extends Form
         $this->extend('beforeInitPayment', $data);
 
         $this->saveInto($this->cart);
-        $this->cart->MemberID = Security::getCurrentUser() ? Security::getCurrentUser()->ID : 0;
         $this->cart->write();
 
+        /** @var Payment|PaymentExtension $payment */
         $payment = Payment::create();
         $payment->OrderID = $this->cart->ID;
 
@@ -190,7 +185,7 @@ class CheckoutForm extends Form
     {
         /** @var OrderConfirmationPage $orderConfirmationPage */
         $orderConfirmationPage = OrderConfirmationPage::get_one(OrderConfirmationPage::class);
-        return $orderConfirmationPage->LinkForOrder($this->cart, true);
+        return $orderConfirmationPage->LinkForOrder($this->cart);
     }
 
     /**

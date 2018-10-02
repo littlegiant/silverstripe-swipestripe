@@ -14,6 +14,7 @@ use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\MoneyField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\Validator;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\ValidationException;
@@ -448,6 +449,7 @@ class PriceField extends FormField
 
     /**
      * @inheritdoc
+     * @param Validator $validator
      */
     public function validate($validator)
     {

@@ -9,6 +9,9 @@ use Heyday\SilverStripe\WkHtml\Output\Browser;
 use Knp\Snappy\Pdf;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Control\HTTPResponse_Exception;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
 use SwipeStripe\SessionData;
 
 /**
@@ -102,17 +105,18 @@ class ViewOrderPageController extends \PageController
     protected function getOrderOr404(HTTPRequest $request, string $orderIdParam = 'OrderID'): Order
     {
         $orderId = $request->param($orderIdParam);
+        $currentUser = Security::getCurrentUser();
         if (!is_numeric($orderId) || intval($orderId) <= 0) {
-            $this->httpError(404);
+            $response = $this->getDisallowedResponse(null, $currentUser);
+            throw new HTTPResponse_Exception($response);
         }
 
         $order = Order::get_by_id(intval($orderId));
-
         /** @var string[] $guestTokens */
         $guestTokens = $request->getSession()->get(SessionData::ACTIVE_GUEST_TOKENS) ?? [];
-        if ($order === null || !$order->canViewOrderPage(null, $guestTokens)) {
-            // Can't view = 404, because a 403 Forbidden would leak information (order ID exists)
-            $this->httpError(404);
+        if ($order === null || !$order->canViewOrderPage($currentUser, $guestTokens)) {
+            $response = $this->getDisallowedResponse($order, $currentUser);
+            throw new HTTPResponse_Exception($response);
         }
 
         return $order;
@@ -137,5 +141,18 @@ class ViewOrderPageController extends \PageController
             Template::create($templates, $order),
             Browser::create("{$this->SiteConfig()->Title} - Order #{$order->ID}", 'application/pdf', true)
         )->process();
+    }
+
+    /**
+     * @param null|Order $order
+     * @param null|Member $currentUser
+     * @return HTTPResponse
+     */
+    protected function getDisallowedResponse(?Order $order, ?Member $currentUser): HTTPResponse
+    {
+        $response = HTTPResponse::create(null, 404);
+        $this->extend('updateDisallowedResponse', $order, $currentUser, $response);
+
+        return $response;
     }
 }

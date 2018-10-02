@@ -4,10 +4,6 @@ After:
 - framework/*
 ---
 
-SilverStripe\Security\Member:
-  has_many:
-    Orders: SwipeStripe\Order\Order
-
 SilverStripe\Omnipay\Model\Payment:
   extensions:
   - SwipeStripe\Order\PaymentExtension

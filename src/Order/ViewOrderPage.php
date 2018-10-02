@@ -16,16 +16,16 @@ class ViewOrderPage extends \Page
 
     /**
      * @param Order $order
-     * @param bool $forceGuestToken Force include guest token.
      * @return string
      */
-    public function LinkForOrder(Order $order, bool $forceGuestToken = false): string
+    public function LinkForOrder(Order $order): string
     {
-        $link = $this->Link($order->ID);
+        $link = Controller::join_links(
+            $this->Link($order->ID),
+            $order->GuestToken
+        );
 
-        if ($forceGuestToken || !$order->Member()->exists()) {
-            $link = Controller::join_links($link, $order->GuestToken);
-        }
+        $this->extend('updateLinkForOrder', $order, $link);
 
         return $link;
     }

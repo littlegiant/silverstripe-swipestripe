@@ -20,7 +20,7 @@ use SwipeStripe\Price\PriceField;
  * @property DBPrice $BaseAmount
  * @property DBPrice $Amount
  * @property int $OrderID
- * @method null|Order Order()
+ * @method Order Order()
  * @mixin Versioned
  */
 class OrderAddOn extends DataObject

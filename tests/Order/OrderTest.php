@@ -9,11 +9,11 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
-use SilverStripe\Security\Member;
 use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Order\ViewOrderPage;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
@@ -36,7 +36,6 @@ class OrderTest extends SapphireTest
      */
     protected static $fixture_file = [
         Fixtures::BASE_COMMERCE_PAGES,
-        Fixtures::CUSTOMERS,
         Fixtures::PRODUCTS,
     ];
 
@@ -124,6 +123,7 @@ class OrderTest extends SapphireTest
 
         /** @var SupportedCurrenciesInterface $supportedCurrencies */
         $supportedCurrencies = Injector::inst()->get(SupportedCurrenciesInterface::class);
+        /** @var Payment|PaymentExtension $payment */
         $payment = Payment::create()->init('Dummy',
             $supportedCurrencies->formatDecimal($halfTotalMoney), $halfTotalMoney->getCurrency()->getCode());
         $payment->Status = PaymentStatus::CAPTURED;
@@ -134,6 +134,7 @@ class OrderTest extends SapphireTest
         $this->assertTrue($order->TotalPaid()->getMoney()->equals($halfTotalMoney));
         $this->assertTrue($order->UnpaidTotal()->getMoney()->equals($halfTotalMoney));
 
+        /** @var Payment|PaymentExtension $payment2 */
         $payment2 = Payment::create()->init('Dummy',
             $supportedCurrencies->formatDecimal($halfTotalMoney), $halfTotalMoney->getCurrency()->getCode());
         $payment2->Status = PaymentStatus::CAPTURED;
@@ -208,17 +209,10 @@ class OrderTest extends SapphireTest
         $this->assertEquals($cartPage->Link(), $order->Link());
 
         $order->IsCart = false;
-        $order->MemberID = 0;
         $order->write();
 
         $this->assertStringStartsWith($orderPage->Link(), $order->Link());
         $this->assertContains($order->GuestToken, $order->Link());
-
-        $order->MemberID = $this->idFromFixture(Member::class, 'customer');
-        $order->write();
-
-        $this->assertStringStartsWith($orderPage->Link(), $order->Link());
-        $this->assertNotContains($order->GuestToken, $order->Link());
     }
 
     /**
@@ -244,7 +238,7 @@ class OrderTest extends SapphireTest
     }
 
     /**
-     * @throws \SilverStripe\ORM\ValidationException
+     * @throws \Exception
      */
     public function testVersionLocking()
     {

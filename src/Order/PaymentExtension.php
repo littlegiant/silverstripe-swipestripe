@@ -17,7 +17,7 @@ use SwipeStripe\GlobalTemplateHelper;
  * @package SwipeStripe\Order
  * @property Payment|PaymentExtension $owner
  * @property int $OrderID
- * @method null|Order Order()
+ * @method Order Order()
  */
 class PaymentExtension extends DataExtension
 {
