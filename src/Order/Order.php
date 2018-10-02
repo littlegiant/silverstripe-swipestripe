@@ -19,7 +19,6 @@ use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
-use SilverStripe\Security\Security;
 use SwipeStripe\CMSHelper;
 use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\OrderItem\OrderItem;
@@ -413,14 +412,13 @@ class Order extends DataObject
             return false;
         }
 
-        $member = $member ?? Security::getCurrentUser();
+        $extendedCan = $this->extendedCan('canViewOrderPage', $member, [
+            'guestTokens' => $guestTokens,
+        ]);
 
-        // Allow valid guest token if the customer is a guest
-        return (in_array($this->GuestToken, $guestTokens, true) && !$this->Member()->exists()) ||
-            // Allow if logged in and member is the customer
-            ($member !== null && intval($this->Member()->ID) === intval($member->ID)) ||
-            // Allow admins
-            Permission::check('ADMIN', 'any', $member);
+        // Allow if extendedCan, admin or valid guest token
+        return $extendedCan ?? (in_array($this->GuestToken, $guestTokens, true) ||
+                Permission::checkMember($member, 'ADMIN'));
     }
 
     /**
