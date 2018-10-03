@@ -119,7 +119,7 @@ class DBAddress extends DBComposite
      */
     public function scaffoldFormField($title = null, $params = null)
     {
-        return FieldGroup::create([
+        return FieldGroup::create($title ?? FieldGroup::name_to_label($this->getName()), [
             TextField::create("{$this->getName()}Unit", 'Unit'),
             TextField::create("{$this->getName()}Street", 'Street'),
             TextField::create("{$this->getName()}Suburb", 'Suburb'),
