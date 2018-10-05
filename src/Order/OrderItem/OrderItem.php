@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\OrderItem;
 
+use SilverShop\HasOneField\HasOneButtonField;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
@@ -31,6 +33,8 @@ use SwipeStripe\Price\PriceField;
  */
 class OrderItem extends DataObject
 {
+    use CMSHelper;
+
     const PURCHASABLE_CLASS = 'PurchasableClass';
     const PURCHASABLE_ID = 'PurchasableID';
 
@@ -78,18 +82,6 @@ class OrderItem extends DataObject
         'Purchasable.Title',
         'Quantity',
     ];
-
-    /**
-     * @var array
-     */
-    private static $dependencies = [
-        'cmsHelper' => '%$' . CMSHelper::class,
-    ];
-
-    /**
-     * @var CMSHelper
-     */
-    public $cmsHelper;
 
     /**
      * @inheritDoc
@@ -233,14 +225,12 @@ class OrderItem extends DataObject
                 'PurchasableLockedVersion',
             ]);
 
-            foreach ($this->Purchasable()->getOrderInlineCMSFields() as $purchasableField) {
-                $purchasableField->setName("Purchasable_Inline_{$purchasableField->getName()}");
-                $purchasableField->setReadonly(true);
-                $fields->insertBefore('Quantity', $purchasableField);
-            }
+            $fields->insertBefore('Quantity', ReadonlyField::create('Title'));
+            $fields->insertAfter('Title', ReadonlyField::create('Description'));
+            $fields->insertAfter('Description', PriceField::create('Price'));
+            $fields->insertBefore('Quantity', HasOneButtonField::create($this, 'Purchasable'));
 
-            $fields->insertBefore('Quantity', PriceField::create('Price'));
-            $this->cmsHelper->convertGridFieldsToReadOnly($fields);
+            $this->convertGridFieldsToReadOnly($fields);
         });
 
         return parent::getCMSFields();

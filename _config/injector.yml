@@ -14,3 +14,6 @@ SilverStripe\Core\Injector\Injector:
 
   Knp\Snappy\Pdf.SwipeStripe_Receipt:
     class: Knp\Snappy\Pdf
+
+  SilverShop\HasOneField\HasOneButtonField.ReadOnly:
+    class: SwipeStripe\Forms\Fields\ReadOnlyHasOneButtonField
