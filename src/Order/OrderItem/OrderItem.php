@@ -33,6 +33,8 @@ use SwipeStripe\Price\PriceField;
  */
 class OrderItem extends DataObject
 {
+    use CMSHelper;
+
     const PURCHASABLE_CLASS = 'PurchasableClass';
     const PURCHASABLE_ID = 'PurchasableID';
 
@@ -80,18 +82,6 @@ class OrderItem extends DataObject
         'Purchasable.Title',
         'Quantity',
     ];
-
-    /**
-     * @var array
-     */
-    private static $dependencies = [
-        'cmsHelper' => '%$' . CMSHelper::class,
-    ];
-
-    /**
-     * @var CMSHelper
-     */
-    public $cmsHelper;
 
     /**
      * @inheritDoc
@@ -240,7 +230,7 @@ class OrderItem extends DataObject
             $fields->insertAfter('Description', PriceField::create('Price'));
             $fields->insertBefore('Quantity', HasOneButtonField::create($this, 'Purchasable'));
 
-            $this->cmsHelper->convertGridFieldsToReadOnly($fields);
+            $this->convertGridFieldsToReadOnly($fields);
         });
 
         return parent::getCMSFields();

@@ -3,20 +3,17 @@ declare(strict_types=1);
 
 namespace SwipeStripe;
 
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SwipeStripe\Forms\Fields\ReadOnlyGridField;
 
 /**
- * Class CMSHelper
+ * Trait CMSHelper
  * @package SwipeStripe
  */
-class CMSHelper
+trait CMSHelper
 {
-    use Injectable;
-
     /**
      * @param FieldList $fieldList
      * @param array|null $fieldNames

@@ -47,6 +47,8 @@ use SwipeStripe\ShopPermissions;
  */
 class Order extends DataObject
 {
+    use CMSHelper;
+
     const GUEST_TOKEN_BYTES = 16;
 
     /**
@@ -115,18 +117,12 @@ class Order extends DataObject
      */
     private static $dependencies = [
         'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
-        'cmsHelper'           => '%$' . CMSHelper::class,
     ];
 
     /**
      * @var SupportedCurrenciesInterface
      */
     public $supportedCurrencies;
-
-    /**
-     * @var CMSHelper
-     */
-    public $cmsHelper;
 
     /**
      * @inheritDoc
@@ -164,9 +160,9 @@ class Order extends DataObject
             $fields->insertAfter('BillingAddress', PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
             $fields->insertAfter('SubTotalValue', PriceField::create('TotalValue', 'Total')->setValue($this->Total()));
 
-            $this->cmsHelper->moveTabBefore($fields, 'Payments', 'Root.OrderItems');
-            $this->cmsHelper->moveTabBefore($fields, 'Payments', 'Root.OrderAddOns');
-            $this->cmsHelper->convertGridFieldsToReadOnly($fields);
+            $this->moveTabBefore($fields, 'Payments', 'Root.OrderItems');
+            $this->moveTabBefore($fields, 'Payments', 'Root.OrderAddOns');
+            $this->convertGridFieldsToReadOnly($fields);
         });
 
         return parent::getCMSFields();
