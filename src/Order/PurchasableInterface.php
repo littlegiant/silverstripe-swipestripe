@@ -32,9 +32,4 @@ interface PurchasableInterface extends DataObjectInterface
      * @return DBPrice
      */
     public function getPrice(): DBPrice;
-
-    /**
-     * @return FieldList
-     */
-    public function getOrderInlineCMSFields(): FieldList;
 }

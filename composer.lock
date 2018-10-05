@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6aa5fd67dda714111e5db14abf64e607",
+    "content-hash": "40ab373b30ed7c3c2fb1ea9bcf0287c4",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -1827,6 +1827,54 @@
                 "simple-cache"
             ],
             "time": "2017-10-23T01:57:42+00:00"
+        },
+        {
+            "name": "silvershop/silverstripe-hasonefield",
+            "version": "2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silvershop/silverstripe-hasonefield.git",
+                "reference": "0aa39e3db2e69c5c06e3b89cf4b9a12f3a3c4266"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silvershop/silverstripe-hasonefield/zipball/0aa39e3db2e69c5c06e3b89cf4b9a12f3a3c4266",
+                "reference": "0aa39e3db2e69c5c06e3b89cf4b9a12f3a3c4266",
+                "shasum": ""
+            },
+            "require": {
+                "silverstripe/framework": "^4.0",
+                "silverstripe/vendor-plugin": "^1.0"
+            },
+            "replace": {
+                "hchokshi/silverstripe-hasonefield": "*"
+            },
+            "type": "silverstripe-vendormodule",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                },
+                "expose": [
+                    "client"
+                ]
+            },
+            "autoload": {
+                "psr-4": {
+                    "SilverShop\\HasOneField\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Jeremy Shipman",
+                    "email": "jeremy@burnbright.net"
+                }
+            ],
+            "description": "Edit a has_one relationship using the gridfield editor, triggered by clicking a button.",
+            "time": "2018-10-05T02:40:33+00:00"
         },
         {
             "name": "silverstripe/admin",
