@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace SwipeStripe;
 
-use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
 use SwipeStripe\Order\Order;
 
 /**
  * Controller trait to expose active cart.
  * @property Order $ActiveCart
  * @package SwipeStripe
- * @mixin Controller
  */
 trait HasActiveCart
 {
@@ -34,7 +33,7 @@ trait HasActiveCart
         $cartObj->IsCart = true;
         $cartObj->write();
 
-        $session->set(SessionData::CART_ID, $cartObj->ID)->save($this->getRequest());
+        $session->set(SessionData::CART_ID, $cartObj->ID);
         return $cartObj;
     }
 
@@ -45,4 +44,9 @@ trait HasActiveCart
     {
         $this->getRequest()->getSession()->clear(SessionData::CART_ID);
     }
+
+    /**
+     * @return HTTPRequest
+     */
+    abstract public function getRequest();
 }
