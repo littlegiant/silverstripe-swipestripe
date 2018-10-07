@@ -75,8 +75,13 @@ class DBAddress extends DBComposite
      */
     public function Empty(): bool
     {
-        return empty($this->Unit) && empty($this->Street) && empty($this->Suburb) && empty($this->City) &&
-            empty($this->Region) && empty($this->Postcode) && empty($this->Country);
+        foreach ($this->compositeDatabaseFields() as $field => $type) {
+            if (!empty($this->getField($field))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
