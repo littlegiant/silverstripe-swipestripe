@@ -150,9 +150,9 @@ class CheckoutForm extends Form
     public function ConfirmCheckout(array $data): HTTPResponse
     {
         $this->cart->Lock();
-        $this->extend('beforeInitPayment', $data);
-
         $this->saveInto($this->cart);
+
+        $this->extend('beforeInitPayment', $data);
         $this->cart->write();
 
         /** @var Payment|PaymentExtension $payment */
