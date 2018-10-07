@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace SwipeStripe\Order\Checkout;
 
 use SilverStripe\Control\Controller;
-use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\EmailField;
 use SilverStripe\Forms\FieldList;
@@ -14,43 +13,26 @@ use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Omnipay\Exception\InvalidConfigurationException;
-use SilverStripe\Omnipay\Exception\InvalidStateException;
 use SilverStripe\Omnipay\GatewayFieldsFactory;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\Omnipay\Model\Message\CompletePurchaseError;
 use SilverStripe\Omnipay\Model\Message\PaymentMessage;
 use SilverStripe\Omnipay\Model\Message\PurchaseError;
 use SilverStripe\Omnipay\Model\Payment;
-use SilverStripe\Omnipay\Service\ServiceFactory;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderConfirmationPage;
-use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Order\PaymentStatus;
-use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * Class CheckoutForm
  * @package SwipeStripe\Order\Checkout
  * @property Payment|null $PaymentError
- * @property-read ServiceFactory $paymentServiceFactory
- * @property-read SupportedCurrenciesInterface $supportedCurrencies
  */
 class CheckoutForm extends Form
 {
     const ORDER_HASH_FIELD = 'OrderContents';
     const PAYMENT_METHOD_FIELD = 'PaymentMethod';
     const PAYMENT_ID_QUERY_PARAM = 'payment';
-
-    const CHECKOUT_GUEST = 'Guest';
-    const CHECKOUT_CREATE_ACCOUNT = 'Account';
-
-    /**
-     * @var array
-     */
-    private static $dependencies = [
-        'paymentServiceFactory' => '%$' . ServiceFactory::class,
-        'supportedCurrencies'   => '%$' . SupportedCurrenciesInterface::class,
-    ];
 
     /**
      * @var Order
@@ -135,46 +117,10 @@ class CheckoutForm extends Form
     }
 
     /**
-     * @param array $data
-     * @return HTTPResponse
-     * @throws InvalidConfigurationException
-     * @throws InvalidStateException
-     * @throws \Exception
-     */
-    public function ConfirmCheckout(array $data): HTTPResponse
-    {
-        $cart = $this->getCart();
-        $cart->Lock();
-        $this->saveInto($cart);
-
-        $this->extend('beforeInitPayment', $data);
-        $cart->write();
-
-        /** @var Payment|PaymentExtension $payment */
-        $payment = Payment::create();
-        $payment->OrderID = $cart->ID;
-
-        $paymentMethod = $data[static::PAYMENT_METHOD_FIELD];
-        $dueMoney = $cart->UnpaidTotal()->getMoney();
-
-        $payment->init($paymentMethod, $this->supportedCurrencies->formatDecimal($dueMoney),
-            $dueMoney->getCurrency()->getCode())
-            ->setSuccessUrl($this->getSuccessUrl())
-            ->setFailureUrl($this->getFailureUrl($payment));
-        $payment->write();
-
-        $response = $this->paymentServiceFactory
-            ->getService($payment, ServiceFactory::INTENT_PURCHASE)
-            ->initiate($data);
-
-        $this->extend('afterInitPayment', $data, $payment, $response);
-        return $response->redirectOrRespond();
-    }
-
-    /**
+     * @param Payment $payment
      * @return string
      */
-    protected function getSuccessUrl(): string
+    public function getSuccessUrl(Payment $payment): string
     {
         /** @var OrderConfirmationPage $orderConfirmationPage */
         $orderConfirmationPage = OrderConfirmationPage::get_one(OrderConfirmationPage::class);
@@ -185,7 +131,7 @@ class CheckoutForm extends Form
      * @param Payment $payment
      * @return string
      */
-    protected function getFailureUrl(Payment $payment): string
+    public function getFailureUrl(Payment $payment): string
     {
         if (!$payment->Identifier) {
             // Force identifier to be generated
