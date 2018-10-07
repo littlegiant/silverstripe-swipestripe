@@ -1,5 +1,5 @@
 ---
-Name: injector
+Name: swipestripe-common-injector
 ---
 
 SilverStripe\Core\Injector\Injector:

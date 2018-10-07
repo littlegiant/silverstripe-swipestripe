@@ -1,7 +1,5 @@
 ---
-Name: extensions
-After:
-- framework/*
+Name: swipestripe-common-extensions
 ---
 
 SilverStripe\Omnipay\Model\Payment:
