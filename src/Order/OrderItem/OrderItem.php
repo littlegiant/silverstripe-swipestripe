@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\OrderItem;
 
-use SilverShop\HasOneField\HasOneButtonField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
@@ -11,6 +10,7 @@ use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\CMSHelper;
+use SwipeStripe\Forms\Fields\HasOneButtonField;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\PurchasableInterface;
 use SwipeStripe\Price\DBPrice;
@@ -230,7 +230,7 @@ class OrderItem extends DataObject
             $fields->insertAfter('Description', PriceField::create('Price'));
             $fields->insertBefore('Quantity', HasOneButtonField::create($this, 'Purchasable'));
 
-            $this->convertGridFieldsToReadOnly($fields);
+            $this->addViewButtonToGridFields($fields);
         });
 
         return parent::getCMSFields();

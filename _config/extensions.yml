@@ -5,7 +5,3 @@ Name: swipestripe-common-extensions
 SilverStripe\Omnipay\Model\Payment:
   extensions:
   - SwipeStripe\Order\PaymentExtension
-
-SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest:
-  extensions:
-  - SwipeStripe\Forms\Fields\GridFieldDetailForm_ItemRequestExtension
