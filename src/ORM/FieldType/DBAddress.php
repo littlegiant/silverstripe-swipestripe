@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace SwipeStripe\ORM\FieldType;
 
 use SilverStripe\Forms\FieldGroup;
-use SilverStripe\Forms\TextField;
 use SilverStripe\i18n\Data\Intl\IntlLocales;
 use SilverStripe\ORM\FieldType\DBComposite;
 use SilverStripe\ORM\FieldType\DBVarchar;
@@ -89,14 +88,17 @@ class DBAddress extends DBComposite
      */
     public function scaffoldFormField($title = null, $params = null)
     {
-        return FieldGroup::create($title ?? FieldGroup::name_to_label($this->getName()), [
-            TextField::create("{$this->getName()}Unit", 'Unit'),
-            TextField::create("{$this->getName()}Street", 'Street'),
-            TextField::create("{$this->getName()}Suburb", 'Suburb'),
-            TextField::create("{$this->getName()}City", 'City'),
-            TextField::create("{$this->getName()}Region", 'Region'),
-            TextField::create("{$this->getName()}Postcode", 'Post Code / Zip'),
-            CountryDropdownField::create("{$this->getName()}Country", 'Country'),
-        ]);
+        $fieldGroup = FieldGroup::create($title ?? FieldGroup::name_to_label($this->getName()));
+
+        foreach ($this->compositeDatabaseFields() as $field => $type) {
+            $title = _t(self::class . ".TITLE_{$field}", FieldGroup::name_to_label($field));
+            $field = $field === 'Country'
+                ? CountryDropdownField::create("{$this->getName()}Country", $title)
+                : $this->dbObject($field)->scaffoldFormField($title);
+
+            $fieldGroup->push($field);
+        }
+
+        return $fieldGroup;
     }
 }
