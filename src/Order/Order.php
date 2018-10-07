@@ -5,7 +5,6 @@ namespace SwipeStripe\Order;
 
 use Money\Money;
 use SilverStripe\Control\Director;
-use SilverStripe\Core\CoreKernel;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Omnipay\Model\Payment;
@@ -14,7 +13,6 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\ORM\FieldType\DBEnum;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
@@ -40,7 +38,6 @@ use SwipeStripe\ShopPermissions;
  * @property string $CustomerEmail
  * @property DBAddress $BillingAddress
  * @property string $ConfirmationTime
- * @property string $Environment
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
  * @mixin Payable
@@ -65,7 +62,6 @@ class Order extends DataObject
         'CartLocked'       => DBBoolean::class,
         'GuestToken'       => DBVarchar::class,
         'ConfirmationTime' => DBDatetime::class,
-        'Environment'      => DBEnum::class . '(array("' . CoreKernel::DEV . '", "' . CoreKernel::TEST . '", "' . CoreKernel::LIVE . '"), "' . CoreKernel::DEV . '")',
 
         'CustomerName'   => DBVarchar::class,
         'CustomerEmail'  => DBVarchar::class,
@@ -84,7 +80,7 @@ class Order extends DataObject
      * @var array
      */
     private static $extensions = [
-        Payable::class,
+        'payable' => Payable::class,
     ];
 
     /**
@@ -96,7 +92,6 @@ class Order extends DataObject
         'OrderItems.Count' => 'Items',
         'Total.Value'      => 'Total',
         'ConfirmationTime' => 'Confirmation Time',
-        'Environment'      => 'Environment',
     ];
 
     /**
@@ -105,13 +100,12 @@ class Order extends DataObject
     private static $searchable_fields = [
         'CustomerName',
         'CustomerEmail',
-        'Environment',
     ];
 
     /**
      * @var string
      */
-    private static $default_sort = 'ConfirmationTime DESC, LastEdited DESC';
+    private static $default_sort = '"ConfirmationTime" DESC, "LastEdited" DESC';
 
     /**
      * @var array
@@ -129,7 +123,6 @@ class Order extends DataObject
         parent::populateDefaults();
 
         $this->GuestToken = bin2hex(random_bytes(static::GUEST_TOKEN_BYTES));
-        $this->Environment = Director::get_environment_type();
 
         return $this;
     }
@@ -145,11 +138,9 @@ class Order extends DataObject
                 'CartLocked',
                 'GuestToken',
                 'ConfirmationTime',
-                'Environment',
             ]);
 
             $fields->insertBefore('CustomerName', FieldGroup::create([
-                $this->dbObject('Environment')->scaffoldFormField(),
                 $this->dbObject('ConfirmationTime')->scaffoldFormField(),
             ]));
 
@@ -440,7 +431,6 @@ class Order extends DataObject
     public function paymentCaptured(Payment $payment, ServiceResponse $response): void
     {
         $this->ConfirmationTime = DBDatetime::now();
-        $this->Environment = Director::get_environment_type();
         $this->IsCart = false;
         $this->write();
 
