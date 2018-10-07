@@ -32,6 +32,8 @@ use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
  * Class CheckoutForm
  * @package SwipeStripe\Order\Checkout
  * @property Payment|null $PaymentError
+ * @property-read ServiceFactory $paymentServiceFactory
+ * @property-read SupportedCurrenciesInterface $supportedCurrencies
  */
 class CheckoutForm extends Form
 {
@@ -49,16 +51,6 @@ class CheckoutForm extends Form
         'paymentServiceFactory' => '%$' . ServiceFactory::class,
         'supportedCurrencies'   => '%$' . SupportedCurrenciesInterface::class,
     ];
-
-    /**
-     * @var ServiceFactory
-     */
-    public $paymentServiceFactory;
-
-    /**
-     * @var SupportedCurrenciesInterface
-     */
-    public $supportedCurrencies;
 
     /**
      * @var Order
@@ -164,14 +156,12 @@ class CheckoutForm extends Form
 
         $paymentMethod = $data[static::PAYMENT_METHOD_FIELD];
         $dueMoney = $cart->UnpaidTotal()->getMoney();
+
         $payment->init($paymentMethod, $this->supportedCurrencies->formatDecimal($dueMoney),
             $dueMoney->getCurrency()->getCode())
             ->setSuccessUrl($this->getSuccessUrl())
             ->setFailureUrl($this->getFailureUrl($payment));
-
-        if ($payment->isChanged(null, Payment::CHANGE_VALUE)) {
-            $payment->write();
-        }
+        $payment->write();
 
         $response = $this->paymentServiceFactory
             ->getService($payment, ServiceFactory::INTENT_PURCHASE)

@@ -19,6 +19,7 @@ use SwipeStripe\SessionData;
  * @package SwipeStripe\Order
  * @property ViewOrderPage $dataRecord
  * @method ViewOrderPage data()
+ * @property-read Pdf $receiptPdfGenerator
  */
 class ViewOrderPageController extends \PageController
 {
@@ -46,11 +47,6 @@ class ViewOrderPageController extends \PageController
     private static $dependencies = [
         'receiptPdfGenerator' => '%$' . Pdf::class . '.SwipeStripe_Receipt',
     ];
-
-    /**
-     * @var Pdf
-     */
-    public $receiptPdfGenerator;
 
     /**
      * @throws \SilverStripe\Control\HTTPResponse_Exception

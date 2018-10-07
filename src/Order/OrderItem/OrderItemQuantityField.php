@@ -64,7 +64,7 @@ class OrderItemQuantityField extends NumericField
                 $record = $this->getOrderItem();
             } else {
                 // Order that doesn't contain this order item, can't determine what OrderItem to save to.
-                throw new \InvalidArgumentException("Order passed to " . __CLASS__ . "::saveInto doesn't contain Order item '{$this->getOrderItem()->ID}'.");
+                throw new \InvalidArgumentException("Order passed to " . __METHOD__ . " doesn't contain Order item '{$this->getOrderItem()->ID}'.");
             }
         }
 

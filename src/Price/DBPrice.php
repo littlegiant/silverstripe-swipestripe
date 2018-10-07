@@ -20,6 +20,7 @@ use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
  * @see DBMoney
  * @property string $Currency
  * @property string $Amount
+ * @property-read SupportedCurrenciesInterface $supportedCurrencies
  */
 class DBPrice extends DBComposite
 {
@@ -42,11 +43,6 @@ class DBPrice extends DBComposite
     private static $dependencies = [
         'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
     ];
-
-    /**
-     * @var SupportedCurrenciesInterface
-     */
-    public $supportedCurrencies;
 
     /**
      * @var null|string

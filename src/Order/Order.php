@@ -44,6 +44,7 @@ use SwipeStripe\ShopPermissions;
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
  * @mixin Payable
+ * @property-read SupportedCurrenciesInterface $supportedCurrencies
  */
 class Order extends DataObject
 {
@@ -118,11 +119,6 @@ class Order extends DataObject
     private static $dependencies = [
         'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
     ];
-
-    /**
-     * @var SupportedCurrenciesInterface
-     */
-    public $supportedCurrencies;
 
     /**
      * @inheritDoc
