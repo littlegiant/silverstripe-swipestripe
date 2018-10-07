@@ -17,9 +17,9 @@ class CheckoutFormRequestHandler extends FormRequestHandler
     public function redirectBack()
     {
         $response = parent::redirectBack();
-
         // Strip query string (e.g. previous payment failure)
-        $response->addHeader('Location', strtok($response->getHeader('Location'), '?'));
-        return $response;
+        $cleanedUrl = strtok($response->getHeader('Location'), '?');
+
+        return $this->redirect($cleanedUrl);
     }
 }
