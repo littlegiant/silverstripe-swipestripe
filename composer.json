@@ -35,12 +35,6 @@
         "heyday/silverstripe-wkhtml": "dev-feature/upgrade-to-ss4",
         "silvershop/silverstripe-hasonefield": "^2.1.1"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/hchokshi/silverstripe-wkhtml.git"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "SwipeStripe\\": "src/"

@@ -11,6 +11,7 @@ before_script:
 - if php -m | grep -q 'xdebug'; then phpenv config-rm xdebug.ini; fi
 
 # Install composer dependencies
+- composer config repositories.wkhtml vcs https://github.com/hchokshi/silverstripe-wkhtml.git # Use SS4-supporting fork until upstream merges PR
 - composer validate
 - composer install --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
