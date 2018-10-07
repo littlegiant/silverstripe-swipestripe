@@ -1,32 +1,24 @@
-# Swipestripe Ecommerce Module
+# SwipeStripe - Ecommerce module for SilverStripe
 [![Build Status](https://travis-ci.org/littlegiant/silverstripe-swipestripe.svg?branch=5.0)](https://travis-ci.org/littlegiant/silverstripe-swipestripe)
 [![Coverage Status](https://coveralls.io/repos/github/littlegiant/silverstripe-swipestripe/badge.svg?branch=5.0)](https://coveralls.io/github/littlegiant/silverstripe-swipestripe?branch=5.0)
 
-## Maintainer Contact
-SwipeStripe  
-[Contact Us](http://swipestripe.com/support/contact-us)  
-[Twitter](https://twitter.com/#!/swipestripe)
-
 ## Requirements
-* SilverStripe 3.1
-* SilverStripe Payment 1.0
+* SilverStripe 4.2
+* Omnipay gateway(s) for your application's supported payment method(s)
 
 ## Version
-2.1.0
-
-## Documentation
-* [Documentation found here](http://swipestripe.com/dev/docs/swipestripe/en)
-* [Demo found here](http://swipestripe.com/dev/docs/swipestripe/en/Basics/Demo)
+5.0
 
 ## Installation Instructions
-1. Save into folder named 'swipestripe/' in the root of your Silverstripe installation.
-2. Install the silverstripe payment module
-3. Run a dev/build?flush=1
-
-[More complete installation instructions here](http://swipestripe.com/dev/docs/swipestripe/en/Basics/Install)
+1. `composer require [provider of php-http/client-implementation]` - e.g. `php-http/guzzle6-adapter` 
+2. `composer require swipestripe/swipestripe:5.0.x-dev`
+3. Add composer dependencies for any relevant Omnipay gateways for your application
+4. Configure your gateway parameters and allowed gateways as per the [silverstripe-omnipay documentation](https://github.com/silverstripe/silverstripe-omnipay/blob/master/docs/en/Configuration.md)
+5. Configure your supported currency (or currencies)
+6. Run a dev/build?flush=1
 
 ## License
-	Copyright (c) 2011 - 2013, [Frank Mullenger](http://nz.linkedin.com/in/frankmullenger)
+	Copyright (c) 2011 - 2018, [Frank Mullenger](http://nz.linkedin.com/in/frankmullenger)
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -48,6 +40,3 @@ SwipeStripe
 Big thanks to:
 
 * [SilverStripe](http://http://www.silverstripe.com/)
-* [Emogrifier](http://www.pelagodesign.com/sidecar/emogrifier/)
-* [Twitter Bootstrap](http://twitter.github.com/bootstrap/) [Licence](http://www.apache.org/licenses/LICENSE-2.0)
-* [jQuery](http://jquery.com)
