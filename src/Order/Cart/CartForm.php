@@ -18,7 +18,6 @@ use SwipeStripe\Order\OrderItem\OrderItemQuantityField;
  */
 class CartForm extends Form
 {
-    const QUANTITY_FIELD_PATTERN = 'Qty_%d';
     const REMOVE_ITEM_ACTION = 'RemoveOrderItem';
     const REMOVE_ITEM_ARG = 'OrderItemID';
 
@@ -51,7 +50,7 @@ class CartForm extends Form
      */
     public function UpdateCart(): HTTPResponse
     {
-        $this->saveInto($this->cart);
+        $this->saveInto($this->getCart());
         return $this->getController()->redirectBack();
     }
 
@@ -62,7 +61,7 @@ class CartForm extends Form
     public function RemoveOrderItem(array $data): HTTPResponse
     {
         $orderItemID = intval($data[static::REMOVE_ITEM_ARG] ?? 0);
-        $this->cart->removeItem($orderItemID);
+        $this->getCart()->removeItem($orderItemID);
         return $this->getController()->redirectBack();
     }
 
@@ -81,8 +80,8 @@ class CartForm extends Form
     {
         $fields = [];
 
-        foreach ($this->cart->OrderItems() as $item) {
-            $fields[] = OrderItemQuantityField::create($item, sprintf(static::QUANTITY_FIELD_PATTERN, $item->ID),
+        foreach ($this->getCart()->OrderItems() as $item) {
+            $fields[] = OrderItemQuantityField::create($item, sprintf('Qty_%d', $item->ID),
                 _t(self::class . '.QUANTITY_LABEL', 'Quantity'))
                 ->setRemoveAction($this->getRemoveActionFor($item));
         }
