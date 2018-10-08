@@ -142,7 +142,8 @@ class Order extends DataObject
                 $this->dbObject('ConfirmationTime')->scaffoldFormField(),
             ]));
 
-            $fields->insertAfter('BillingAddress', PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
+            $fields->insertAfter('BillingAddress',
+                PriceField::create('SubTotalValue', 'Sub-Total')->setValue($this->SubTotal()));
             $fields->insertAfter('SubTotalValue', PriceField::create('TotalValue', 'Total')->setValue($this->Total()));
 
             $this->moveTabBefore($fields, 'Payments', 'Root.OrderItems');
@@ -295,7 +296,9 @@ class Order extends DataObject
 
         if ($item instanceof PurchasableInterface) {
             $item = $this->getOrderItem($item, false);
-            if ($item === null) return $this;
+            if ($item === null) {
+                return $this;
+            }
         }
 
         $itemID = is_int($item) ? $item : $item->ID;
@@ -398,7 +401,9 @@ class Order extends DataObject
      */
     public function Lock(): void
     {
-        if ($this->CartLocked) return;
+        if ($this->CartLocked) {
+            return;
+        }
 
         DB::get_conn()->withTransaction(function () {
             foreach ($this->OrderItems() as $item) {
@@ -452,7 +457,9 @@ class Order extends DataObject
      */
     public function Unlock(): void
     {
-        if (!$this->IsCart || !$this->CartLocked) return;
+        if (!$this->IsCart || !$this->CartLocked) {
+            return;
+        }
 
         DB::get_conn()->withTransaction(function () {
             foreach ($this->OrderItems() as $item) {
@@ -524,5 +531,26 @@ class Order extends DataObject
         }
 
         return md5(json_encode($data));
+    }
+
+    /**
+     * Convert to Omnipay payment data for a purchase.
+     * @return array
+     */
+    public function toPaymentData(): array
+    {
+        $customerName = explode(' ', $this->CustomerName, 2);
+
+        return [
+            'firstName'       => $customerName[0],
+            'lastName'        => $customerName[1] ?? '',
+            'email'           => $this->CustomerEmail,
+            'billingAddress1' => $this->BillingAddress->Unit,
+            'billingAddress2' => $this->BillingAddress->Street,
+            'billingCity'     => $this->BillingAddress->City,
+            'billingPostcode' => $this->BillingAddress->Postcode,
+            'billingState'    => $this->BillingAddress->Region,
+            'billingCountry'  => $this->BillingAddress->Country,
+        ];
     }
 }

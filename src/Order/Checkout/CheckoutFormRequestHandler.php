@@ -64,7 +64,7 @@ class CheckoutFormRequestHandler extends FormRequestHandler
 
         $response = $this->paymentServiceFactory
             ->getService($payment, ServiceFactory::INTENT_PURCHASE)
-            ->initiate($data);
+            ->initiate($cart->toPaymentData());
 
         $this->extend('afterInitPayment', $data, $form, $payment, $response);
         return $response->redirectOrRespond();
