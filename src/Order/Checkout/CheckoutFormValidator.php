@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace SwipeStripe\Order\Checkout;
 
 use SilverStripe\Forms\RequiredFields;
-use SilverStripe\Forms\SingleSelectField;
-use SilverStripe\Omnipay\GatewayInfo;
 
 /**
  * Class CheckoutFormValidator
@@ -20,7 +18,6 @@ class CheckoutFormValidator extends RequiredFields
     public function __construct()
     {
         parent::__construct([
-            CheckoutForm::PAYMENT_METHOD_FIELD,
             'CustomerName',
             'CustomerEmail',
             'BillingAddressStreet',
@@ -45,7 +42,6 @@ class CheckoutFormValidator extends RequiredFields
 
     /**
      * @inheritdoc
-     * @throws \SilverStripe\Omnipay\Exception\InvalidConfigurationException
      */
     public function php($data)
     {
@@ -65,30 +61,7 @@ class CheckoutFormValidator extends RequiredFields
                 'It looks like your cart has changed since you last loaded the checkout page. Please refresh, re-check your cart and try again.'));
         }
 
-        $this->validatePaymentMethod($data);
-
         $this->extend('validate', $this->form, $data);
         return $parentValid && $this->result->isValid();
-    }
-
-    /**
-     * @param array $data
-     * @throws \SilverStripe\Omnipay\Exception\InvalidConfigurationException
-     */
-    protected function validatePaymentMethod(array $data): void
-    {
-        if ($this->form->Fields()->dataFieldByName(CheckoutForm::PAYMENT_METHOD_FIELD) instanceof SingleSelectField) {
-            // Single select field will validate option is allowed
-            return;
-        }
-
-        $gateways = GatewayInfo::getSupportedGateways(false);
-        $selectedGateway = $data[CheckoutForm::PAYMENT_METHOD_FIELD];
-
-        if (!isset($gateways[$selectedGateway])) {
-            // Could be hidden field for single available payment method, so we must make it a form-level message
-            $this->result->addError(_t(self::class . '.INVALID_PAYMENT_METHOD',
-                'The requested payment method is not available.'));
-        }
     }
 }

@@ -7,8 +7,11 @@ use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\FormRequestHandler;
 use SilverStripe\Omnipay\Exception\InvalidConfigurationException;
 use SilverStripe\Omnipay\Exception\InvalidStateException;
+use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\ORM\ValidationResult;
 use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
@@ -50,14 +53,15 @@ class CheckoutFormRequestHandler extends FormRequestHandler
         $payment = Payment::create();
         $payment->OrderID = $cart->ID;
 
-        $paymentMethod = $data[CheckoutForm::PAYMENT_METHOD_FIELD];
         $dueMoney = $cart->UnpaidTotal()->getMoney();
 
-        $payment->init($paymentMethod, $this->supportedCurrencies->formatDecimal($dueMoney),
-            $dueMoney->getCurrency()->getCode())
-            ->setSuccessUrl($form->getSuccessUrl($payment))
-            ->setFailureUrl($form->getFailureUrl($payment));
-        $payment->write();
+        $payment->init(
+            $this->getPaymentMethod($data, $form),
+            $this->supportedCurrencies->formatDecimal($dueMoney),
+            $dueMoney->getCurrency()->getCode()
+        )->setSuccessUrl($form->getSuccessUrl($payment))
+            ->setFailureUrl($form->getFailureUrl($payment))
+            ->write();
 
         $response = $this->paymentServiceFactory
             ->getService($payment, ServiceFactory::INTENT_PURCHASE)
@@ -65,6 +69,31 @@ class CheckoutFormRequestHandler extends FormRequestHandler
 
         $this->extend('afterInitPayment', $data, $payment, $response);
         return $response->redirectOrRespond();
+    }
+
+    /**
+     * @param array $data
+     * @param CheckoutForm $form
+     * @return string
+     * @throws InvalidConfigurationException
+     */
+    protected function getPaymentMethod(array $data, CheckoutForm $form): string
+    {
+        $gateways = $form->getAvailablePaymentMethods();
+        if (count($gateways) === 1) {
+            return key($gateways);
+        }
+
+        $paymentMethod = $data[CheckoutForm::PAYMENT_METHOD_FIELD];
+        if (isset($gateways[$paymentMethod])) {
+            return $paymentMethod;
+        } else {
+            throw new ValidationException(
+                ValidationResult::create()->addFieldError(CheckoutForm::PAYMENT_METHOD_FIELD,
+                    _t(CheckoutForm::class . '.UNSUPPORTED_PAYMENT_METHOD',
+                        'The payment method you have selected is not supported.'))
+            );
+        }
     }
 
     /**

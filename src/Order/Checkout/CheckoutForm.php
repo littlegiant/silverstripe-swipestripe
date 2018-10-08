@@ -53,12 +53,17 @@ class CheckoutForm extends Form
         $this->cart = $cart;
         $cart->Unlock();
 
+        $validator = CheckoutFormValidator::create();
+        if (count($this->getAvailablePaymentMethods()) > 1) {
+            $validator->addRequiredField(static::PAYMENT_METHOD_FIELD);
+        }
+
         parent::__construct(
             $controller,
             $name ?? static::DEFAULT_NAME,
             $this->buildFields(),
             $this->buildActions(),
-            CheckoutFormValidator::create()
+            $validator
         );
 
         if (!$this->getSessionData()) {
@@ -157,18 +162,26 @@ class CheckoutForm extends Form
             $this->getCart()->BillingAddress->scaffoldFormField('Billing Address'),
         ]);
 
-        $gateways = GatewayInfo::getSupportedGateways();
-        $gatewayField = count($gateways) > 1
-            ? OptionsetField::create(static::PAYMENT_METHOD_FIELD,
-                _t(self::class . '.PAYMENT_METHOD', 'Select your payment method'), $gateways)
-            : HiddenField::create(static::PAYMENT_METHOD_FIELD, null, key($gateways));
+        $gateways = $this->getAvailablePaymentMethods();
+        if (count($gateways) > 1) {
+            $fields->add(OptionsetField::create(static::PAYMENT_METHOD_FIELD,
+                _t(self::class . '.PAYMENT_METHOD', 'Select your payment method'), $gateways));
+        }
 
-        $fields->add($gatewayField);
         $fields->merge($this->buildGatewayFields($gateways));
         $fields->add(HiddenField::create(static::ORDER_HASH_FIELD, null, $this->getCart()->getHash()));
 
         $this->extend('updateFields', $fields);
         return $fields;
+    }
+
+    /**
+     * @return array
+     * @throws InvalidConfigurationException
+     */
+    public function getAvailablePaymentMethods(): array
+    {
+        return GatewayInfo::getSupportedGateways();
     }
 
     /**
