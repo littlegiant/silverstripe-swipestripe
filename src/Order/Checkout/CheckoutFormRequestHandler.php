@@ -7,7 +7,6 @@ use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\FormRequestHandler;
 use SilverStripe\Omnipay\Exception\InvalidConfigurationException;
 use SilverStripe\Omnipay\Exception\InvalidStateException;
-use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
 use SilverStripe\ORM\ValidationException;
@@ -46,7 +45,7 @@ class CheckoutFormRequestHandler extends FormRequestHandler
         $cart->Lock();
         $form->saveInto($cart);
 
-        $this->extend('beforeInitPayment', $data);
+        $this->extend('beforeInitPayment', $data, $form);
         $cart->write();
 
         /** @var Payment|PaymentExtension $payment */
@@ -67,7 +66,7 @@ class CheckoutFormRequestHandler extends FormRequestHandler
             ->getService($payment, ServiceFactory::INTENT_PURCHASE)
             ->initiate($data);
 
-        $this->extend('afterInitPayment', $data, $payment, $response);
+        $this->extend('afterInitPayment', $data, $form, $payment, $response);
         return $response->redirectOrRespond();
     }
 
