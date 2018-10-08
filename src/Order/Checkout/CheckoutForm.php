@@ -51,7 +51,6 @@ class CheckoutForm extends Form
     public function __construct(Order $cart, ?RequestHandler $controller = null, ?string $name = null)
     {
         $this->cart = $cart;
-        $cart->Unlock();
 
         $validator = CheckoutFormValidator::create();
         if (count($this->getAvailablePaymentMethods()) > 1) {
@@ -172,6 +171,13 @@ class CheckoutForm extends Form
         $fields->add(HiddenField::create(static::ORDER_HASH_FIELD, null, $this->getCart()->getHash()));
 
         $this->extend('updateFields', $fields);
+
+        if (!$this->getCart()->IsMutable()) {
+            foreach ($fields->dataFields() as  $field) {
+                $field->setReadonly(true);
+            }
+        }
+
         return $fields;
     }
 
