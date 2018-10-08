@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SwipeStripe;
 
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\Session;
 use SwipeStripe\Order\Order;
 
 /**
@@ -29,12 +30,21 @@ trait HasActiveCart
             }
         }
 
-        $cartObj = Order::create();
-        $cartObj->IsCart = true;
-        $cartObj->write();
+        $cartObj = Order::singleton()->createCart();
+        $this->setActiveCart($cartObj);
 
-        $session->set(SessionData::CART_ID, $cartObj->ID);
         return $cartObj;
+    }
+
+    public function setActiveCart(?Order $cart): void
+    {
+        $session = $this->getRequest()->getSession();
+
+        if ($cart !== null) {
+            $session->set(SessionData::CART_ID, $cart->ID);
+        } else {
+            $session->clear(SessionData::CART_ID);
+        }
     }
 
     /**

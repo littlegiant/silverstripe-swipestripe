@@ -113,6 +113,18 @@ class Order extends DataObject
     ];
 
     /**
+     * @return Order
+     */
+    public function createCart(): self
+    {
+        $cart = Order::create();
+        $cart->IsCart = true;
+        $cart->write();
+
+        return $cart;
+    }
+
+    /**
      * @inheritDoc
      * @throws \Exception
      */
