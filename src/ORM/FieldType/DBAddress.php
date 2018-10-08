@@ -32,7 +32,7 @@ class DBAddress extends DBComposite
         'City'     => DBVarchar::class,
         'Region'   => DBVarchar::class,
         'Postcode' => DBVarchar::class,
-        'Country'  => DBVarchar::class,
+        'Country'  => DBVarchar::class . '(2)',
     ];
 
     /**
