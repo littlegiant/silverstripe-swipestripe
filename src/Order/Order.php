@@ -11,9 +11,7 @@ use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
-use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
@@ -58,14 +56,14 @@ class Order extends DataObject
      * @var array
      */
     private static $db = [
-        'IsCart'           => DBBoolean::class,
-        'CartLocked'       => DBBoolean::class,
-        'GuestToken'       => DBVarchar::class,
-        'ConfirmationTime' => DBDatetime::class,
+        'IsCart'           => 'Boolean',
+        'CartLocked'       => 'Boolean',
+        'GuestToken'       => 'Varchar',
+        'ConfirmationTime' => 'Datetime',
 
-        'CustomerName'   => DBVarchar::class,
-        'CustomerEmail'  => DBVarchar::class,
-        'BillingAddress' => DBAddress::class,
+        'CustomerName'   => 'Varchar',
+        'CustomerEmail'  => 'Varchar',
+        'BillingAddress' => 'Address',
     ];
 
     /**

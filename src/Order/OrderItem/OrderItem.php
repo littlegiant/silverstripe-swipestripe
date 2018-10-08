@@ -6,7 +6,6 @@ namespace SwipeStripe\Order\OrderItem;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\CMSHelper;
@@ -47,8 +46,8 @@ class OrderItem extends DataObject
      * @var array
      */
     private static $db = [
-        'Quantity'                 => DBInt::class,
-        'PurchasableLockedVersion' => DBInt::class,
+        'Quantity'                 => 'Int',
+        'PurchasableLockedVersion' => 'Int',
     ];
 
     /**

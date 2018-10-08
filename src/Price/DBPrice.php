@@ -9,7 +9,6 @@ use Money\Money;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\FieldType\DBComposite;
 use SilverStripe\ORM\FieldType\DBMoney;
-use SilverStripe\ORM\FieldType\DBVarchar;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
@@ -24,17 +23,14 @@ use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
  */
 class DBPrice extends DBComposite
 {
-    /**
-     *
-     */
     const INJECTOR_SPEC = 'Price';
 
     /**
      * @var array
      */
     private static $composite_db = [
-        'Currency' => DBVarchar::class . '(3)',
-        'Amount'   => DBVarchar::class, // Money library uses integer strings to support values > PHP_INT_MAX
+        'Currency' => 'Varchar(3)',
+        'Amount'   => 'Varchar', // Money library uses integer strings to support values > PHP_INT_MAX
     ];
 
     /**

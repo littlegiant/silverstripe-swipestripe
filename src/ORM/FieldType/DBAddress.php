@@ -6,7 +6,6 @@ namespace SwipeStripe\ORM\FieldType;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\i18n\Data\Intl\IntlLocales;
 use SilverStripe\ORM\FieldType\DBComposite;
-use SilverStripe\ORM\FieldType\DBVarchar;
 use SwipeStripe\Forms\Fields\CountryDropdownField;
 
 /**
@@ -22,17 +21,19 @@ use SwipeStripe\Forms\Fields\CountryDropdownField;
  */
 class DBAddress extends DBComposite
 {
+    const INJECTOR_SPEC = 'Address';
+
     /**
      * @var array
      */
     private static $composite_db = [
-        'Unit'     => DBVarchar::class,
-        'Street'   => DBVarchar::class,
-        'Suburb'   => DBVarchar::class,
-        'City'     => DBVarchar::class,
-        'Region'   => DBVarchar::class,
-        'Postcode' => DBVarchar::class,
-        'Country'  => DBVarchar::class . '(2)',
+        'Unit'     => 'Varchar',
+        'Street'   => 'Varchar',
+        'Suburb'   => 'Varchar',
+        'City'     => 'Varchar',
+        'Region'   => 'Varchar',
+        'Postcode' => 'Varchar',
+        'Country'  => 'Varchar(2)',
     ];
 
     /**
