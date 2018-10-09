@@ -11,6 +11,7 @@ use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceFactory;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\ValidationResult;
+use SwipeStripe\HasActiveCart;
 use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
@@ -23,6 +24,8 @@ use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
  */
 class CheckoutFormRequestHandler extends FormRequestHandler
 {
+    use HasActiveCart;
+
     /**
      * @var array
      */
@@ -41,6 +44,19 @@ class CheckoutFormRequestHandler extends FormRequestHandler
      */
     public function ConfirmCheckout(array $data, CheckoutForm $form): HTTPResponse
     {
+        if (!$form->getCart()->IsMutable()) {
+            // If the cart was locked due to trying to pay, then checkout was clicked again
+            // This stops being able to create multiple active checkouts on one order
+            $original = $form->getCart();
+            $clone = $original->duplicate();
+
+            if ($original->ID === $this->ActiveCart->ID) {
+                $this->setActiveCart($clone);
+            }
+
+            $form->setCart($clone);
+        }
+
         $cart = $form->getCart();
         $cart->Lock();
         $form->saveInto($cart);

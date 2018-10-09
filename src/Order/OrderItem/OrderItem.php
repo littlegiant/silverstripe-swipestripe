@@ -68,6 +68,13 @@ class OrderItem extends DataObject
     /**
      * @var array
      */
+    private static $cascade_duplicates = [
+        'OrderItemAddOns',
+    ];
+
+    /**
+     * @var array
+     */
     private static $summary_fields = [
         'Title'       => 'Title',
         'Quantity'    => 'Quantity',

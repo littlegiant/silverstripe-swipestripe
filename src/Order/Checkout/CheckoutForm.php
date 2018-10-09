@@ -172,12 +172,6 @@ class CheckoutForm extends Form
 
         $this->extend('updateFields', $fields);
 
-        if (!$this->getCart()->IsMutable()) {
-            foreach ($fields->dataFields() as  $field) {
-                $field->setReadonly(true);
-            }
-        }
-
         return $fields;
     }
 
@@ -214,6 +208,16 @@ class CheckoutForm extends Form
         return FieldList::create(
             FormAction::create('ConfirmCheckout', _t(self::class . '.CONFIRM_CHECKOUT', 'Confirm Checkout'))
         );
+    }
+
+    /**
+     * @param Order $cart
+     * @return CheckoutForm
+     */
+    public function setCart(Order $cart): self
+    {
+        $this->cart = $cart;
+        return $this;
     }
 
     /**

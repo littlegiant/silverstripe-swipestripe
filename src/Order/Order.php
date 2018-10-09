@@ -77,6 +77,14 @@ class Order extends DataObject
     /**
      * @var array
      */
+    private static $cascade_duplicates = [
+        'OrderAddOns',
+        'OrderItems',
+    ];
+
+    /**
+     * @var array
+     */
     private static $extensions = [
         'payable' => Payable::class,
     ];

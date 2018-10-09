@@ -36,6 +36,9 @@ trait HasActiveCart
         return $cartObj;
     }
 
+    /**
+     * @param null|Order $cart
+     */
     public function setActiveCart(?Order $cart): void
     {
         $session = $this->getRequest()->getSession();

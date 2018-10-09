@@ -45,13 +45,6 @@ class CheckoutFormValidator extends RequiredFields
      */
     public function php($data)
     {
-        if (!$this->form->getCart()->IsMutable()) {
-            $this->result->addError(_t(self::class . '.CART_LOCKED', 'There is already another checkout ' .
-                'in progress. Please complete or cancel that to checkout again.'));
-
-            return $this->result->isValid();
-        }
-
         $this->extend('beforeRequiredFields', $this->form, $data);
         $parentValid = parent::php($data);
         $this->extend('afterRequiredFields', $this->form, $data);
