@@ -67,5 +67,12 @@
             "silverstripe/framework": "source",
             "silverstripe/cms": "source"
         }
+    },
+    "repositories": {
+        "wkhtml": {
+            "type": "vcs",
+            "url": "https://github.com/hchokshi/silverstripe-wkhtml.git",
+            "no-api": true
+        }
     }
 }
