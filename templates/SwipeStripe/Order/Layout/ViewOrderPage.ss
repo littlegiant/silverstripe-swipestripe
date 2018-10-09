@@ -3,7 +3,7 @@
         <section class="col-md-10 col-md-offset-1">
             <div class="page-header">
                 {$Breadcrumbs}
-                <h1>{$Title} - Order #{$Order.ID}</h1>
+                <h1>{$Title} - {$Order.Title}</h1>
             </div>
         </section>
     </div>

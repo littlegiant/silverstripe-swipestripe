@@ -152,6 +152,17 @@ class Order extends DataObject
     /**
      * @inheritDoc
      */
+    public function getTitle()
+    {
+        return _t(self::class . '.Title', '{name} #{id}', [
+            'name' => $this->i18n_singular_name(),
+            'id'   => $this->ID,
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
