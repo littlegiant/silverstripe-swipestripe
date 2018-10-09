@@ -36,6 +36,7 @@ use SwipeStripe\ShopPermissions;
  * @property string $CustomerEmail
  * @property DBAddress $BillingAddress
  * @property string $ConfirmationTime
+ * @property string $Status
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
  * @mixin Payable
@@ -60,6 +61,7 @@ class Order extends DataObject
         'CartLocked'       => 'Boolean',
         'GuestToken'       => 'Varchar',
         'ConfirmationTime' => 'Datetime',
+        'Status'           => OrderStatus::ENUM,
 
         'CustomerName'   => 'Varchar',
         'CustomerEmail'  => 'Varchar',
@@ -93,6 +95,7 @@ class Order extends DataObject
      * @var array
      */
     private static $summary_fields = [
+        'Status'           => 'Status',
         'CustomerName'     => 'Customer Name',
         'CustomerEmail'    => 'Customer Email',
         'OrderItems.Count' => 'Items',
@@ -106,6 +109,7 @@ class Order extends DataObject
     private static $searchable_fields = [
         'CustomerName',
         'CustomerEmail',
+        'Status',
     ];
 
     /**
@@ -156,10 +160,12 @@ class Order extends DataObject
                 'CartLocked',
                 'GuestToken',
                 'ConfirmationTime',
+                'Status',
             ]);
 
             $fields->insertBefore('CustomerName', FieldGroup::create([
                 $this->dbObject('ConfirmationTime')->scaffoldFormField(),
+                $this->dbObject('Status')->scaffoldFormField(),
             ]));
 
             $fields->insertAfter('BillingAddress',
