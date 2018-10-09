@@ -367,7 +367,7 @@ class Order extends DataObject
     public function canView($member = null)
     {
         return $this->extendedCan(__FUNCTION__, $member) ??
-            Permission::check(ShopPermissions::VIEW_ORDERS, 'any', $member);
+            Permission::checkMember($member, ShopPermissions::VIEW_ORDERS);
     }
 
     /**
@@ -376,7 +376,7 @@ class Order extends DataObject
     public function canEdit($member = null)
     {
         return $this->extendedCan(__FUNCTION__, $member) ??
-            ($this->IsMutable() && Permission::check(ShopPermissions::EDIT_ORDERS, 'any', $member));
+            ($this->IsMutable() && Permission::checkMember($member, ShopPermissions::EDIT_ORDERS));
     }
 
     /**
