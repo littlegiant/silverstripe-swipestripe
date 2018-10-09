@@ -15,6 +15,8 @@ class ShopPermissions implements PermissionProvider
     const VIEW_ORDERS = self::class . '.VIEW_ORDERS';
     const EDIT_ORDERS = self::class . '.EDIT_ORDERS';
 
+    const MANAGE_ORDER_STATUS = self::class . '.MANAGE_ORDER_STATUSES';
+
     const VIEW_PRODUCTS = self::class . '.VIEW_PRODUCTS';
     const EDIT_PRODUCTS = self::class . '.EDIT_PRODUCTS';
     const CREATE_PRODUCTS = self::class . '.CREATE_PRODUCTS';
@@ -37,6 +39,12 @@ class ShopPermissions implements PermissionProvider
                 'name'     => _t(self::EDIT_ORDERS, 'Edit orders'),
                 'category' => $permissionCategory,
                 'help'     => _t(self::EDIT_ORDERS . '_HELP', 'Edit orders in the CMS.'),
+            ],
+
+            self::MANAGE_ORDER_STATUS => [
+                'name'     => _t(self::MANAGE_ORDER_STATUS, 'Manage order status'),
+                'category' => $permissionCategory,
+                'help'     => _t(self::MANAGE_ORDER_STATUS . '_HELP', 'Manage order status in the CMS.'),
             ],
 
             self::VIEW_PRODUCTS   => [
