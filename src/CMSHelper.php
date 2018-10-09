@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace SwipeStripe;
 
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
-use SwipeStripe\Forms\Fields\ReadOnlyGridField;
+use SilverStripe\Forms\GridField\GridFieldEditButton;
+use SilverStripe\Forms\GridField\GridFieldViewButton;
 
 /**
  * Trait CMSHelper
@@ -19,43 +19,33 @@ trait CMSHelper
      * @param array|null $fieldNames
      * @return FieldList
      */
-    public function convertGridFieldsToReadOnly(FieldList $fieldList, ?array $fieldNames = null): FieldList
+    public function addViewButtonToGridFields(FieldList $fieldList, ?array $fieldNames = null): FieldList
     {
+        /** @var GridField[] $gridFields */
+        $gridFields = [];
         if ($fieldNames === null) {
-            $fieldNames = [];
-
             foreach ($fieldList->dataFields() as $field) {
                 if ($field instanceof GridField) {
-                    $fieldNames[] = $field->getName();
+                    $gridFields[] = $field;
                 }
+            }
+        } else {
+            foreach ($fieldNames as $name) {
+                $gridFields[] = $fieldList->dataFieldByName($name);
             }
         }
 
-        foreach ($fieldNames as $fieldName) {
-            /** @var GridField $originalField */
-            $originalField = $fieldList->dataFieldByName($fieldName);
-            $replacement = $this->getReadOnlyGridField($originalField);
+        foreach ($gridFields as $field) {
+            $config = $field->getConfig();
 
-            $fieldList->replaceField($fieldName, $replacement);
+            if ($config->getComponentByType(GridFieldEditButton::class) !== null &&
+                $config->getComponentByType(GridFieldViewButton::class) === null) {
+
+                $config->addComponent(new GridFieldViewButton());
+            }
         }
 
         return $fieldList;
-    }
-
-    /**
-     * @param GridField $original
-     * @return GridField
-     */
-    public function getReadOnlyGridField(GridField $original): GridField
-    {
-        $injector = Injector::inst();
-        $originalClass = get_class($original);
-
-        $service = $injector->has("{$originalClass}.ReadOnly")
-            ? "{$originalClass}.ReadOnly"
-            : ReadOnlyGridField::class;
-
-        return $injector->create($service, $original);
     }
 
     /**

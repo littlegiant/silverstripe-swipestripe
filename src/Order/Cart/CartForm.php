@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\Cart;
 
-use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
@@ -18,10 +17,6 @@ use SwipeStripe\Order\OrderItem\OrderItemQuantityField;
  */
 class CartForm extends Form
 {
-    const QUANTITY_FIELD_PATTERN = 'Qty_%d';
-    const REMOVE_ITEM_ACTION = 'RemoveOrderItem';
-    const REMOVE_ITEM_ARG = 'OrderItemID';
-
     /**
      * @var Order
      */
@@ -47,26 +42,6 @@ class CartForm extends Form
     }
 
     /**
-     * @return HTTPResponse
-     */
-    public function UpdateCart(): HTTPResponse
-    {
-        $this->saveInto($this->cart);
-        return $this->getController()->redirectBack();
-    }
-
-    /**
-     * @param array $data
-     * @return HTTPResponse
-     */
-    public function RemoveOrderItem(array $data): HTTPResponse
-    {
-        $orderItemID = intval($data[static::REMOVE_ITEM_ARG] ?? 0);
-        $this->cart->removeItem($orderItemID);
-        return $this->getController()->redirectBack();
-    }
-
-    /**
      * @return Order
      */
     public function getCart(): Order
@@ -81,10 +56,10 @@ class CartForm extends Form
     {
         $fields = [];
 
-        foreach ($this->cart->OrderItems() as $item) {
-            $fields[] = OrderItemQuantityField::create($item, sprintf(static::QUANTITY_FIELD_PATTERN, $item->ID),
-                _t(self::class . '.QUANTITY_LABEL', 'Quantity'))
-                ->setRemoveAction($this->getRemoveActionFor($item));
+        foreach ($this->getCart()->OrderItems() as $item) {
+            $fields[] = OrderItemQuantityField::create($item, "Qty_{$item->ID}",
+                _t(self::class . '.QUANTITY_LABEL', 'Quantity')
+            )->setRemoveAction($this->getRemoveActionFor($item));
         }
 
         return FieldList::create($fields);
@@ -96,10 +71,11 @@ class CartForm extends Form
      */
     protected function getRemoveActionFor(OrderItem $item): FormAction
     {
-        return FormAction::create(static::REMOVE_ITEM_ACTION . '?' . static::REMOVE_ITEM_ARG . "={$item->ID}",
-            _t(self::class . '.REMOVE_ITEM', 'Remove'))
-            // Disable if item is immutable
-            ->setDisabled(!$item->IsMutable());
+        return FormAction::create(
+            sprintf('%1$s?%2$s=%3$d', CartFormRequestHandler::REMOVE_ITEM_ACTION,
+                CartFormRequestHandler::REMOVE_ITEM_ARG, $item->ID),
+            _t(self::class . '.REMOVE_ITEM', 'Remove')
+        )->setDisabled(!$item->IsMutable()); // Disable if item is immutable
     }
 
     /**
@@ -110,5 +86,13 @@ class CartForm extends Form
         return FieldList::create(
             FormAction::create('UpdateCart', _t(self::class . '.UPDATE_CART', 'Update Cart'))
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function buildRequestHandler()
+    {
+        return CartFormRequestHandler::create($this);
     }
 }

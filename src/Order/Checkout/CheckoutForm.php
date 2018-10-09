@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace SwipeStripe\Order\Checkout;
 
 use SilverStripe\Control\Controller;
-use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\EmailField;
 use SilverStripe\Forms\FieldList;
@@ -13,18 +12,16 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\TextField;
+use SilverStripe\Omnipay\Exception\InvalidConfigurationException;
 use SilverStripe\Omnipay\GatewayFieldsFactory;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\Omnipay\Model\Message\CompletePurchaseError;
 use SilverStripe\Omnipay\Model\Message\PaymentMessage;
 use SilverStripe\Omnipay\Model\Message\PurchaseError;
 use SilverStripe\Omnipay\Model\Payment;
-use SilverStripe\Omnipay\Service\ServiceFactory;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderConfirmationPage;
-use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Order\PaymentStatus;
-use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 
 /**
  * Class CheckoutForm
@@ -36,27 +33,6 @@ class CheckoutForm extends Form
     const ORDER_HASH_FIELD = 'OrderContents';
     const PAYMENT_METHOD_FIELD = 'PaymentMethod';
     const PAYMENT_ID_QUERY_PARAM = 'payment';
-
-    const CHECKOUT_GUEST = 'Guest';
-    const CHECKOUT_CREATE_ACCOUNT = 'Account';
-
-    /**
-     * @var array
-     */
-    private static $dependencies = [
-        'paymentServiceFactory' => '%$' . ServiceFactory::class,
-        'supportedCurrencies'   => '%$' . SupportedCurrenciesInterface::class,
-    ];
-
-    /**
-     * @var ServiceFactory
-     */
-    public $paymentServiceFactory;
-
-    /**
-     * @var SupportedCurrenciesInterface
-     */
-    public $supportedCurrencies;
 
     /**
      * @var Order
@@ -75,14 +51,18 @@ class CheckoutForm extends Form
     public function __construct(Order $cart, ?RequestHandler $controller = null, ?string $name = null)
     {
         $this->cart = $cart;
-        $cart->Unlock();
+
+        $validator = CheckoutFormValidator::create();
+        if (count($this->getAvailablePaymentMethods()) > 1) {
+            $validator->addRequiredField(static::PAYMENT_METHOD_FIELD);
+        }
 
         parent::__construct(
             $controller,
             $name ?? static::DEFAULT_NAME,
             $this->buildFields(),
             $this->buildActions(),
-            CheckoutFormValidator::create()
+            $validator
         );
 
         if (!$this->getSessionData()) {
@@ -118,7 +98,7 @@ class CheckoutForm extends Form
         }
 
         /** @var Payment|null $payment */
-        $payment = $this->cart->Payments()->find('Identifier', $paymentIdentifier);
+        $payment = $this->getCart()->Payments()->find('Identifier', $paymentIdentifier);
         $defaultMessage = _t(self::class . '.PAYMENT_ERROR',
             'There was an error processing your payment. Please try again.');
 
@@ -141,59 +121,21 @@ class CheckoutForm extends Form
     }
 
     /**
-     * @param array $data
-     * @return HTTPResponse
-     * @throws \SilverStripe\Omnipay\Exception\InvalidConfigurationException
-     * @throws \SilverStripe\Omnipay\Exception\InvalidStateException
-     * @throws \Exception
-     */
-    public function ConfirmCheckout(array $data): HTTPResponse
-    {
-        $this->cart->Lock();
-        $this->extend('beforeInitPayment', $data);
-
-        $this->saveInto($this->cart);
-        $this->cart->write();
-
-        /** @var Payment|PaymentExtension $payment */
-        $payment = Payment::create();
-        $payment->OrderID = $this->cart->ID;
-
-        $paymentMethod = $data[static::PAYMENT_METHOD_FIELD];
-        $dueMoney = $this->cart->UnpaidTotal()->getMoney();
-        $payment->init($paymentMethod, $this->supportedCurrencies->formatDecimal($dueMoney),
-            $dueMoney->getCurrency()->getCode())
-            ->setSuccessUrl($this->getSuccessUrl())
-            ->setFailureUrl($this->getFailureUrl($payment));
-
-        if ($payment->isChanged(null, Payment::CHANGE_VALUE)) {
-            $payment->write();
-        }
-
-        $response = $this->paymentServiceFactory
-            ->getService($payment, ServiceFactory::INTENT_PURCHASE)
-            ->initiate($data);
-
-        $this->extend('afterInitPayment', $data, $payment, $response);
-        return $response->redirectOrRespond();
-    }
-
-    /**
+     * @param Payment $payment
      * @return string
      */
-    protected function getSuccessUrl(): string
+    public function getSuccessUrl(Payment $payment): string
     {
         /** @var OrderConfirmationPage $orderConfirmationPage */
         $orderConfirmationPage = OrderConfirmationPage::get_one(OrderConfirmationPage::class);
-        return $orderConfirmationPage->LinkForOrder($this->cart);
+        return $orderConfirmationPage->LinkForOrder($this->getCart());
     }
 
     /**
      * @param Payment $payment
      * @return string
-     * @throws \SilverStripe\ORM\ValidationException
      */
-    protected function getFailureUrl(Payment $payment): string
+    public function getFailureUrl(Payment $payment): string
     {
         if (!$payment->Identifier) {
             // Force identifier to be generated
@@ -209,28 +151,37 @@ class CheckoutForm extends Form
 
     /**
      * @inheritdoc
-     * @throws \SilverStripe\Omnipay\Exception\InvalidConfigurationException
+     * @throws InvalidConfigurationException
      */
     protected function buildFields(): FieldList
     {
         $fields = FieldList::create([
             TextField::create('CustomerName', 'Name'),
             EmailField::create('CustomerEmail', 'Email'),
-            $this->cart->BillingAddress->scaffoldFormField('Billing Address'),
+            $this->getCart()->BillingAddress->scaffoldFormField('Billing Address'),
         ]);
 
-        $gateways = GatewayInfo::getSupportedGateways();
-        $gatewayField = count($gateways) > 1
-            ? OptionsetField::create(static::PAYMENT_METHOD_FIELD,
-                _t(self::class . '.PAYMENT_METHOD', 'Select your payment method'), $gateways)
-            : HiddenField::create(static::PAYMENT_METHOD_FIELD, null, key($gateways));
+        $gateways = $this->getAvailablePaymentMethods();
+        if (count($gateways) > 1) {
+            $fields->add(OptionsetField::create(static::PAYMENT_METHOD_FIELD,
+                _t(self::class . '.PAYMENT_METHOD', 'Select your payment method'), $gateways));
+        }
 
-        $fields->add($gatewayField);
         $fields->merge($this->buildGatewayFields($gateways));
-        $fields->add(HiddenField::create(static::ORDER_HASH_FIELD, null, $this->cart->getHash()));
+        $fields->add(HiddenField::create(static::ORDER_HASH_FIELD, null, $this->getCart()->getHash()));
 
         $this->extend('updateFields', $fields);
+
         return $fields;
+    }
+
+    /**
+     * @return array
+     * @throws InvalidConfigurationException
+     */
+    public function getAvailablePaymentMethods(): array
+    {
+        return GatewayInfo::getSupportedGateways();
     }
 
     /**
@@ -257,6 +208,16 @@ class CheckoutForm extends Form
         return FieldList::create(
             FormAction::create('ConfirmCheckout', _t(self::class . '.CONFIRM_CHECKOUT', 'Confirm Checkout'))
         );
+    }
+
+    /**
+     * @param Order $cart
+     * @return CheckoutForm
+     */
+    public function setCart(Order $cart): self
+    {
+        $this->cart = $cart;
+        return $this;
     }
 
     /**

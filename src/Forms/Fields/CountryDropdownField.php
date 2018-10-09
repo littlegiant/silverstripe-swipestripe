@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace SwipeStripe\Forms\Fields;
 
 use SilverStripe\Forms\DropdownField;
-use SilverStripe\i18n\Data\Intl\IntlLocales;
+use SilverStripe\i18n\i18n;
 
 /**
  * Class CountryDropdownField
@@ -18,7 +18,7 @@ class CountryDropdownField extends DropdownField
     public function __construct(string $name, ?string $title = null, $source = [], $value = null)
     {
         $source = empty($source)
-            ? IntlLocales::singleton()->getCountries()
+            ? i18n::getData()->getCountries()
             : $source;
 
         parent::__construct($name, $title, $source, $value);

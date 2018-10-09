@@ -5,8 +5,6 @@ namespace SwipeStripe\Order;
 
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBInt;
-use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
@@ -34,10 +32,10 @@ class OrderAddOn extends DataObject
      * @var array
      */
     private static $db = [
-        'Type'       => DBVarchar::class,
-        'Priority'   => DBInt::class,
-        'Title'      => DBVarchar::class,
-        'BaseAmount' => DBPrice::class,
+        'Type'       => 'Varchar',
+        'Priority'   => 'Int',
+        'Title'      => 'Varchar',
+        'BaseAmount' => 'Price',
     ];
 
     /**

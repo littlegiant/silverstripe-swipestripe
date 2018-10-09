@@ -4,12 +4,13 @@ declare(strict_types=1);
 namespace SwipeStripe;
 
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\View\TemplateGlobalProvider;
 use SilverStripe\View\ViewableData;
-use SwipeStripe\Order\Order;
 use SwipeStripe\Order\PaymentStatus;
 
 /**
@@ -19,6 +20,7 @@ use SwipeStripe\Order\PaymentStatus;
 class GlobalTemplateHelper extends ViewableData implements TemplateGlobalProvider
 {
     use Configurable;
+    use HasActiveCart;
     use Injectable;
 
     /**
@@ -40,16 +42,6 @@ class GlobalTemplateHelper extends ViewableData implements TemplateGlobalProvide
             /** @see GlobalTemplateHelper::singleton() */
             $name => 'singleton',
         ];
-    }
-
-    /**
-     * @return Order
-     */
-    public function ActiveCart(): Order
-    {
-        /** @var Controller|HasActiveCart $controller */
-        $controller = Controller::curr();
-        return $controller->ActiveCart;
     }
 
     /**
@@ -78,5 +70,21 @@ class GlobalTemplateHelper extends ViewableData implements TemplateGlobalProvide
         ];
 
         return $displayStatuses[$status] ?? null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRequest(): ?HTTPRequest
+    {
+        $request = Injector::inst()->get(HTTPRequest::class);
+
+        if ($request) {
+            return $request;
+        } elseif (Controller::has_curr()) {
+            return Controller::curr()->getRequest();
+        }
+
+        return null;
     }
 }

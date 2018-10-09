@@ -26,6 +26,7 @@ use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
  * @package SwipeStripe\Price
  * @see DBPrice
  * @see MoneyField
+ * @property-read SupportedCurrenciesInterface $supportedCurrencies
  */
 class PriceField extends FormField
 {
@@ -35,11 +36,6 @@ class PriceField extends FormField
     private static $dependencies = [
         'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
     ];
-
-    /**
-     * @var SupportedCurrenciesInterface
-     */
-    public $supportedCurrencies;
 
     /**
      * @var string
