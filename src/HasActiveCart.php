@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace SwipeStripe;
 
 use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Control\Session;
 use SwipeStripe\Order\Order;
 
 /**
@@ -41,13 +40,20 @@ trait HasActiveCart
      */
     public function setActiveCart(?Order $cart): void
     {
-        $session = $this->getRequest()->getSession();
-
-        if ($cart !== null) {
-            $session->set(SessionData::CART_ID, $cart->ID);
-        } else {
-            $session->clear(SessionData::CART_ID);
+        if ($cart === null) {
+            $this->clearActiveCart();
+            return;
         }
+
+        if (!$cart->IsMutable()) {
+            throw new \InvalidArgumentException('Order passed to ' . __METHOD__ . ' must be mutable.');
+        }
+
+        if (!$cart->isInDB()) {
+            $cart->write();
+        }
+
+        $this->getRequest()->getSession()->set(SessionData::CART_ID, $cart->ID);
     }
 
     /**
