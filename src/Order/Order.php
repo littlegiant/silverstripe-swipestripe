@@ -132,6 +132,13 @@ class Order extends DataObject
     ];
 
     /**
+     * @var array
+     */
+    private static $defaults = [
+        'Status' => OrderStatus::PENDING,
+    ];
+
+    /**
      * @return Order
      */
     public function createCart(): self
