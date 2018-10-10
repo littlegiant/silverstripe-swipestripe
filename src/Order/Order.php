@@ -186,7 +186,7 @@ class Order extends DataObject
             $this->moveTabBefore($fields, 'Payments', 'Root.OrderItems');
             $this->moveTabBefore($fields, 'Payments', 'Root.OrderAddOns');
 
-            $this->addViewButtonToGridFields($fields);
+            $this->addViewButtonToGridFields($fields, null, true);
         });
 
         return parent::getCMSFields();
