@@ -135,7 +135,7 @@ class ViewOrderPageController extends \PageController
         return Generator::create(
             $this->receiptPdfGenerator,
             Template::create($templates, $order),
-            Browser::create("{$this->SiteConfig()->Title} - Order #{$order->ID}", 'application/pdf', true)
+            Browser::create("{$this->SiteConfig()->Title} - {$order->Title}", 'application/pdf', true)
         )->process();
     }
 
