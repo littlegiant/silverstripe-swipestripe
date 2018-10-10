@@ -149,6 +149,21 @@ class OrderStatusUpdate extends DataObject
     /**
      * @inheritDoc
      */
+    protected function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+
+        if (!$this->isInDB() && !$this->CustomerVisible) {
+            // Don't show checked notification box if not customer visible
+            // Notification won't be sent regardless
+            /** @see OrderStatusUpdate::shouldSendNotification() */
+            $this->NotifyCustomer = false;
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     protected function onAfterWrite()
     {
         parent::onAfterWrite();
@@ -170,8 +185,11 @@ class OrderStatusUpdate extends DataObject
      */
     protected function shouldSendNotification(): bool
     {
-        $shouldSend = $this->isChanged('ID') &&
-            $this->CustomerVisible && $this->NotifyCustomer;
+        if (!$this->CustomerVisible || !$this->NotifyCustomer) {
+            return false;
+        }
+
+        $shouldSend = $this->isChanged('ID');
 
         $this->extend('shouldSendNotification', $shouldSend);
         return $shouldSend;
