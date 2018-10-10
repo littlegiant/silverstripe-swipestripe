@@ -29,6 +29,36 @@
     </div>
 
     <div class="row">
+        <div class="col-md-12">
+            <% if $Order.CustomerVisibleOrderStatusUpdates %>
+                <h3>Updates</h3>
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <td>Time</td>
+                        <td>Status</td>
+                        <td>Notes</td>
+                    </tr>
+
+                    <tr>
+
+                    </tr>
+                    </thead>
+
+                    <% loop $Order.CustomerVisibleOrderStatusUpdates %>
+                        <tr>
+                            <td>{$Created.Nice}</td>
+                            <td>{$Status}</td>
+                            <td>{$Message}</td>
+                        </tr>
+                    <% end_loop %>
+                </table>
+            <% end_if %>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-md-8">
             <% include SwipeStripe/Order/CheckoutSummary Cart=$Order %>
         </div>
