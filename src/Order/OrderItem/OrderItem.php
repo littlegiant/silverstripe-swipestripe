@@ -170,9 +170,7 @@ class OrderItem extends DataObject
             throw new \BadMethodCallException("Cannot set Purchasable on locked OrderItem {$this->ID}.");
         }
 
-        $this->PurchasableClass = $purchasable->ClassName;
-        $this->PurchasableID = $purchasable->ID;
-
+        $this->setComponent('Purchasable', $purchasable);
         return $this;
     }
 

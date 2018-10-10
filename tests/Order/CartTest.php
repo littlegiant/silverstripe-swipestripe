@@ -64,11 +64,8 @@ class CartTest extends SapphireTest
     {
         parent::setUp();
 
+        $this->order = Order::singleton()->createCart();
         $this->product = $this->objFromFixture(TestProduct::class, 'product');
-
-        $this->order = Order::create();
-        $this->order->IsCart = true;
-        $this->order->write();
     }
 
     /**
@@ -217,7 +214,7 @@ class CartTest extends SapphireTest
         /** @var Order $sameOrder */
         $sameOrder = Order::get()->byID($order->ID);
         $differentOrder = Order::create();
-        $order->write();
+        $differentOrder->write();
 
         // Different empty orders have different hashes
         $this->assertSame($originalHash, $sameOrder->getHash());
