@@ -273,10 +273,7 @@ class OrderTest extends SapphireTest
         $this->currency = new Currency('NZD');
         $this->setupSupportedCurrencies();
 
-        $this->order = Order::create();
-        $this->order->IsCart = true;
-        $this->order->write();
-
+        $this->order = Order::singleton()->createCart();
         $this->product = $this->objFromFixture(TestProduct::class, 'product');
     }
 }
