@@ -45,8 +45,8 @@ trait HasActiveCart
             return;
         }
 
-        if (!$cart->IsMutable()) {
-            throw new \InvalidArgumentException('Order passed to ' . __METHOD__ . ' must be mutable.');
+        if (!$cart->IsCart) {
+            throw new \InvalidArgumentException('Order passed to ' . __METHOD__ . ' must be cart.');
         }
 
         if (!$cart->isInDB()) {
