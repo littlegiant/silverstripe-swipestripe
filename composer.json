@@ -33,7 +33,8 @@
         "silverstripe/cms": "^4.2",
         "silverstripe/silverstripe-omnipay": "^3",
         "heyday/silverstripe-wkhtml": "dev-feature/upgrade-to-ss4",
-        "silvershop/silverstripe-hasonefield": "^2.1.1"
+        "silvershop/silverstripe-hasonefield": "^2.1.1",
+        "unclecheese/display-logic": "^2.0"
     },
     "autoload": {
         "psr-4": {

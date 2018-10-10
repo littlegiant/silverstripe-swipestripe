@@ -17,9 +17,14 @@ trait CMSHelper
     /**
      * @param FieldList $fieldList
      * @param array|null $fieldNames
+     * @param bool $restrictReadOnly
      * @return FieldList
      */
-    public function addViewButtonToGridFields(FieldList $fieldList, ?array $fieldNames = null): FieldList
+    public function addViewButtonToGridFields(
+        FieldList $fieldList,
+        ?array $fieldNames = null,
+        bool $restrictReadOnly = false
+    ): FieldList
     {
         /** @var GridField[] $gridFields */
         $gridFields = [];
@@ -38,7 +43,8 @@ trait CMSHelper
         foreach ($gridFields as $field) {
             $config = $field->getConfig();
 
-            if ($config->getComponentByType(GridFieldEditButton::class) !== null &&
+            if (($field->isReadonly() || !$restrictReadOnly) &&
+                $config->getComponentByType(GridFieldEditButton::class) !== null &&
                 $config->getComponentByType(GridFieldViewButton::class) === null) {
 
                 $config->addComponent(new GridFieldViewButton());

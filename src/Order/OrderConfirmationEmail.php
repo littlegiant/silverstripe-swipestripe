@@ -32,9 +32,9 @@ class OrderConfirmationEmail extends SwipeStripeEmail
         ?string $returnPath = null
     ) {
         $this->order = $order;
-        $subject = $subject ?? _t(self::class . '.SUBJECT', 'Your {site} order confirmation - Order #{order_id}', [
+        $subject = $subject ?? _t(self::class . '.SUBJECT', 'Your {site} order confirmation - {order_title}', [
                 'site'     => SiteConfig::current_site_config()->Title,
-                'order_id' => $order->ID,
+                'order_title' => $order->Title,
             ]);
         $to = $to ?? [$order->CustomerEmail => $order->CustomerName];
 

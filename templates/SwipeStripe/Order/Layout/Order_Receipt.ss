@@ -1,7 +1,7 @@
 <div class="container">
     <div class="row">
         <div class="page-header col-md-12">
-            <h1>Order #{$ID} <small>Receipt</small></h1>
+            <h1>{$Title} <small>Receipt</small></h1>
         </div>
     </div>
 

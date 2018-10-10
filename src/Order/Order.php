@@ -7,6 +7,8 @@ use Money\Money;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataObject;
@@ -16,9 +18,12 @@ use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SwipeStripe\CMSHelper;
+use SwipeStripe\Forms\Fields\AlwaysModifiableGridField;
 use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\Order\Status\OrderStatus;
+use SwipeStripe\Order\Status\OrderStatusUpdate;
 use SwipeStripe\ORM\FieldType\DBAddress;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
@@ -36,8 +41,10 @@ use SwipeStripe\ShopPermissions;
  * @property string $CustomerEmail
  * @property DBAddress $BillingAddress
  * @property string $ConfirmationTime
+ * @property string $Status
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
+ * @method HasManyList|OrderStatusUpdate[] OrderStatusUpdates()
  * @mixin Payable
  * @property-read SupportedCurrenciesInterface $supportedCurrencies
  */
@@ -60,6 +67,7 @@ class Order extends DataObject
         'CartLocked'       => 'Boolean',
         'GuestToken'       => 'Varchar',
         'ConfirmationTime' => 'Datetime',
+        'Status'           => OrderStatus::ENUM,
 
         'CustomerName'   => 'Varchar',
         'CustomerEmail'  => 'Varchar',
@@ -70,8 +78,9 @@ class Order extends DataObject
      * @var array
      */
     private static $has_many = [
-        'OrderAddOns' => OrderAddOn::class,
-        'OrderItems'  => OrderItem::class,
+        'OrderAddOns'        => OrderAddOn::class,
+        'OrderItems'         => OrderItem::class,
+        'OrderStatusUpdates' => OrderStatusUpdate::class,
     ];
 
     /**
@@ -93,6 +102,7 @@ class Order extends DataObject
      * @var array
      */
     private static $summary_fields = [
+        'Status'           => 'Status',
         'CustomerName'     => 'Customer Name',
         'CustomerEmail'    => 'Customer Email',
         'OrderItems.Count' => 'Items',
@@ -106,6 +116,7 @@ class Order extends DataObject
     private static $searchable_fields = [
         'CustomerName',
         'CustomerEmail',
+        'Status',
     ];
 
     /**
@@ -118,6 +129,13 @@ class Order extends DataObject
      */
     private static $dependencies = [
         'supportedCurrencies' => '%$' . SupportedCurrenciesInterface::class,
+    ];
+
+    /**
+     * @var array
+     */
+    private static $defaults = [
+        'Status' => OrderStatus::PENDING,
     ];
 
     /**
@@ -148,6 +166,17 @@ class Order extends DataObject
     /**
      * @inheritDoc
      */
+    public function getTitle()
+    {
+        return _t(self::class . '.Title', '{name} #{id}', [
+            'name' => $this->i18n_singular_name(),
+            'id'   => $this->ID,
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
@@ -156,10 +185,12 @@ class Order extends DataObject
                 'CartLocked',
                 'GuestToken',
                 'ConfirmationTime',
+                'Status',
             ]);
 
             $fields->insertBefore('CustomerName', FieldGroup::create([
                 $this->dbObject('ConfirmationTime')->scaffoldFormField(),
+                $this->dbObject('Status')->scaffoldFormField(),
             ]));
 
             $fields->insertAfter('BillingAddress',
@@ -169,10 +200,27 @@ class Order extends DataObject
             $this->moveTabBefore($fields, 'Payments', 'Root.OrderItems');
             $this->moveTabBefore($fields, 'Payments', 'Root.OrderAddOns');
 
-            $this->addViewButtonToGridFields($fields);
+            $statusUpdates = $fields->dataFieldByName('OrderStatusUpdates');
+            if ($statusUpdates instanceof GridField) {
+                $statusUpdates->setConfig(GridFieldConfig_RecordEditor::create());
+            }
+
+            $this->addViewButtonToGridFields($fields, null, true);
         });
 
-        return parent::getCMSFields();
+        /** @see DataObject::getCMSFields() */
+        $tabbedFields = $this->scaffoldFormFields(array(
+            'includeRelations' => $this->isInDB(),
+            'tabbed' => true,
+            'ajaxSafe' => true,
+            'fieldClasses' => [
+                'OrderStatusUpdates' => AlwaysModifiableGridField::class,
+            ],
+        ));
+
+        $this->extend('updateCMSFields', $tabbedFields);
+
+        return $tabbedFields;
     }
 
     /**
@@ -242,6 +290,14 @@ class Order extends DataObject
         }
 
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
+    }
+
+    /**
+     * @return HasManyList|OrderStatusUpdate[]
+     */
+    public function CustomerVisibleOrderStatusUpdates(): HasManyList
+    {
+        return $this->OrderStatusUpdates()->filter('CustomerVisible', true);
     }
 
     /**
@@ -367,7 +423,7 @@ class Order extends DataObject
     public function canView($member = null)
     {
         return $this->extendedCan(__FUNCTION__, $member) ??
-            Permission::check(ShopPermissions::VIEW_ORDERS, 'any', $member);
+            Permission::checkMember($member, ShopPermissions::VIEW_ORDERS);
     }
 
     /**
@@ -376,7 +432,7 @@ class Order extends DataObject
     public function canEdit($member = null)
     {
         return $this->extendedCan(__FUNCTION__, $member) ??
-            ($this->IsMutable() && Permission::check(ShopPermissions::EDIT_ORDERS, 'any', $member));
+            ($this->IsMutable() && Permission::checkMember($member, ShopPermissions::EDIT_ORDERS));
     }
 
     /**
