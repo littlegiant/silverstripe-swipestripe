@@ -176,8 +176,17 @@ class OrderStatusUpdate extends DataObject
         }
 
         if ($this->shouldSendNotification()) {
-            // TODO - send email to customer
+            $this->sendNotification();
         }
+    }
+
+    /**
+     * @param null|string $to
+     * @return bool
+     */
+    public function sendNotification(?string $to = null): bool
+    {
+        return OrderStatusUpdateEmail::create($this, null, $to)->send();
     }
 
     /**
