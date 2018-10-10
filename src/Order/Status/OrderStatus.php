@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Order;
+namespace SwipeStripe\Order\Status;
 
 /**
  * Interface OrderStatus
- * @package SwipeStripe\Order
+ * @package SwipeStripe\Order\Status
  */
 interface OrderStatus
 {

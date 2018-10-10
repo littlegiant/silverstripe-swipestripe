@@ -7,6 +7,8 @@ use Money\Money;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataObject;
@@ -16,9 +18,12 @@ use SilverStripe\ORM\HasManyList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SwipeStripe\CMSHelper;
+use SwipeStripe\Forms\Fields\AlwaysModifiableGridField;
 use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
+use SwipeStripe\Order\Status\OrderStatus;
+use SwipeStripe\Order\Status\OrderStatusUpdate;
 use SwipeStripe\ORM\FieldType\DBAddress;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
@@ -39,6 +44,7 @@ use SwipeStripe\ShopPermissions;
  * @property string $Status
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
+ * @method HasManyList|OrderStatusUpdate[] OrderStatusUpdates()
  * @mixin Payable
  * @property-read SupportedCurrenciesInterface $supportedCurrencies
  */
@@ -72,8 +78,9 @@ class Order extends DataObject
      * @var array
      */
     private static $has_many = [
-        'OrderAddOns' => OrderAddOn::class,
-        'OrderItems'  => OrderItem::class,
+        'OrderAddOns'        => OrderAddOn::class,
+        'OrderItems'         => OrderItem::class,
+        'OrderStatusUpdates' => OrderStatusUpdate::class,
     ];
 
     /**
@@ -186,10 +193,27 @@ class Order extends DataObject
             $this->moveTabBefore($fields, 'Payments', 'Root.OrderItems');
             $this->moveTabBefore($fields, 'Payments', 'Root.OrderAddOns');
 
+            $statusUpdates = $fields->dataFieldByName('OrderStatusUpdates');
+            if ($statusUpdates instanceof GridField) {
+                $statusUpdates->setConfig(GridFieldConfig_RecordEditor::create());
+            }
+
             $this->addViewButtonToGridFields($fields, null, true);
         });
 
-        return parent::getCMSFields();
+        /** @see DataObject::getCMSFields() */
+        $tabbedFields = $this->scaffoldFormFields(array(
+            'includeRelations' => $this->isInDB(),
+            'tabbed' => true,
+            'ajaxSafe' => true,
+            'fieldClasses' => [
+                'OrderStatusUpdates' => AlwaysModifiableGridField::class,
+            ],
+        ));
+
+        $this->extend('updateCMSFields', $tabbedFields);
+
+        return $tabbedFields;
     }
 
     /**
@@ -259,6 +283,14 @@ class Order extends DataObject
         }
 
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
+    }
+
+    /**
+     * @return HasManyList|OrderStatusUpdate[]
+     */
+    public function CustomerVisibleOrderStatusUpdates(): HasManyList
+    {
+        return $this->OrderStatusUpdates()->filter('CustomerVisible', true);
     }
 
     /**
