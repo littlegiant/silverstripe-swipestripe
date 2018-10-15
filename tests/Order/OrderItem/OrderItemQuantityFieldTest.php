@@ -147,8 +147,7 @@ class OrderItemQuantityFieldTest extends SapphireTest
             ->setQuantity($quantityOld, false);
         $orderItem->write();
 
-        $this->cart->CartLocked = true;
-        $this->cart->write();
+        $this->cart->Lock();
 
         $this->assertFalse($orderItem->IsMutable());
         $quantityField = OrderItemQuantityField::create($orderItem, 'qty');

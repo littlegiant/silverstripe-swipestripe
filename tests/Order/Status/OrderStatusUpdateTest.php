@@ -135,9 +135,10 @@ class OrderStatusUpdateTest extends SapphireTest
 
         $order = Order::create();
         $order->IsCart = false;
-        $order->CartLocked = true;
         $order->CustomerEmail = static::CUSTOMER_EMAIL;
+
         $order->write();
+        $order->Lock();
 
         $this->order = $order;
     }
