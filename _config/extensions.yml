@@ -1,5 +1,5 @@
 ---
-Name: swipestripe-common-extensions
+Name: swipestripe-core-extensions
 ---
 
 SilverStripe\Omnipay\Model\Payment:
