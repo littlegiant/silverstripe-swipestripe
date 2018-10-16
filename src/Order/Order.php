@@ -11,12 +11,16 @@ use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\HasManyList;
+use SilverStripe\ORM\Relation;
+use SilverStripe\ORM\UnsavedRelationList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use SilverStripe\Versioned\Versioned;
 use SwipeStripe\CMSHelper;
 use SwipeStripe\Forms\Fields\AlwaysModifiableGridField;
 use SwipeStripe\Order\Cart\ViewCartPage;
@@ -34,7 +38,7 @@ use SwipeStripe\ShopPermissions;
  * Class Order
  * @package SwipeStripe\Order
  * @property bool $IsCart
- * @property bool $CartLocked
+ * @property string $CartLockedAt
  * @property string $GuestToken
  * @property string $Hash
  * @property string $CustomerName
@@ -42,8 +46,6 @@ use SwipeStripe\ShopPermissions;
  * @property DBAddress $BillingAddress
  * @property string $ConfirmationTime
  * @property string $Status
- * @method HasManyList|OrderItem[] OrderItems()
- * @method HasManyList|OrderAddOn[] OrderAddOns()
  * @method HasManyList|OrderStatusUpdate[] OrderStatusUpdates()
  * @mixin Payable
  * @property-read SupportedCurrenciesInterface $supportedCurrencies
@@ -63,8 +65,9 @@ class Order extends DataObject
      * @var array
      */
     private static $db = [
-        'IsCart'           => 'Boolean',
-        'CartLocked'       => 'Boolean',
+        'IsCart'       => 'Boolean',
+        'CartLockedAt' => 'Datetime',
+
         'GuestToken'       => 'Varchar',
         'ConfirmationTime' => 'Datetime',
         'Status'           => OrderStatus::ENUM,
@@ -147,7 +150,7 @@ class Order extends DataObject
         $cart->IsCart = true;
         $cart->write();
 
-        return $cart;
+        return static::get_by_id($cart->ID);
     }
 
     /**
@@ -182,7 +185,7 @@ class Order extends DataObject
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $fields->removeByName([
                 'IsCart',
-                'CartLocked',
+                'CartLockedAt',
                 'GuestToken',
                 'ConfirmationTime',
                 'Status',
@@ -318,7 +321,7 @@ class Order extends DataObject
      */
     public function IsMutable(): bool
     {
-        return $this->IsCart && !$this->CartLocked;
+        return $this->IsCart && !$this->CartLockedAt;
     }
 
     /**
@@ -477,7 +480,7 @@ class Order extends DataObject
      */
     public function Lock(): void
     {
-        if ($this->CartLocked) {
+        if ($this->CartLockedAt) {
             return;
         }
 
@@ -485,13 +488,10 @@ class Order extends DataObject
             foreach ($this->OrderItems() as $item) {
                 if ($item->getQuantity() < 1) {
                     $item->delete();
-                } else {
-                    $item->PurchasableLockedVersion = $item->Purchasable()->Version;
-                    $item->write();
                 }
             }
 
-            $this->CartLocked = true;
+            $this->CartLockedAt = DBDatetime::now()->getValue();
             $this->write();
         }, null, false, true);
     }
@@ -533,17 +533,12 @@ class Order extends DataObject
      */
     public function Unlock(): void
     {
-        if (!$this->IsCart || !$this->CartLocked) {
+        if (!$this->IsCart || !$this->CartLockedAt) {
             return;
         }
 
         DB::get_conn()->withTransaction(function () {
-            foreach ($this->OrderItems() as $item) {
-                $item->PurchasableLockedVersion = null;
-                $item->write();
-            }
-
-            $this->CartLocked = false;
+            $this->CartLockedAt = null;
             $this->write();
         }, null, false, true);
     }
@@ -628,5 +623,52 @@ class Order extends DataObject
             'billingState'    => $this->BillingAddress->Region,
             'billingCountry'  => $this->BillingAddress->Country,
         ];
+    }
+
+    /**
+     * If the order is locked, this forces queries to return relations as at the time the order was locked rather than
+     * the current live items. For example, prices and coupons as at the time the user paid rather than potentially
+     * changed live prices from now.
+     * @return array
+     */
+    public function getVersionedQueryParams(): array
+    {
+        return $this->IsMutable()
+            ? []
+            : [
+                'Versioned.mode'  => 'archive',
+                'Versioned.date'  => $this->CartLockedAt ?? DBDatetime::now(),
+                'Versioned.stage' => Versioned::get_stage() ?? Versioned::LIVE,
+            ];
+    }
+
+    /**
+     * @return UnsavedRelationList|HasManyList|OrderItem[]
+     */
+    public function OrderItems(): Relation
+    {
+        $orderItems = $this->getComponents('OrderItems');
+
+        // Don't call on UnsavedRelationList
+        if ($orderItems instanceof DataList) {
+            $orderItems = $orderItems->setDataQueryParam($this->getVersionedQueryParams());
+        }
+
+        return $orderItems;
+    }
+
+    /**
+     * @return UnsavedRelationList|HasManyList|OrderAddOn[]
+     */
+    public function OrderAddOns(): Relation
+    {
+        $orderAddOns = $this->getComponents('OrderAddOns');
+
+        // Don't call on UnsavedRelationList
+        if ($orderAddOns instanceof DataList) {
+            $orderAddOns = $orderAddOns->setDataQueryParam($this->getVersionedQueryParams());
+        }
+
+        return $orderAddOns;
     }
 }

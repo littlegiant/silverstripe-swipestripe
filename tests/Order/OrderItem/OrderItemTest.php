@@ -102,10 +102,22 @@ class OrderItemTest extends SapphireTest
         $this->assertTrue($orderItem->Purchasable()->getPrice()->getMoney()->equals($productOriginalPrice));
         $this->assertTrue($orderItem->getPrice()->getMoney()->equals($productOriginalPrice));
 
+        // Test fetching OrderItem directly, rather than through relation
+        /** @var OrderItem $orderItem */
+        $orderItem = OrderItem::get()->byID($orderItem->ID);
+        $this->assertTrue($orderItem->Purchasable()->getPrice()->getMoney()->equals($productOriginalPrice));
+        $this->assertTrue($orderItem->getPrice()->getMoney()->equals($productOriginalPrice));
+
         $order->Unlock();
 
         // Test again, with new instance of the OrderItem
         $orderItem = $order->getOrderItem($product, false);
+        $this->assertTrue($orderItem->Purchasable()->getPrice()->getMoney()->equals($productNewPrice));
+        $this->assertTrue($orderItem->getPrice()->getMoney()->equals($productNewPrice));
+
+        // Test fetching OrderItem directly, rather than through relation
+        /** @var OrderItem $orderItem */
+        $orderItem = OrderItem::get()->byID($orderItem->ID);
         $this->assertTrue($orderItem->Purchasable()->getPrice()->getMoney()->equals($productNewPrice));
         $this->assertTrue($orderItem->getPrice()->getMoney()->equals($productNewPrice));
     }

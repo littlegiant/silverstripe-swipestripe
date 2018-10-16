@@ -9,6 +9,7 @@ use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemQuantityField;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;
+use SwipeStripe\Tests\WaitsMockTime;
 
 /**
  * Class OrderItemQuantityFieldTest
@@ -16,6 +17,8 @@ use SwipeStripe\Tests\Fixtures;
  */
 class OrderItemQuantityFieldTest extends SapphireTest
 {
+    use WaitsMockTime;
+
     /**
      * @var array
      */
@@ -135,6 +138,7 @@ class OrderItemQuantityFieldTest extends SapphireTest
 
     /**
      *
+     * @throws \Exception
      */
     public function testReadOnlyForImmutableOrderItem()
     {
@@ -148,6 +152,7 @@ class OrderItemQuantityFieldTest extends SapphireTest
         $orderItem->write();
 
         $this->cart->Lock();
+        $this->mockWait();
 
         $this->assertFalse($orderItem->IsMutable());
         $quantityField = OrderItemQuantityField::create($orderItem, 'qty');

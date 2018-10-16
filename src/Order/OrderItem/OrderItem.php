@@ -7,6 +7,8 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
+use SilverStripe\ORM\Relation;
+use SilverStripe\ORM\UnsavedRelationList;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\CMSHelper;
 use SwipeStripe\Forms\Fields\HasOneButtonField;
@@ -22,13 +24,11 @@ use SwipeStripe\Price\PriceField;
  * @property DBPrice $Price
  * @property int $Quantity
  * @property int $OrderID
- * @property int $PurchasableID
- * @property DBPrice $SubTotal
- * @property DBPrice $Total
  * @property string $PurchasableClass
- * @property int $PurchasableLockedVersion
+ * @property int $PurchasableID
+ * @property-read DBPrice $SubTotal
+ * @property-read DBPrice $Total
  * @method Order Order()
- * @method HasManyList|OrderItemAddOn[] OrderItemAddOns()
  */
 class OrderItem extends DataObject
 {
@@ -47,7 +47,6 @@ class OrderItem extends DataObject
      */
     private static $db = [
         'Quantity'                 => 'Int',
-        'PurchasableLockedVersion' => 'Int',
     ];
 
     /**
@@ -63,6 +62,13 @@ class OrderItem extends DataObject
      */
     private static $has_many = [
         'OrderItemAddOns' => OrderItemAddOn::class,
+    ];
+
+    /**
+     * @var array
+     */
+    private static $extensions = [
+        Versioned::class => Versioned::class . '.versioned',
     ];
 
     /**
@@ -98,14 +104,21 @@ class OrderItem extends DataObject
     }
 
     /**
-     * @return DataObject|PurchasableInterface
+     * @return null|DataObject|PurchasableInterface
      */
     public function Purchasable(): ?PurchasableInterface
     {
-        return !$this->IsMutable() && !empty($this->PurchasableLockedVersion)
-            ? Versioned::get_version($this->PurchasableClass, $this->PurchasableID, $this->PurchasableLockedVersion)
-            /** @see OrderItem::$has_one */
-            : $this->getComponent('Purchasable');
+        $this->setSourceQueryParams($this->Order()->getVersionedQueryParams());
+        return $this->getComponent('Purchasable');
+    }
+
+    /**
+     * @return HasManyList|UnsavedRelationList|OrderItem[]
+     */
+    public function OrderItemAddOns(): Relation
+    {
+        $this->setSourceQueryParams($this->Order()->getVersionedQueryParams());
+        return $this->getComponents('OrderItemAddOns');
     }
 
     /**
@@ -226,7 +239,6 @@ class OrderItem extends DataObject
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $fields->removeByName([
                 'OrderID',
-                'PurchasableLockedVersion',
             ]);
 
             $fields->insertBefore('Quantity', ReadonlyField::create('Title'));
