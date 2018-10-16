@@ -1,7 +1,9 @@
 # Swipestripe Ecommerce Module
+[![Build Status](https://travis-ci.org/swipestripe/silverstripe-swipestripe.svg?branch=5.0)](https://travis-ci.org/swipestripe/silverstripe-swipestripe)
+[![Coverage Status](https://coveralls.io/repos/github/swipestripe/silverstripe-swipestripe/badge.svg?branch=5.0)](https://coveralls.io/github/swipestripe/silverstripe-swipestripe?branch=5.0)
 
 ## Maintainer Contact
-SwipeStripe  
+SwipeStripe
 [Contact Us](http://swipestripe.com/support/contact-us)  
 [Twitter](https://twitter.com/#!/swipestripe)
 

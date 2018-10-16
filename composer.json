@@ -1,41 +1,91 @@
 {
-	"name": "swipestripe/swipestripe",
-	"description": "Ecommerce module to create online shops using SilverStripe.",
-	"homepage": "http://swipestripe.com",
-	"license": "BSD-3-Clause",
-	"type": "silverstripe-module",
-	"keywords": ["silverstripe", "ecommerce", "e-commerce", "shop", "swipestripe", "swipe stripe"],
-	"authors": [
-		{
-			"name": "Frank Mullenger",
-			"email": "frankmullenger@gmail.com"
-		}
-	],
-	"require":
-	{
-		"silverstripe/framework": "~3.1",
-		"silverstripe/cms": "~3.1",
-		"silverstripe/payment": "1.0.*"
-	},
-	"require-dev": 
-	{
-		"silverstripe/sqlite3": "*"
-	},
-	"suggest": {
-		"frankmullenger/payment-cheque": "Simple payment method for testing"
-	},
-	"support": 
-	{
-		"email": "info@swipestripe.com",
-		"irc": "irc://irc.freenode.org/silverstripe",
-		"forum": "http://www.silverstripe.org/e-commerce-modules/",
-		"issues": "https://github.com/frankmullenger/silverstripe-swipestripe/issues"
-	},
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "git@github.com:silverstripe-labs/silverstripe-payment.git"
-		}
-	],
-	"minimum-stability": "dev"
+    "name": "swipestripe/swipestripe",
+    "description": "Ecommerce module to create online shops using SilverStripe.",
+    "homepage": "http://swipestripe.com",
+    "license": "BSD-3-Clause",
+    "type": "silverstripe-vendormodule",
+    "keywords": [
+        "silverstripe",
+        "ecommerce",
+        "e-commerce",
+        "shop",
+        "swipestripe",
+        "swipe stripe"
+    ],
+    "authors": [
+        {
+            "name": "Frank Mullenger",
+            "email": "frankmullenger@gmail.com"
+        },
+        {
+            "name": "Harsh Chokshi",
+            "email": "harsh.chokshi@littlegiant.co.nz"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.1",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "silverstripe/cms": "^4.2",
+        "silverstripe/versioned": "1.2.x-dev",
+        "silverstripe/silverstripe-omnipay": "^3",
+        "heyday/silverstripe-wkhtml": "dev-feature/upgrade-to-ss4",
+        "silvershop/silverstripe-hasonefield": "^2.1.1",
+        "unclecheese/display-logic": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SwipeStripe\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SwipeStripe\\Tests\\": "tests/"
+        },
+        "classmap": [
+            "app/src/Page.php",
+            "app/src/PageController.php"
+        ]
+    },
+    "support": {
+        "email": "info@swipestripe.com",
+        "irc": "irc://irc.freenode.org/silverstripe",
+        "forum": "http://www.silverstripe.org/e-commerce-modules/",
+        "issues": "https://github.com/frankmullenger/silverstripe-swipestripe/issues"
+    },
+    "require-dev": {
+        "php-http/guzzle6-adapter": "^1.1",
+        "phpunit/phpunit": "^5.7",
+        "php-coveralls/php-coveralls": "^2.1",
+        "silverstripe/recipe-cms": "^4.2",
+        "omnipay/dummy": "^3.0"
+    },
+    "config": {
+        "preferred-install": {
+            "silverstripe/framework": "source"
+        }
+    },
+    "repositories": {
+        "wkhtml": {
+            "type": "vcs",
+            "url": "https://github.com/hchokshi/silverstripe-wkhtml.git",
+            "no-api": true
+        }
+    },
+    "extra": {
+        "project-files-installed": [
+            "app/.htaccess",
+            "app/_config.php",
+            "app/_config/mysite.yml"
+        ],
+        "public-files-installed": [
+            ".htaccess",
+            "index.php",
+            "install-frameworkmissing.html",
+            "install.php",
+            "web.config"
+        ]
+    }
 }

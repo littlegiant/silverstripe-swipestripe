@@ -1,0 +1,22 @@
+---
+Name: swipestripe-core-injector
+---
+
+SilverStripe\Core\Injector\Injector:
+  Price:
+    class: SwipeStripe\Price\DBPrice
+
+  Address:
+    class: SwipeStripe\ORM\FieldType\DBAddress
+
+  SwipeStripe\Price\SupportedCurrencies\AbstractSupportedCurrencies.DefaultSubUnitSource:
+    class: Money\Currencies\ISOCurrencies
+
+  SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface:
+    class: SwipeStripe\Price\SupportedCurrencies\SingleSupportedCurrency
+
+  Knp\Snappy\Pdf.SwipeStripe_Receipt:
+    class: Knp\Snappy\Pdf
+
+  SilverShop\HasOneField\HasOneButtonField.ReadOnly:
+    class: SwipeStripe\Forms\Fields\ReadOnlyHasOneButtonField
