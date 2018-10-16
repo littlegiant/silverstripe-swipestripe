@@ -28,9 +28,8 @@
         "php": ">=7.1",
         "ext-intl": "*",
         "ext-json": "*",
-        "silverstripe/framework": "^4.2",
-        "silverstripe/versioned": "^1.2",
         "silverstripe/cms": "^4.2",
+        "silverstripe/versioned": "1.2.x-dev",
         "silverstripe/silverstripe-omnipay": "^3",
         "heyday/silverstripe-wkhtml": "dev-feature/upgrade-to-ss4",
         "silvershop/silverstripe-hasonefield": "^2.1.1",
@@ -65,8 +64,7 @@
     },
     "config": {
         "preferred-install": {
-            "silverstripe/framework": "source",
-            "silverstripe/cms": "source"
+            "silverstripe/framework": "source"
         }
     },
     "repositories": {
@@ -75,5 +73,19 @@
             "url": "https://github.com/hchokshi/silverstripe-wkhtml.git",
             "no-api": true
         }
+    },
+    "extra": {
+        "project-files-installed": [
+            "app/.htaccess",
+            "app/_config.php",
+            "app/_config/mysite.yml"
+        ],
+        "public-files-installed": [
+            ".htaccess",
+            "index.php",
+            "install-frameworkmissing.html",
+            "install.php",
+            "web.config"
+        ]
     }
 }
