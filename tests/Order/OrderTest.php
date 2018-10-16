@@ -21,6 +21,7 @@ use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;
 use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
 use SwipeStripe\Tests\PublishesFixtures;
+use SwipeStripe\Tests\WaitsMockTime;
 
 /**
  * Class OrderTest
@@ -30,6 +31,7 @@ class OrderTest extends SapphireTest
 {
     use NeedsSupportedCurrencies;
     use PublishesFixtures;
+    use WaitsMockTime;
 
     /**
      * @var array
@@ -209,6 +211,7 @@ class OrderTest extends SapphireTest
         $this->assertEquals($cartPage->Link(), $order->Link());
 
         $order->IsCart = false;
+        $order->Lock();
         $order->write();
 
         $this->assertStringStartsWith($orderPage->Link(), $order->Link());
@@ -251,6 +254,8 @@ class OrderTest extends SapphireTest
 
         // Lock and adjust price
         $order->Lock();
+        $this->mockWait();
+
         $product->Price->setValue($productOriginalPrice->multiply(3));
         $product->write();
         $this->assertTrue($order->Total()->getMoney()->equals($productOriginalPrice));

@@ -92,7 +92,7 @@ class CartTest extends SapphireTest
     }
 
     /**
-     * @throws \Exception
+     *
      */
     public function testAddItemToLockedCart()
     {
@@ -142,7 +142,7 @@ class CartTest extends SapphireTest
     }
 
     /**
-     * @throws \Exception
+     *
      */
     public function testRemoveItemFromLockedCart()
     {
@@ -171,7 +171,7 @@ class CartTest extends SapphireTest
     }
 
     /**
-     * @throws \Exception
+     *
      */
     public function testUnlock()
     {
@@ -204,7 +204,6 @@ class CartTest extends SapphireTest
 
     /**
      * @throws \SilverStripe\ORM\ValidationException
-     * @throws \Exception
      */
     public function testHash()
     {
@@ -222,11 +221,13 @@ class CartTest extends SapphireTest
 
         // Test that changing from cart to order doesn't affect the hash
         $order->IsCart = false;
+        $order->Lock();
         $order->write();
         $this->assertSame($originalHash, $order->getHash());
 
         // Restore modifications
         $order->IsCart = true;
+        $order->Unlock();
         $order->write();
 
         // Adding item changes hash

@@ -40,7 +40,6 @@ class CheckoutFormRequestHandler extends FormRequestHandler
      * @return HTTPResponse
      * @throws InvalidConfigurationException
      * @throws InvalidStateException
-     * @throws \Exception
      */
     public function ConfirmCheckout(array $data, CheckoutForm $form): HTTPResponse
     {
