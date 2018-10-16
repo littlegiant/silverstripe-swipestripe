@@ -491,7 +491,7 @@ class Order extends DataObject
     }
 
     /**
-     * @throws \Exception
+     * Lock cart to prevent modifications.
      */
     public function Lock(): void
     {
@@ -499,16 +499,8 @@ class Order extends DataObject
             return;
         }
 
-        DB::get_conn()->withTransaction(function () {
-            foreach ($this->OrderItems() as $item) {
-                if ($item->getQuantity() < 1) {
-                    $item->delete();
-                }
-            }
-
-            $this->CartLockedAt = DBDatetime::now()->getValue();
-            $this->write();
-        }, null, false, true);
+        $this->CartLockedAt = DBDatetime::now()->getValue();
+        $this->write();
     }
 
     /**
@@ -536,7 +528,6 @@ class Order extends DataObject
 
     /**
      * @param null|Payment $payment
-     * @throws \Exception
      */
     public function paymentCancelled(?Payment $payment): void
     {
@@ -544,18 +535,17 @@ class Order extends DataObject
     }
 
     /**
-     * @throws \Exception
+     * Unlock the cart to restore ability to modify.
      */
     public function Unlock(): void
     {
-        if (!$this->IsCart || !$this->CartLockedAt) {
+        if (!$this->IsCart) {
+            // If not cart, unlock should not be possible
             return;
         }
 
-        DB::get_conn()->withTransaction(function () {
-            $this->CartLockedAt = null;
-            $this->write();
-        }, null, false, true);
+        $this->CartLockedAt = null;
+        $this->write();
     }
 
     /**

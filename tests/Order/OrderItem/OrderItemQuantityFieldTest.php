@@ -137,7 +137,6 @@ class OrderItemQuantityFieldTest extends SapphireTest
     }
 
     /**
-     *
      * @throws \Exception
      */
     public function testReadOnlyForImmutableOrderItem()

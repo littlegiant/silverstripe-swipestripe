@@ -41,7 +41,7 @@ class PaymentExtension extends DataExtension
     }
 
     /**
-     * @throws \Exception
+     *
      */
     public function onCancelled(): void
     {

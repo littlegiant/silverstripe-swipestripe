@@ -15,7 +15,6 @@ trait WaitsMockTime
 {
     /**
      * @param int $seconds
-     * @throws \Exception
      */
     protected function mockWait(int $seconds = 5): void
     {
