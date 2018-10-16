@@ -222,11 +222,13 @@ class CartTest extends SapphireTest
 
         // Test that changing from cart to order doesn't affect the hash
         $order->IsCart = false;
+        $order->Lock();
         $order->write();
         $this->assertSame($originalHash, $order->getHash());
 
         // Restore modifications
         $order->IsCart = true;
+        $order->Unlock();
         $order->write();
 
         // Adding item changes hash

@@ -138,6 +138,7 @@ class Order extends DataObject
      * @var array
      */
     private static $defaults = [
+        'IsCart' => true,
         'Status' => OrderStatus::PENDING,
     ];
 
@@ -147,7 +148,6 @@ class Order extends DataObject
     public function createCart(): self
     {
         $cart = Order::create();
-        $cart->IsCart = true;
         $cart->write();
 
         return static::get_by_id($cart->ID);
@@ -175,6 +175,21 @@ class Order extends DataObject
             'name' => $this->i18n_singular_name(),
             'id'   => $this->ID,
         ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validate()
+    {
+        $result = parent::validate();
+
+        if (!$this->IsCart && empty($this->CartLockedAt)) {
+            $result->addFieldError('CartLockedAt',
+                'Non-cart order must be locked to a certain time.');
+        }
+
+        return $result;
     }
 
     /**
@@ -637,7 +652,7 @@ class Order extends DataObject
             ? []
             : [
                 'Versioned.mode'  => 'archive',
-                'Versioned.date'  => $this->CartLockedAt ?? DBDatetime::now(),
+                'Versioned.date'  => $this->CartLockedAt,
                 'Versioned.stage' => Versioned::get_stage() ?? Versioned::LIVE,
             ];
     }

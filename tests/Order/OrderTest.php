@@ -211,6 +211,7 @@ class OrderTest extends SapphireTest
         $this->assertEquals($cartPage->Link(), $order->Link());
 
         $order->IsCart = false;
+        $order->Lock();
         $order->write();
 
         $this->assertStringStartsWith($orderPage->Link(), $order->Link());

@@ -69,6 +69,7 @@ class ViewOrderPageTest extends FunctionalTest
     {
         $order = Order::create();
         $order->IsCart = false;
+        $order->Lock();
         $order->write();
 
         $orderUrlWithoutToken = $this->viewOrderPage->Link("{$order->ID}");
@@ -86,6 +87,7 @@ class ViewOrderPageTest extends FunctionalTest
     {
         $order = Order::create();
         $order->IsCart = false;
+        $order->Lock();
         $order->write();
 
         $orderUrlWithoutToken = $this->viewOrderPage->Link("{$order->ID}");
