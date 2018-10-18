@@ -4,12 +4,19 @@ declare(strict_types=1);
 namespace SwipeStripe\Order;
 
 /**
- * Interface AddOnPriority
+ * Class AddOnPriority
  * @package SwipeStripe\Order
  */
-interface AddOnPriority
+final class AddOnPriority
 {
     const EARLY = -1;
     const NORMAL = 0;
     const LATE = 1;
+
+    /**
+     * AddOnPriority constructor.
+     */
+    private function __construct()
+    {
+    }
 }

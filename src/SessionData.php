@@ -6,11 +6,18 @@ namespace SwipeStripe;
 use SwipeStripe\Order\ViewOrderPageController;
 
 /**
- * Interface SessionData
+ * Class SessionData
  * @package SwipeStripe
  */
-interface SessionData
+final class SessionData
 {
     const CART_ID = 'ActiveCartID';
     const ACTIVE_GUEST_TOKENS = ViewOrderPageController::class . '.GUEST_TOKENS';
+
+    /**
+     * SessionData constructor.
+     */
+    private function __construct()
+    {
+    }
 }

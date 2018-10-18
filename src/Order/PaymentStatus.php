@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace SwipeStripe\Order;
 
 /**
- * Interface PaymentStatus
+ * Class PaymentStatus
  * @package SwipeStripe\Order
  */
-interface PaymentStatus
+final class PaymentStatus
 {
     const CREATED = 'Created';
     const PENDING_AUTHORIZATION = 'PendingAuthorization';
@@ -21,4 +21,11 @@ interface PaymentStatus
     const REFUNDED = 'Refunded';
     const PENDING_VOID = 'PendingVoid';
     const VOID = 'Void';
+
+    /**
+     * PaymentStatus constructor.
+     */
+    private function __construct()
+    {
+    }
 }
