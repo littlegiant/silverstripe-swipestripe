@@ -13,7 +13,6 @@ use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\Relation;
@@ -223,7 +222,11 @@ class Order extends DataObject
                 $statusUpdates->setConfig(GridFieldConfig_RecordEditor::create());
             }
 
-            $this->addViewButtonToGridFields($fields, null, true);
+            $this->addViewButtonToGridFields($fields, [
+                'OrderItems',
+                'OrderAddOns',
+                'Payments',
+            ]);
         });
 
         /** @see DataObject::getCMSFields() */
