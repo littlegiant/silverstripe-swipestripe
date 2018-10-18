@@ -6,6 +6,7 @@ namespace SwipeStripe\Order\OrderItem;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\Relation;
 use SilverStripe\ORM\UnsavedRelationList;
@@ -122,9 +123,9 @@ class OrderItem extends DataObject
     }
 
     /**
-     * @return string
+     * @return string|DBHTMLText
      */
-    public function getDescription(): string
+    public function getDescription()
     {
         return $this->Purchasable() ? $this->Purchasable()->getDescription() : '';
     }
