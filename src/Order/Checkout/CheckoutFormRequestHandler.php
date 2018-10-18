@@ -102,7 +102,7 @@ class CheckoutFormRequestHandler extends FormRequestHandler
         if (isset($gateways[$paymentMethod])) {
             return $paymentMethod;
         } else {
-            throw new ValidationException(
+            throw ValidationException::create(
                 ValidationResult::create()->addFieldError(CheckoutForm::PAYMENT_METHOD_FIELD,
                     _t(CheckoutForm::class . '.UNSUPPORTED_PAYMENT_METHOD',
                         'The payment method you have selected is not supported.'))
