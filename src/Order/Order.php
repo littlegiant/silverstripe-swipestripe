@@ -13,7 +13,6 @@ use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\Relation;
@@ -223,7 +222,11 @@ class Order extends DataObject
                 $statusUpdates->setConfig(GridFieldConfig_RecordEditor::create());
             }
 
-            $this->addViewButtonToGridFields($fields, null, true);
+            $this->addViewButtonToGridFields($fields, [
+                'OrderItems',
+                'OrderAddOns',
+                'Payments',
+            ]);
         });
 
         /** @see DataObject::getCMSFields() */
@@ -492,15 +495,18 @@ class Order extends DataObject
 
     /**
      * Lock cart to prevent modifications.
+     * @param bool $writeImmediately
      */
-    public function Lock(): void
+    public function Lock(bool $writeImmediately = true): void
     {
         if ($this->CartLockedAt) {
             return;
         }
 
         $this->CartLockedAt = DBDatetime::now()->getValue();
-        $this->write();
+        if ($writeImmediately) {
+            $this->write();
+        }
     }
 
     /**
@@ -536,8 +542,9 @@ class Order extends DataObject
 
     /**
      * Unlock the cart to restore ability to modify.
+     * @param bool $writeImmediately
      */
-    public function Unlock(): void
+    public function Unlock(bool $writeImmediately = true): void
     {
         if (!$this->IsCart) {
             // If not cart, unlock should not be possible
@@ -545,7 +552,9 @@ class Order extends DataObject
         }
 
         $this->CartLockedAt = null;
-        $this->write();
+        if ($writeImmediately) {
+            $this->write();
+        }
     }
 
     /**

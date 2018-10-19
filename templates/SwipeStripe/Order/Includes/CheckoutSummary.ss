@@ -6,7 +6,7 @@
                     <small>{$Price.Nice}</small>
                 </h3>
                 <h5>Quantity: {$Quantity}</h5>
-                <p>{$Description}</p>
+                <div>{$Description}</div>
 
                 <% if $OrderItemAddOns %>
                     <table class="table">

@@ -2,7 +2,7 @@
     <% with $OrderItem %>
         <div class="col-md-10">
             <h3><a href="{$Purchasable.Link}">{$Title}</a> <small>{$Price.Nice}</small></h3>
-            <p>{$Description}</p>
+            <div>{$Description}</div>
 
             <% if $OrderItemAddOns %>
                 <div class="col-md-5">

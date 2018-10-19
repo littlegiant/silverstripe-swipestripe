@@ -6,6 +6,7 @@ namespace SwipeStripe\Price;
 use Money\Currency;
 use Money\Formatter\IntlMoneyFormatter;
 use Money\Money;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\FieldType\DBComposite;
 use SilverStripe\ORM\FieldType\DBMoney;
@@ -53,7 +54,9 @@ class DBPrice extends DBComposite
     {
         $money = $this->getMoney();
 
-        $formatter = new IntlMoneyFormatter($this->getNumberFormatter(), $this->supportedCurrencies);
+        /** @var IntlMoneyFormatter $formatter */
+        $formatter = Injector::inst()->create(IntlMoneyFormatter::class,
+            $this->getNumberFormatter(), $this->supportedCurrencies);
         return $formatter->format($money);
     }
 

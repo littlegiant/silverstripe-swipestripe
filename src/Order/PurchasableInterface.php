@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order;
 
-use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Price\DBPrice;
 
@@ -23,9 +23,9 @@ interface PurchasableInterface extends DataObjectInterface
     public function getTitle();
 
     /**
-     * @return string
+     * @return string|DBHTMLText
      */
-    public function getDescription(): string;
+    public function getDescription();
 
     /**
      * Unit price.

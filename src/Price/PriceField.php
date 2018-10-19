@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Price;
 
-use InvalidArgumentException;
 use Money\Currencies;
 use Money\Currencies\CurrencyList;
 use Money\Currency;
@@ -182,7 +181,7 @@ class PriceField extends FormField
                 }
             }
 
-            $currencies = new CurrencyList($subUnitMap);
+            $currencies = Injector::inst()->create(CurrencyList::class, $subUnitMap);
         } elseif (!$currencies instanceof Currencies) {
             throw new \InvalidArgumentException('Currencies must be null, array or instance of Currencies interface.');
         }
@@ -215,7 +214,7 @@ class PriceField extends FormField
                 ->setAmount(null);
             return $this;
         } elseif (!is_array($value)) {
-            throw new InvalidArgumentException('Value is not submitted array');
+            throw new \InvalidArgumentException('Value is not submitted array');
         }
 
         if (!isset($value['Currency']) && $this->getCurrencyField() instanceof ReadonlyField) {
@@ -366,7 +365,7 @@ class PriceField extends FormField
                 'Amount'   => $money !== null ? $this->supportedCurrencies->formatDecimal($money) : null,
             ];
         } elseif (!is_array($value)) {
-            throw new ValidationException(ValidationResult::create()
+            throw ValidationException::create(ValidationResult::create()
                 ->addFieldError($this->getName(), 'Invalid currency format'));
         }
 

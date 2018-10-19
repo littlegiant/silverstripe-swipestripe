@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace SwipeStripe\Order\Status;
 
 /**
- * Interface OrderStatus
+ * Class OrderStatus
  * @package SwipeStripe\Order\Status
  */
-interface OrderStatus
+final class OrderStatus
 {
     /**
      * $db ENUM for order status - defaults to pending
@@ -21,4 +21,11 @@ interface OrderStatus
     const COMPLETED = 'Completed';
     const REFUNDED = 'Refunded';
     const CANCELLED = 'Cancelled';
+
+    /**
+     * OrderStatus constructor.
+     */
+    private function __construct()
+    {
+    }
 }
