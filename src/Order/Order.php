@@ -495,15 +495,18 @@ class Order extends DataObject
 
     /**
      * Lock cart to prevent modifications.
+     * @param bool $writeImmediately
      */
-    public function Lock(): void
+    public function Lock(bool $writeImmediately = true): void
     {
         if ($this->CartLockedAt) {
             return;
         }
 
         $this->CartLockedAt = DBDatetime::now()->getValue();
-        $this->write();
+        if ($writeImmediately) {
+            $this->write();
+        }
     }
 
     /**
@@ -539,8 +542,9 @@ class Order extends DataObject
 
     /**
      * Unlock the cart to restore ability to modify.
+     * @param bool $writeImmediately
      */
-    public function Unlock(): void
+    public function Unlock(bool $writeImmediately = true): void
     {
         if (!$this->IsCart) {
             // If not cart, unlock should not be possible
@@ -548,7 +552,9 @@ class Order extends DataObject
         }
 
         $this->CartLockedAt = null;
-        $this->write();
+        if ($writeImmediately) {
+            $this->write();
+        }
     }
 
     /**
