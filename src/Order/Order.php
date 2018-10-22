@@ -523,7 +523,7 @@ class Order extends DataObject
      */
     public function paymentCaptured(Payment $payment, ServiceResponse $response): void
     {
-        $this->ConfirmationTime = DBDatetime::now();
+        $this->ConfirmationTime = DBDatetime::now()->getValue();
         $this->IsCart = false;
         $this->write();
 
