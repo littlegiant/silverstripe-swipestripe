@@ -147,7 +147,7 @@ class ViewOrderPageController extends \PageController
     protected function getDisallowedResponse(?Order $order, ?Member $currentUser): HTTPResponse
     {
         $response = HTTPResponse::create(null, 404);
-        $this->extend('updateDisallowedResponse', $order, $currentUser, $response);
+        $this->extend('updateDisallowedResponse', $response, $order, $currentUser);
 
         return $response;
     }

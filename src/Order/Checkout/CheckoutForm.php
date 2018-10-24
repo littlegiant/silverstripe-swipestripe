@@ -66,7 +66,7 @@ class CheckoutForm extends Form
         );
 
         if (!$this->getSessionData()) {
-            $this->extend('beforeLoadDataFromCart');
+            $this->extend('beforeLoadDataFromCart', $cart);
             $this->loadDataFrom($cart);
         }
     }

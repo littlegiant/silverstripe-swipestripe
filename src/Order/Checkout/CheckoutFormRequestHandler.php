@@ -60,7 +60,7 @@ class CheckoutFormRequestHandler extends FormRequestHandler
         $cart->Lock();
         $form->saveInto($cart);
 
-        $this->extend('beforeInitPayment', $data, $form);
+        $this->extend('beforeInitPayment', $form, $data);
         $cart->write();
 
         /** @var Payment|PaymentExtension $payment */
@@ -81,7 +81,7 @@ class CheckoutFormRequestHandler extends FormRequestHandler
             ->getService($payment, ServiceFactory::INTENT_PURCHASE)
             ->initiate(array_merge($data, $cart->toPaymentData()));
 
-        $this->extend('afterInitPayment', $data, $form, $payment, $response);
+        $this->extend('afterInitPayment', $form, $data, $payment, $response);
         return $response->redirectOrRespond();
     }
 
