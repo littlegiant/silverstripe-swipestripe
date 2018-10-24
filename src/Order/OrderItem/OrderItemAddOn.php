@@ -8,17 +8,14 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Order\AddOnPriority;
 use SwipeStripe\Price\DBPrice;
-use SwipeStripe\Price\PriceField;
 
 /**
  * Add on applied to on order item on a purchase. The add-on is applied once to the item's subtotal (unit price x quantity),
  * not to the unit price (i.e. add-on is not applied $quantity times).
  * @package SwipeStripe\Order\OrderItem
- * @property bool $ApplyPerUnit
  * @property string $Type The type of add-on this is.
  * @property string $Title
  * @property int $Priority
- * @property DBPrice $BaseAmount
  * @property DBPrice $Amount
  * @property int $OrderItemID
  * @method OrderItem OrderItem()
@@ -35,11 +32,10 @@ class OrderItemAddOn extends DataObject
      * @var array
      */
     private static $db = [
-        'Type'         => 'Varchar',
-        'Priority'     => 'Int',
-        'Title'        => 'Varchar',
-        'ApplyPerUnit' => 'Boolean',
-        'BaseAmount'   => 'Price',
+        'Type'     => 'Varchar',
+        'Priority' => 'Int',
+        'Title'    => 'Varchar',
+        'Amount'   => 'Price',
     ];
 
     /**
@@ -68,7 +64,6 @@ class OrderItemAddOn extends DataObject
      */
     private static $searchable_fields = [
         'Title',
-        'ApplyPerUnit',
     ];
 
     /**
@@ -77,25 +72,12 @@ class OrderItemAddOn extends DataObject
     private static $summary_fields = [
         'Title'             => 'Title',
         'Amount.Value'      => 'Amount',
-        'ApplyPerUnit.Nice' => 'Apply Per Unit',
     ];
 
     /**
      * @var string
      */
     private static $default_sort = 'Priority ASC';
-
-    /**
-     * @inheritDoc
-     */
-    public function getAmount(): DBPrice
-    {
-        $baseAmount = $this->BaseAmount;
-
-        return $this->ApplyPerUnit
-            ? DBPrice::create_field(DBPrice::INJECTOR_SPEC, $baseAmount->getMoney()->multiply($this->OrderItem()->getQuantity()))
-            : $baseAmount;
-    }
 
     /**
      * @inheritdoc
@@ -108,8 +90,6 @@ class OrderItemAddOn extends DataObject
                 'Priority',
                 'OrderItemID',
             ]);
-
-            $fields->insertAfter('BaseAmount', PriceField::create('AppliedAmount')->setValue($this->Amount));
         });
 
         return parent::getCMSFields();

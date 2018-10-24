@@ -140,7 +140,7 @@ class OrderItem extends DataObject
 
         if ($this->getQuantity() > 0) {
             foreach ($this->OrderItemAddOns() as $addOn) {
-                $money = $money->add($addOn->getAmount()->getMoney());
+                $money = $money->add($addOn->Amount->getMoney());
             }
         }
 

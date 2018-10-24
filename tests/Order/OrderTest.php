@@ -88,7 +88,7 @@ class OrderTest extends SapphireTest
 
         $addOn = OrderAddOn::create();
         $addOn->OrderID = $order->ID;
-        $addOn->BaseAmount->setValue(new Money(10, $this->currency));
+        $addOn->Amount->setValue(new Money(10, $this->currency));
         $addOn->write();
 
         // Not applied for empty cart
@@ -160,7 +160,7 @@ class OrderTest extends SapphireTest
         $halfPrice = $fullPrice->divide(2);
 
         $addOn = OrderItemAddOn::create();
-        $addOn->BaseAmount->setValue($halfPrice->multiply(-1));
+        $addOn->Amount->setValue($halfPrice->multiply(-1));
         $addOn->write();
         $order->setItemQuantity($product, 0);
         $order->attachPurchasableAddOn($product, $addOn);
@@ -179,22 +179,6 @@ class OrderTest extends SapphireTest
         $order->addItem($product);
         $this->assertEquals(2, $order->OrderItems()->sum('Quantity'));
         $this->assertTrue($order->Total()->getMoney()->equals($fullPrice->add($halfPrice)));
-
-        // Add-on applied per unit, quantity is 2
-        $addOn->ApplyPerUnit = true;
-        $addOn->write();
-        $this->assertEquals(2, $order->OrderItems()->sum('Quantity'));
-        $this->assertTrue($order->Total()->getMoney()->equals($fullPrice));
-
-        // Add-on applied per unit, quantity is 1
-        $order->setItemQuantity($product, 1);
-        $this->assertEquals(1, $order->OrderItems()->sum('Quantity'));
-        $this->assertTrue($order->Total()->getMoney()->equals($halfPrice));
-
-        // Add-on applied per unit, quantity is 0
-        $order->setItemQuantity($product, 0);
-        $this->assertEquals(0, $order->OrderItems()->sum('Quantity'));
-        $this->assertTrue($order->Total()->getMoney()->isZero());
     }
 
     /**
@@ -230,7 +214,7 @@ class OrderTest extends SapphireTest
        $this->assertTrue($order->Total()->getMoney()->equals($product->getPrice()->getMoney()));
 
        $halfPriceAddOn = OrderItemAddOn::create();
-       $halfPriceAddOn->BaseAmount->setValue($product->getPrice()->getMoney()->multiply(-0.5));
+       $halfPriceAddOn->Amount->setValue($product->getPrice()->getMoney()->multiply(-0.5));
        $halfPriceAddOn->write();
 
        $order->attachPurchasableAddOn($product, $halfPriceAddOn);

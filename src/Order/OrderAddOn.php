@@ -7,7 +7,6 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\Price\DBPrice;
-use SwipeStripe\Price\PriceField;
 
 /**
  * Class OrderAddOn
@@ -15,7 +14,6 @@ use SwipeStripe\Price\PriceField;
  * @property string $Type The type of add-on this is.
  * @property string $Title
  * @property int $Priority
- * @property DBPrice $BaseAmount
  * @property DBPrice $Amount
  * @property int $OrderID
  * @method Order Order()
@@ -32,10 +30,10 @@ class OrderAddOn extends DataObject
      * @var array
      */
     private static $db = [
-        'Type'       => 'Varchar',
-        'Priority'   => 'Int',
-        'Title'      => 'Varchar',
-        'BaseAmount' => 'Price',
+        'Type'     => 'Varchar',
+        'Priority' => 'Int',
+        'Title'    => 'Varchar',
+        'Amount'   => 'Price',
     ];
 
     /**
@@ -80,14 +78,6 @@ class OrderAddOn extends DataObject
     private static $default_sort = 'Priority ASC';
 
     /**
-     * @return DBPrice
-     */
-    public function getAmount(): DBPrice
-    {
-        return $this->BaseAmount;
-    }
-
-    /**
      * @inheritDoc
      */
     public function getCMSFields()
@@ -98,8 +88,6 @@ class OrderAddOn extends DataObject
                 'Priority',
                 'OrderID',
             ]);
-
-            $fields->insertAfter('BaseAmount', PriceField::create('AppliedAmount')->setValue($this->Amount));
         });
 
         return parent::getCMSFields();
