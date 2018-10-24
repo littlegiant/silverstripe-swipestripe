@@ -280,7 +280,7 @@ class Order extends DataObject
         if ($applyOrderAddOns && !$this->Empty()) {
             /** @var OrderAddOn $addOn */
             foreach ($this->OrderAddOns() as $addOn) {
-                $runningTotal = $runningTotal->add($addOn->getAmount()->getMoney());
+                $runningTotal = $runningTotal->add($addOn->Amount->getMoney());
             }
         }
 
