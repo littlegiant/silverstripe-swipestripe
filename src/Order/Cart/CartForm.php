@@ -62,7 +62,9 @@ class CartForm extends Form
             )->setRemoveAction($this->getRemoveActionFor($item));
         }
 
-        return FieldList::create($fields);
+        $fields = FieldList::create($fields);
+        $this->extend('updateFields', $fields);
+        return $fields;
     }
 
     /**
@@ -83,9 +85,12 @@ class CartForm extends Form
      */
     protected function buildActions(): FieldList
     {
-        return FieldList::create(
+        $actions = FieldList::create(
             FormAction::create('UpdateCart', _t(self::class . '.UPDATE_CART', 'Update Cart'))
         );
+
+        $this->extend('updateActions', $actions);
+        return $actions;
     }
 
     /**
