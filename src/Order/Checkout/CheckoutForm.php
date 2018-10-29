@@ -205,9 +205,12 @@ class CheckoutForm extends Form
      */
     protected function buildActions(): FieldList
     {
-        return FieldList::create(
+        $actions = FieldList::create(
             FormAction::create('ConfirmCheckout', _t(self::class . '.CONFIRM_CHECKOUT', 'Confirm Checkout'))
         );
+
+        $this->extend('updateActions', $actions);
+        return $actions;
     }
 
     /**
