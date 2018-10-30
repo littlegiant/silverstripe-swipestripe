@@ -11,7 +11,6 @@ use SwipeStripe\Price\DBPrice;
 /**
  * Class OrderAddOn
  * @package SwipeStripe\Order
- * @property string $Type The type of add-on this is.
  * @property string $Title
  * @property int $Priority
  * @property DBPrice $Amount
@@ -30,7 +29,6 @@ class OrderAddOn extends DataObject
      * @var array
      */
     private static $db = [
-        'Type'     => 'Varchar',
         'Priority' => 'Int',
         'Title'    => 'Varchar',
         'Amount'   => 'Price',
@@ -84,7 +82,6 @@ class OrderAddOn extends DataObject
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $fields->removeByName([
-                'Type',
                 'Priority',
                 'OrderID',
             ]);

@@ -13,7 +13,6 @@ use SwipeStripe\Price\DBPrice;
  * Add on applied to on order item on a purchase. The add-on is applied once to the item's subtotal (unit price x quantity),
  * not to the unit price (i.e. add-on is not applied $quantity times).
  * @package SwipeStripe\Order\OrderItem
- * @property string $Type The type of add-on this is.
  * @property string $Title
  * @property int $Priority
  * @property DBPrice $Amount
@@ -32,7 +31,6 @@ class OrderItemAddOn extends DataObject
      * @var array
      */
     private static $db = [
-        'Type'     => 'Varchar',
         'Priority' => 'Int',
         'Title'    => 'Varchar',
         'Amount'   => 'Price',
@@ -86,7 +84,6 @@ class OrderItemAddOn extends DataObject
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $fields->removeByName([
-                'Type',
                 'Priority',
                 'OrderItemID',
             ]);
