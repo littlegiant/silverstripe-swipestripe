@@ -20,14 +20,4 @@ trait WaitsMockTime
     {
         DBDatetime::set_mock_now(DBDatetime::now()->getTimestamp() + $seconds);
     }
-
-    /**
-     *
-     */
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        DBDatetime::clear_mock_now();
-    }
 }

@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Tests\Order\OrderItem;
 
-use Money\Money;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
-use SwipeStripe\Price\DBPrice;
+use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;
@@ -80,7 +79,7 @@ class OrderItemTest extends SapphireTest
     public function testPurchasableForLockedItem()
     {
         $order = Order::singleton()->createCart();
-        $product =  $this->product;
+        $product = $this->product;
         $productOriginalPrice = $product->Price->getMoney();
         $productNewPrice = $productOriginalPrice->multiply(3);
 
@@ -120,5 +119,24 @@ class OrderItemTest extends SapphireTest
         $orderItem = OrderItem::get()->byID($orderItem->ID);
         $this->assertTrue($orderItem->Purchasable()->getPrice()->getMoney()->equals($productNewPrice));
         $this->assertTrue($orderItem->getPrice()->getMoney()->equals($productNewPrice));
+    }
+
+    /**
+     *
+     */
+    public function testTotalWithNegativeAddOns()
+    {
+        $order = Order::singleton()->createCart();
+        $order->addItem($this->product);
+        $orderItem = $order->getOrderItem($this->product);
+        $this->assertTrue($orderItem->Total->getMoney()->isPositive());
+
+        $productPrice = $this->product->getPrice()->getMoney();
+        $addOn = OrderItemAddOn::create();
+        $addOn->Amount->setValue($productPrice->negative()->multiply(3));
+        $addOn->OrderItemID = $orderItem->ID;
+        $addOn->write();
+
+        $this->assertTrue($orderItem->Total->getMoney()->isZero());
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\OrderItem;
 
+use Money\Money;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
@@ -142,6 +143,10 @@ class OrderItem extends DataObject
             foreach ($this->OrderItemAddOns() as $addOn) {
                 $money = $money->add($addOn->Amount->getMoney());
             }
+        }
+
+        if ($money->isNegative()) {
+            $money = new Money(0, $money->getCurrency());
         }
 
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
