@@ -250,6 +250,23 @@ class OrderTest extends SapphireTest
     }
 
     /**
+     *
+     */
+    public function testTotalWithNegativeAddOns()
+    {
+        $this->order->addItem($this->product);
+        $total = $this->order->Total()->getMoney();
+        $this->assertTrue($total->isPositive());
+
+        $addOn = OrderAddOn::create();
+        $addOn->Amount->setValue($total->negative()->multiply(3));
+        $addOn->OrderID = $this->order->ID;
+        $addOn->write();
+
+        $this->assertTrue($this->order->Total()->getMoney()->isZero());
+    }
+
+    /**
      * @throws \SilverStripe\ORM\ValidationException
      */
     protected function setUp()
