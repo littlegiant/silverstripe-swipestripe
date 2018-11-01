@@ -284,6 +284,10 @@ class Order extends DataObject
             }
         }
 
+        if ($runningTotal->isNegative()) {
+            $runningTotal = new Money(0, $runningTotal->getCurrency());
+        }
+
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $runningTotal);
     }
 
@@ -308,6 +312,10 @@ class Order extends DataObject
             $money = $money->isZero()
                 ? $itemAmount
                 : $money->add($itemAmount);
+        }
+
+        if ($money->isNegative()) {
+            $money = new Money(0, $money->getCurrency());
         }
 
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
