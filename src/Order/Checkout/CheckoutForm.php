@@ -117,7 +117,10 @@ class CheckoutForm extends Form
         }
 
         $this->paymentError = $errorMessage;
-        return $errorMessage ?: null;
+        $message = $errorMessage ?: null;
+
+        $this->extend('updatePaymentError', $payment,$message);
+        return $message;
     }
 
     /**
@@ -128,7 +131,10 @@ class CheckoutForm extends Form
     {
         /** @var OrderConfirmationPage $orderConfirmationPage */
         $orderConfirmationPage = OrderConfirmationPage::get_one(OrderConfirmationPage::class);
-        return $orderConfirmationPage->LinkForOrder($this->getCart());
+        $successUrl = $orderConfirmationPage->LinkForOrder($this->getCart());
+
+        $this->extend('updateSuccessUrl', $payment, $successUrl);
+        return $successUrl;
     }
 
     /**
@@ -171,7 +177,6 @@ class CheckoutForm extends Form
         $fields->add(HiddenField::create(static::ORDER_HASH_FIELD, null, $this->getCart()->getHash()));
 
         $this->extend('updateFields', $fields);
-
         return $fields;
     }
 
@@ -197,6 +202,7 @@ class CheckoutForm extends Form
             $fields->merge($fieldFactory->getFields());
         }
 
+        $this->extend('updateGatewayFields', $gateways, $fields);
         return $fields;
     }
 

@@ -67,7 +67,10 @@ class DBAddress extends DBComposite
             $address .= $this->Postcode;
         }
 
-        return rtrim($address);
+        $address = rtrim($address);
+
+        $this->extend('updateNice', $address);
+        return $address;
     }
 
     /**
@@ -100,6 +103,7 @@ class DBAddress extends DBComposite
             $fieldGroup->push($field);
         }
 
+        $this->extend('scaffoldFormField', $title, $params, $fieldGroup);
         return $fieldGroup;
     }
 }

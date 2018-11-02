@@ -538,6 +538,8 @@ class Order extends DataObject
         if (!$this->UnpaidTotal()->getMoney()->isPositive()) {
             OrderConfirmationEmail::create($this)->send();
         }
+
+        $this->extend('paymentCaptured', $payment, $response);
     }
 
     /**
@@ -546,6 +548,7 @@ class Order extends DataObject
     public function paymentCancelled(?Payment $payment): void
     {
         $this->Unlock();
+        $this->extend('paymentCancelled', $payment);
     }
 
     /**
@@ -578,7 +581,10 @@ class Order extends DataObject
 
         /** @var ViewOrderPage $page */
         $page = ViewOrderPage::get_one(ViewOrderPage::class, ['ClassName' => ViewOrderPage::class]);
-        return $page->LinkForOrder($this);
+        $link = $page->LinkForOrder($this);
+
+        $this->extend('updateLink', $link);
+        return $link;
     }
 
     /**
@@ -623,6 +629,7 @@ class Order extends DataObject
             ];
         }
 
+        $this->extend('updateHashData', $data);
         return md5(json_encode($data));
     }
 
@@ -634,7 +641,7 @@ class Order extends DataObject
     {
         $customerName = explode(' ', $this->CustomerName, 2);
 
-        return [
+        $data = [
             'firstName'       => $customerName[0],
             'lastName'        => $customerName[1] ?? '',
             'email'           => $this->CustomerEmail,
@@ -645,6 +652,9 @@ class Order extends DataObject
             'billingState'    => $this->BillingAddress->Region,
             'billingCountry'  => $this->BillingAddress->Country,
         ];
+
+        $this->extend('updatePaymentData', $data);
+        return $data;
     }
 
     /**

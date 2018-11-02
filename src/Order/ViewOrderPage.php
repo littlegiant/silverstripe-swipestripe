@@ -26,7 +26,6 @@ class ViewOrderPage extends \Page
         );
 
         $this->extend('updateLinkForOrder', $order, $link);
-
         return $link;
     }
 }
