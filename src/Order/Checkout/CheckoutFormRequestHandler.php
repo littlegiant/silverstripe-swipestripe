@@ -55,6 +55,7 @@ class CheckoutFormRequestHandler extends FormRequestHandler
 
             $form->setCart($clone);
         }
+        $this->extend('beforeConfirmCheckout', $form, $data);
 
         $cart = $form->getCart();
         $cart->Lock();
@@ -68,9 +69,10 @@ class CheckoutFormRequestHandler extends FormRequestHandler
         $payment->OrderID = $cart->ID;
 
         $dueMoney = $cart->UnpaidTotal()->getMoney();
+        $this->extend('updateDueMoney', $form, $data, $dueMoney);
 
         $payment->init(
-            $this->getPaymentMethod($data, $form),
+            $this->getPaymentMethod($form, $data),
             $this->supportedCurrencies->formatDecimal($dueMoney),
             $dueMoney->getCurrency()->getCode()
         )->setSuccessUrl($form->getSuccessUrl($payment))
@@ -86,12 +88,12 @@ class CheckoutFormRequestHandler extends FormRequestHandler
     }
 
     /**
-     * @param array $data
      * @param CheckoutForm $form
+     * @param array $data
      * @return string
      * @throws InvalidConfigurationException
      */
-    protected function getPaymentMethod(array $data, CheckoutForm $form): string
+    protected function getPaymentMethod(CheckoutForm $form, array $data): string
     {
         $gateways = $form->getAvailablePaymentMethods();
         if (count($gateways) === 1) {

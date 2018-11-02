@@ -30,6 +30,8 @@ class CartFormRequestHandler extends FormRequestHandler
     public function UpdateCart(array $data, CartForm $form): HTTPResponse
     {
         $form->saveInto($form->getCart());
+
+        $this->extend('UpdateCart', $form, $data);
         return $form->getController()->redirectBack();
     }
 
@@ -42,6 +44,8 @@ class CartFormRequestHandler extends FormRequestHandler
     {
         $orderItemID = intval($data[static::REMOVE_ITEM_ARG] ?? 0);
         $form->getCart()->removeItem($orderItemID);
+
+        $this->extend('RemoveOrderItem', $form, $data);
         return $form->getController()->redirectBack();
     }
 }

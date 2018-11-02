@@ -22,6 +22,7 @@ class CartFormValidator extends Validator
                 'Your cart is currently locked because there is a checkout in progress. Please complete or cancel the checkout process to modify your cart.'));
         }
 
+        $this->extend('validate', $this->form, $data);
         return $this->result->isValid();
     }
 
