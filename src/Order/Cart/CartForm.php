@@ -15,7 +15,7 @@ use SwipeStripe\Order\OrderItem\OrderItemQuantityField;
  * Class CartForm
  * @package SwipeStripe\Order\Cart
  */
-class CartForm extends Form
+class CartForm extends Form implements CartFormInterface
 {
     /**
      * @var Order
@@ -24,29 +24,37 @@ class CartForm extends Form
 
     /**
      * CartForm constructor.
-     * @param Order $cart
      * @param null|RequestHandler $controller
      * @param null|string $name
      */
-    public function __construct(Order $cart, ?RequestHandler $controller = null, ?string $name = null)
+    public function __construct(?RequestHandler $controller = null, ?string $name = null)
     {
-        $this->cart = $cart;
-
         parent::__construct(
             $controller,
             $name ?? static::DEFAULT_NAME,
-            $this->buildFields(),
+            FieldList::create(),
             $this->buildActions(),
             CartFormValidator::create()
         );
     }
 
     /**
-     * @return Order
+     * @inheritdoc
      */
     public function getCart(): Order
     {
         return $this->cart;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setCart(Order $order): CartFormInterface
+    {
+        $this->cart = $order;
+        $this->setFields($this->buildFields());
+
+        return $this;
     }
 
     /**

@@ -8,7 +8,7 @@ use SilverStripe\Forms\Validator;
 /**
  * Class CartFormValidator
  * @package SwipeStripe\Order\Cart
- * @property CartForm $form
+ * @property CartFormInterface $form
  */
 class CartFormValidator extends Validator
 {
@@ -28,12 +28,12 @@ class CartFormValidator extends Validator
 
     /**
      * @inheritDoc
-     * @param CartForm $form
+     * @param CartFormInterface $form
      */
     public function setForm($form)
     {
-        if (!$form instanceof CartForm) {
-            throw new \InvalidArgumentException(__CLASS__ . ' can only be used for ' . CartForm::class);
+        if (!$form instanceof CartFormInterface) {
+            throw new \InvalidArgumentException(__CLASS__ . ' can only be used for ' . CartFormInterface::class);
         }
 
         return parent::setForm($form);

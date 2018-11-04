@@ -20,3 +20,6 @@ SilverStripe\Core\Injector\Injector:
 
   SilverShop\HasOneField\HasOneButtonField.ReadOnly:
     class: SwipeStripe\Forms\Fields\ReadOnlyHasOneButtonField
+
+  SwipeStripe\Order\Cart\CartFormInterface:
+    class: SwipeStripe\Order\Cart\CartForm
