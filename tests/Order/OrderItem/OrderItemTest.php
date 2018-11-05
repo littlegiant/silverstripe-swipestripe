@@ -9,6 +9,7 @@ use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
+use SwipeStripe\Tests\DataObjects\AddOnInactiveExtension;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;
 use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
@@ -138,5 +139,25 @@ class OrderItemTest extends SapphireTest
         $addOn->write();
 
         $this->assertTrue($orderItem->Total->getMoney()->isZero());
+    }
+
+    /**
+     *
+     */
+    public function testTotalWithInactiveAddons()
+    {
+        $order = Order::singleton()->createCart();
+        $order->addItem($this->product);
+        $orderItem = $order->getOrderItem($this->product);
+        $this->assertTrue($orderItem->Total->getMoney()->isPositive());
+
+        OrderItemAddOn::add_extension(AddOnInactiveExtension::class);
+        $productPrice = $this->product->getPrice()->getMoney();
+        $addOn = OrderItemAddOn::create();
+        $addOn->Amount->setValue($productPrice->negative()->multiply(3));
+        $addOn->OrderItemID = $orderItem->ID;
+        $addOn->write();
+
+        $this->assertTrue($orderItem->Total->getMoney()->equals($productPrice));
     }
 }

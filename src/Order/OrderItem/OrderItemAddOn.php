@@ -97,7 +97,7 @@ class OrderItemAddOn extends DataObject
      */
     public function canView($member = null)
     {
-        return $this->OrderItem()->canView($member);
+        return $this->isActive() && $this->OrderItem()->canView($member);
     }
 
     /**
@@ -105,6 +105,16 @@ class OrderItemAddOn extends DataObject
      */
     public function canEdit($member = null)
     {
-        return $this->OrderItem()->canEdit($member);
+        return $this->isActive() && $this->OrderItem()->canEdit($member);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        $active = true;
+        $this->extend('isActive', $active);
+        return $active;
     }
 }

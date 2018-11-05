@@ -6,10 +6,12 @@
             <td><strong>{$SubTotal.Nice}</strong></td>
         </tr>
             <% loop $OrderAddOns %>
-            <tr>
-                <td>{$Title}</td>
-                <td>{$Amount.Nice}</td>
-            </tr>
+                <% if $IsActive %>
+                <tr>
+                    <td>{$Title}</td>
+                    <td>{$Amount.Nice}</td>
+                </tr>
+                <% end_if %>
             <% end_loop %>
         <tr>
             <td><strong>Total</strong></td>

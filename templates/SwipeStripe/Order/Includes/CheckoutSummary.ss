@@ -11,10 +11,12 @@
                 <% if $OrderItemAddOns %>
                     <table class="table">
                         <% loop $OrderItemAddOns %>
-                            <tr>
-                                <td>{$Title}</td>
-                                <td>{$Amount.Nice}</td>
-                            </tr>
+                            <% if $IsActive %>
+                                <tr>
+                                    <td>{$Title}</td>
+                                    <td>{$Amount.Nice}</td>
+                                </tr>
+                            <% end_if %>
                         <% end_loop %>
                     </table>
                 <% end_if %>

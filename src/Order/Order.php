@@ -278,9 +278,10 @@ class Order extends DataObject
         $runningTotal = $subTotal;
 
         if ($applyOrderAddOns && !$this->Empty()) {
-            /** @var OrderAddOn $addOn */
             foreach ($this->OrderAddOns() as $addOn) {
-                $runningTotal = $runningTotal->add($addOn->Amount->getMoney());
+                if ($addOn->isActive()) {
+                    $runningTotal = $runningTotal->add($addOn->Amount->getMoney());
+                }
             }
         }
 
@@ -617,6 +618,7 @@ class Order extends DataObject
                     $addOn->ID,
                     $addOn->Priority,
                     $addOn->Amount,
+                    $addOn->isActive(),
                 ];
             }
         }
@@ -626,6 +628,7 @@ class Order extends DataObject
                 $addOn->ID,
                 $addOn->Priority,
                 $addOn->Amount,
+                $addOn->isActive(),
             ];
         }
 
