@@ -54,7 +54,7 @@ class OrderItemQuantityFieldTest extends SapphireTest
             ->setQuantity($quantity, false)
             ->write();
 
-        $quantityField = OrderItemQuantityField::create($orderItem, 'qty');
+        $quantityField = OrderItemQuantityField::create('qty')->setOrderItem($orderItem);
         $this->assertSame($quantity, $quantityField->dataValue());
     }
 
@@ -72,7 +72,7 @@ class OrderItemQuantityFieldTest extends SapphireTest
             ->setQuantity($quantityOld, false)
             ->write();
 
-        $quantityField = OrderItemQuantityField::create($orderItem, 'qty');
+        $quantityField = OrderItemQuantityField::create('qty')->setOrderItem($orderItem);
         $this->assertSame($quantityOld, $quantityField->dataValue());
         $this->assertSame($quantityOld, $orderItem->getQuantity());
 
@@ -98,7 +98,7 @@ class OrderItemQuantityFieldTest extends SapphireTest
             ->setQuantity($quantityOld, false)
             ->write();
 
-        $quantityField = OrderItemQuantityField::create($orderItem, 'qty');
+        $quantityField = OrderItemQuantityField::create('qty')->setOrderItem($orderItem);
         $this->assertSame($quantityOld, $quantityField->dataValue());
         $this->assertSame($quantityOld, $orderItem->getQuantity());
 
@@ -124,7 +124,7 @@ class OrderItemQuantityFieldTest extends SapphireTest
             ->setQuantity($quantityOld, false)
             ->write();
 
-        $quantityField = OrderItemQuantityField::create($orderItem, 'qty');
+        $quantityField = OrderItemQuantityField::create('qty')->setOrderItem($orderItem);
         $this->assertSame($quantityOld, $quantityField->dataValue());
         $this->assertSame($quantityOld, $orderItem->getQuantity());
 
@@ -154,7 +154,7 @@ class OrderItemQuantityFieldTest extends SapphireTest
         $this->mockWait();
 
         $this->assertFalse($orderItem->IsMutable());
-        $quantityField = OrderItemQuantityField::create($orderItem, 'qty');
+        $quantityField = OrderItemQuantityField::create('qty')->setOrderItem($orderItem);
         $this->assertSame($quantityOld, $quantityField->dataValue());
         $this->assertSame($quantityOld, $orderItem->getQuantity());
         $this->assertTrue($quantityField->isReadonly());

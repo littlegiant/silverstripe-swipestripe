@@ -24,10 +24,10 @@ class CartFormRequestHandler extends FormRequestHandler
 
     /**
      * @param array $data
-     * @param CartForm $form
+     * @param CartFormInterface $form
      * @return HTTPResponse
      */
-    public function UpdateCart(array $data, CartForm $form): HTTPResponse
+    public function UpdateCart(array $data, CartFormInterface $form): HTTPResponse
     {
         $form->saveInto($form->getCart());
 
@@ -37,10 +37,10 @@ class CartFormRequestHandler extends FormRequestHandler
 
     /**
      * @param array $data
-     * @param CartForm $form
+     * @param CartFormInterface $form
      * @return HTTPResponse
      */
-    public function RemoveOrderItem(array $data, CartForm $form): HTTPResponse
+    public function RemoveOrderItem(array $data, CartFormInterface $form): HTTPResponse
     {
         $orderItemID = intval($data[static::REMOVE_ITEM_ARG] ?? 0);
         $form->getCart()->removeItem($orderItemID);

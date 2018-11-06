@@ -20,7 +20,7 @@ use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
  * @package SwipeStripe\Order\Checkout
  * @property-read ServiceFactory $paymentServiceFactory
  * @property-read SupportedCurrenciesInterface $supportedCurrencies
- * @property CheckoutForm $form
+ * @property CheckoutFormInterface $form
  */
 class CheckoutFormRequestHandler extends FormRequestHandler
 {
@@ -36,12 +36,12 @@ class CheckoutFormRequestHandler extends FormRequestHandler
 
     /**
      * @param array $data
-     * @param CheckoutForm $form
+     * @param CheckoutFormInterface $form
      * @return HTTPResponse
      * @throws InvalidConfigurationException
      * @throws InvalidStateException
      */
-    public function ConfirmCheckout(array $data, CheckoutForm $form): HTTPResponse
+    public function ConfirmCheckout(array $data, CheckoutFormInterface $form): HTTPResponse
     {
         if (!$form->getCart()->IsMutable()) {
             // If the cart was locked due to trying to pay, then checkout was clicked again
@@ -72,7 +72,7 @@ class CheckoutFormRequestHandler extends FormRequestHandler
         $this->extend('updateDueMoney', $form, $data, $dueMoney);
 
         $payment->init(
-            $this->getPaymentMethod($form, $data),
+            $this->getPaymentMethod($form->getAvailablePaymentMethods(), $data),
             $this->supportedCurrencies->formatDecimal($dueMoney),
             $dueMoney->getCurrency()->getCode()
         )->setSuccessUrl($form->getSuccessUrl($payment))
@@ -88,25 +88,23 @@ class CheckoutFormRequestHandler extends FormRequestHandler
     }
 
     /**
-     * @param CheckoutForm $form
+     * @param array $availableMethods
      * @param array $data
      * @return string
-     * @throws InvalidConfigurationException
      */
-    protected function getPaymentMethod(CheckoutForm $form, array $data): string
+    protected function getPaymentMethod(array $availableMethods, array $data): string
     {
-        $gateways = $form->getAvailablePaymentMethods();
-        if (count($gateways) === 1) {
-            return key($gateways);
+        if (count($availableMethods) === 1) {
+            return key($availableMethods);
         }
 
         $paymentMethod = $data[CheckoutForm::PAYMENT_METHOD_FIELD];
-        if (isset($gateways[$paymentMethod])) {
+        if (isset($availableMethods[$paymentMethod])) {
             return $paymentMethod;
         } else {
             throw ValidationException::create(
                 ValidationResult::create()->addFieldError(CheckoutForm::PAYMENT_METHOD_FIELD,
-                    _t(CheckoutForm::class . '.UNSUPPORTED_PAYMENT_METHOD',
+                    _t(self::class . '.UNSUPPORTED_PAYMENT_METHOD',
                         'The payment method you have selected is not supported.'))
             );
         }

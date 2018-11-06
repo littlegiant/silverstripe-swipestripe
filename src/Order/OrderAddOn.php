@@ -77,6 +77,7 @@ class OrderAddOn extends DataObject
 
     /**
      * @inheritDoc
+     * @codeCoverageIgnore
      */
     public function getCMSFields()
     {

@@ -122,6 +122,7 @@ class OrderStatusUpdate extends DataObject
 
     /**
      * @inheritDoc
+     * @codeCoverageIgnore
      */
     public function getCMSFields()
     {

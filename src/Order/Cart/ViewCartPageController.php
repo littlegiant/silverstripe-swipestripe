@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\Cart;
 
-use SilverStripe\Forms\Form;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SwipeStripe\HasActiveCart;
 use SwipeStripe\Order\Checkout\CheckoutPage;
@@ -26,11 +26,15 @@ class ViewCartPageController extends \PageController
     ];
 
     /**
-     * @return Form
+     * @return CartFormInterface
      */
-    public function CartForm(): Form
+    public function CartForm(): CartFormInterface
     {
-        return CartForm::create($this->ActiveCart, $this, __FUNCTION__);
+        /** @var CartFormInterface $form */
+        $form = Injector::inst()->create(CartFormInterface::class, $this, __FUNCTION__);
+        $form->setCart($this->ActiveCart);
+
+        return $form;
     }
 
     /**

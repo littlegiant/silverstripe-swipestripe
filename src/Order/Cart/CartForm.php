@@ -4,18 +4,19 @@ declare(strict_types=1);
 namespace SwipeStripe\Order\Cart;
 
 use SilverStripe\Control\RequestHandler;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
-use SwipeStripe\Order\OrderItem\OrderItemQuantityField;
+use SwipeStripe\Order\OrderItem\OrderItemQuantityFieldInterface;
 
 /**
  * Class CartForm
  * @package SwipeStripe\Order\Cart
  */
-class CartForm extends Form
+class CartForm extends Form implements CartFormInterface
 {
     /**
      * @var Order
@@ -24,25 +25,22 @@ class CartForm extends Form
 
     /**
      * CartForm constructor.
-     * @param Order $cart
      * @param null|RequestHandler $controller
      * @param null|string $name
      */
-    public function __construct(Order $cart, ?RequestHandler $controller = null, ?string $name = null)
+    public function __construct(?RequestHandler $controller = null, ?string $name = null)
     {
-        $this->cart = $cart;
-
         parent::__construct(
             $controller,
             $name ?? static::DEFAULT_NAME,
-            $this->buildFields(),
+            FieldList::create(),
             $this->buildActions(),
             CartFormValidator::create()
         );
     }
 
     /**
-     * @return Order
+     * @inheritdoc
      */
     public function getCart(): Order
     {
@@ -52,14 +50,30 @@ class CartForm extends Form
     /**
      * @inheritDoc
      */
+    public function setCart(Order $order): CartFormInterface
+    {
+        $this->cart = $order;
+        $this->setFields($this->buildFields());
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     protected function buildFields(): FieldList
     {
         $fields = [];
+        $injector = Injector::inst();
 
         foreach ($this->getCart()->OrderItems() as $item) {
-            $fields[] = OrderItemQuantityField::create($item, "Qty_{$item->ID}",
-                _t(self::class . '.QUANTITY_LABEL', 'Quantity')
-            )->setRemoveAction($this->getRemoveActionFor($item));
+            /** @var OrderItemQuantityFieldInterface $itemField */
+            $itemField = $injector->create(OrderItemQuantityFieldInterface::class, "Qty_{$item->ID}",
+                _t(self::class . '.QUANTITY_LABEL', 'Quantity'));
+            $itemField->setOrderItem($item)
+                ->setRemoveAction($this->getRemoveActionFor($item));
+
+            $fields[] = $itemField;
         }
 
         $fields = FieldList::create($fields);

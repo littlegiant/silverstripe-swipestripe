@@ -7,7 +7,7 @@ SilverStripe\Core\Injector\Injector:
     class: SwipeStripe\Price\DBPrice
 
   Address:
-    class: SwipeStripe\ORM\FieldType\DBAddress
+    class: SwipeStripe\Address\DBAddress
 
   SwipeStripe\Price\SupportedCurrencies\AbstractSupportedCurrencies.DefaultSubUnitSource:
     class: Money\Currencies\ISOCurrencies
@@ -20,3 +20,12 @@ SilverStripe\Core\Injector\Injector:
 
   SilverShop\HasOneField\HasOneButtonField.ReadOnly:
     class: SwipeStripe\Forms\Fields\ReadOnlyHasOneButtonField
+
+  SwipeStripe\Order\Cart\CartFormInterface:
+    class: SwipeStripe\Order\Cart\CartForm
+
+  SwipeStripe\Order\Checkout\CheckoutFormInterface:
+    class: SwipeStripe\Order\Checkout\CheckoutForm
+
+  SwipeStripe\Order\OrderItem\OrderItemQuantityFieldInterface:
+    class: SwipeStripe\Order\OrderItem\OrderItemQuantityField

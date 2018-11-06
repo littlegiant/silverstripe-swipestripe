@@ -69,6 +69,7 @@ class PaymentExtension extends DataExtension
 
     /**
      * @inheritDoc
+     * @codeCoverageIgnore
      */
     public function updateCMSFields(FieldList $fields)
     {

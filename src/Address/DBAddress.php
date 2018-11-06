@@ -1,16 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\ORM\FieldType;
+namespace SwipeStripe\Address;
 
-use SilverStripe\Forms\FieldGroup;
 use SilverStripe\i18n\Data\Intl\IntlLocales;
 use SilverStripe\ORM\FieldType\DBComposite;
-use SwipeStripe\Forms\Fields\CountryDropdownField;
 
 /**
  * Class DBAddress
- * @package SwipeStripe\ORM\FieldType
+ * @package SwipeStripe\Address
  * @property string $Unit
  * @property string $Street
  * @property string $Suburb
@@ -92,18 +90,8 @@ class DBAddress extends DBComposite
      */
     public function scaffoldFormField($title = null, $params = null)
     {
-        $fieldGroup = FieldGroup::create($title ?? FieldGroup::name_to_label($this->getName()));
-
-        foreach ($this->compositeDatabaseFields() as $field => $type) {
-            $title = _t(self::class . ".TITLE_{$field}", FieldGroup::name_to_label($field));
-            $field = $field === 'Country'
-                ? CountryDropdownField::create("{$this->getName()}Country", $title)
-                : $this->dbObject($field)->scaffoldFormField($title);
-
-            $fieldGroup->push($field);
-        }
-
-        $this->extend('scaffoldFormField', $title, $params, $fieldGroup);
-        return $fieldGroup;
+        $field = AddressField::create($this->getName(), $title);
+        $this->extend('scaffoldFormField', $title, $params, $field);
+        return $field;
     }
 }
