@@ -6,6 +6,7 @@ namespace SwipeStripe\Tests\Order;
 use SilverStripe\Dev\SapphireTest;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
+use SwipeStripe\Order\OrderLockedException;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;
 use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
@@ -111,7 +112,7 @@ class CartTest extends SapphireTest
         try {
             $order->addItem($this->product);
             $this->fail('Add item on locked order should throw.');
-        } catch (\BadMethodCallException $e) {
+        } catch (OrderLockedException $e) {
             // Assert quantity remains the same
             $this->assertCount(1, $order->OrderItems());
             $this->assertSame(1, $order->getOrderItem($this->product)->getQuantity());
@@ -161,7 +162,7 @@ class CartTest extends SapphireTest
         try {
             $order->removeItem($this->product);
             $this->fail('Remove item on locked order should throw.');
-        } catch (\BadMethodCallException $e) {
+        } catch (OrderLockedException $e) {
             $this->assertCount(1, $order->OrderItems());
 
             $orderItem = $order->getOrderItem($this->product);
@@ -189,7 +190,7 @@ class CartTest extends SapphireTest
         try {
             $order->addItem($this->product);
             $this->fail('Add item on locked order should throw.');
-        } catch (\BadMethodCallException $e) {
+        } catch (OrderLockedException $e) {
             // Assert quantity remains the same
             $this->assertCount(1, $order->OrderItems());
             $this->assertSame(3, $order->getOrderItem($this->product)->getQuantity());

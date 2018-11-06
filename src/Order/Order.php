@@ -338,7 +338,7 @@ class Order extends DataObject
     public function setItemQuantity(PurchasableInterface $item, int $quantity = 1): void
     {
         if (!$this->IsMutable()) {
-            throw new \BadMethodCallException("Can't change items on locked Order {$this->ID}.");
+            throw new OrderLockedException($this);
         }
 
         $this->getOrderItem($item)->setQuantity($quantity);
@@ -383,7 +383,7 @@ class Order extends DataObject
     public function addItem(PurchasableInterface $item, int $quantity = 1): self
     {
         if (!$this->IsMutable()) {
-            throw new \BadMethodCallException("Can't change items on locked Order {$this->ID}.");
+            throw new OrderLockedException($this);
         }
 
         $item = $this->getOrderItem($item);
@@ -398,7 +398,7 @@ class Order extends DataObject
     public function removeItem($item): self
     {
         if (!$this->IsMutable()) {
-            throw new \BadMethodCallException("Can't change items on locked Order {$this->ID}.");
+            throw new OrderLockedException($this);
         }
 
         if ($item instanceof PurchasableInterface) {
@@ -424,7 +424,7 @@ class Order extends DataObject
 
         if ($orderItem !== null) {
             if (!$orderItem->IsMutable()) {
-                throw new \BadMethodCallException("Can't change add-ons on locked OrderItem {$orderItem->ID}.");
+                throw new OrderLockedException($this);
             }
 
             $orderItem->OrderItemAddOns()->add($addOn);
@@ -441,7 +441,7 @@ class Order extends DataObject
 
         if ($orderItem !== null) {
             if (!$orderItem->IsMutable()) {
-                throw new \BadMethodCallException("Can't change add-ons on locked OrderItem {$orderItem->ID}.");
+                throw new OrderLockedException($orderItem);
             }
 
             $orderItem->OrderItemAddOns()->remove($addOn);

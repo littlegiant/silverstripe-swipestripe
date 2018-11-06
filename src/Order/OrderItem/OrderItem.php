@@ -15,6 +15,7 @@ use SilverStripe\Versioned\Versioned;
 use SwipeStripe\CMSHelper;
 use SwipeStripe\Forms\Fields\HasOneButtonField;
 use SwipeStripe\Order\Order;
+use SwipeStripe\Order\OrderLockedException;
 use SwipeStripe\Order\PurchasableInterface;
 use SwipeStripe\Price\DBPrice;
 use SwipeStripe\Price\PriceField;
@@ -188,7 +189,7 @@ class OrderItem extends DataObject
     public function setPurchasable(PurchasableInterface $purchasable): self
     {
         if (!$this->IsMutable()) {
-            throw new \BadMethodCallException("Cannot set Purchasable on locked OrderItem {$this->ID}.");
+            throw new OrderLockedException($this);
         }
 
         $this->setComponent('Purchasable', $purchasable);
@@ -211,7 +212,7 @@ class OrderItem extends DataObject
     public function setQuantity(int $quantity, bool $writeImmediately = true): self
     {
         if (!$this->IsMutable()) {
-            throw new \BadMethodCallException("Cannot set quantity on locked OrderItem {$this->ID}.");
+            throw new OrderLockedException($this);
         }
 
         $this->setField('Quantity', max($quantity, 0));

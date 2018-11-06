@@ -7,6 +7,7 @@ use SilverStripe\Dev\SapphireTest;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderItem\OrderItem;
 use SwipeStripe\Order\OrderItem\OrderItemQuantityField;
+use SwipeStripe\Order\OrderLockedException;
 use SwipeStripe\Tests\DataObjects\TestProduct;
 use SwipeStripe\Tests\Fixtures;
 use SwipeStripe\Tests\WaitsMockTime;
@@ -163,7 +164,7 @@ class OrderItemQuantityFieldTest extends SapphireTest
         $this->assertSame($quantityNew, $quantityField->dataValue());
         $this->assertSame($quantityOld, $orderItem->getQuantity());
 
-        $this->expectException(\BadMethodCallException::class);
+        $this->expectException(OrderLockedException::class);
         $quantityField->saveInto($orderItem);
     }
 
