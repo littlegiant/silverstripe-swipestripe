@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\Checkout;
 
-use SilverStripe\Forms\Form;
+use SilverStripe\Core\Injector\Injector;
 use SwipeStripe\HasActiveCart;
 use SwipeStripe\Order\Cart\ViewCartPage;
 
@@ -37,10 +37,10 @@ class CheckoutPageController extends \PageController
     }
 
     /**
-     * @return Form
+     * @return CheckoutFormInterface
      */
-    public function CheckoutForm(): Form
+    public function CheckoutForm(): CheckoutFormInterface
     {
-        return CheckoutForm::create($this->ActiveCart, $this, __FUNCTION__);
+        return Injector::inst()->create(CheckoutFormInterface::class, $this->ActiveCart, $this, __FUNCTION__);
     }
 }

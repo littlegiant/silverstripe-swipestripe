@@ -8,7 +8,7 @@ use SilverStripe\Forms\RequiredFields;
 /**
  * Class CheckoutFormValidator
  * @package SwipeStripe\Order\Checkout
- * @property CheckoutForm $form
+ * @property CheckoutFormInterface $form
  */
 class CheckoutFormValidator extends RequiredFields
 {
@@ -29,12 +29,12 @@ class CheckoutFormValidator extends RequiredFields
 
     /**
      * @inheritDoc
-     * @param CheckoutForm $form
+     * @param CheckoutFormInterface $form
      */
     public function setForm($form)
     {
-        if (!$form instanceof CheckoutForm) {
-            throw new \InvalidArgumentException(__CLASS__ . ' can only be used for ' . CheckoutForm::class);
+        if (!$form instanceof CheckoutFormInterface) {
+            throw new \InvalidArgumentException(__CLASS__ . ' can only be used for ' . CheckoutFormInterface::class);
         }
 
         return parent::setForm($form);

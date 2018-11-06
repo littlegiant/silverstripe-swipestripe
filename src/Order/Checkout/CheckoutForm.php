@@ -28,7 +28,7 @@ use SwipeStripe\Order\PaymentStatus;
  * @package SwipeStripe\Order\Checkout
  * @property Payment|null $PaymentError
  */
-class CheckoutForm extends Form
+class CheckoutForm extends Form implements CheckoutFormInterface
 {
     const ORDER_HASH_FIELD = 'OrderContents';
     const PAYMENT_METHOD_FIELD = 'PaymentMethod';
@@ -50,7 +50,7 @@ class CheckoutForm extends Form
      */
     public function __construct(Order $cart, ?RequestHandler $controller = null, ?string $name = null)
     {
-        $this->cart = $cart;
+        $this->setCart($cart);
 
         $validator = CheckoutFormValidator::create();
         if (count($this->getAvailablePaymentMethods()) > 1) {
@@ -72,7 +72,7 @@ class CheckoutForm extends Form
     }
 
     /**
-     * @return Order
+     * @inheritdoc
      */
     public function getCart(): Order
     {
@@ -124,8 +124,7 @@ class CheckoutForm extends Form
     }
 
     /**
-     * @param Payment $payment
-     * @return string
+     * @inheritdoc
      */
     public function getSuccessUrl(Payment $payment): string
     {
@@ -138,8 +137,7 @@ class CheckoutForm extends Form
     }
 
     /**
-     * @param Payment $payment
-     * @return string
+     * @inheritdoc
      */
     public function getFailureUrl(Payment $payment): string
     {
@@ -181,7 +179,7 @@ class CheckoutForm extends Form
     }
 
     /**
-     * @return array
+     * @inheritdoc
      * @throws InvalidConfigurationException
      */
     public function getAvailablePaymentMethods(): array
@@ -220,10 +218,9 @@ class CheckoutForm extends Form
     }
 
     /**
-     * @param Order $cart
-     * @return CheckoutForm
+     * @inheritdoc
      */
-    public function setCart(Order $cart): self
+    public function setCart(Order $cart): CheckoutFormInterface
     {
         $this->cart = $cart;
         return $this;

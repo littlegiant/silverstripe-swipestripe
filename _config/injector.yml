@@ -23,3 +23,6 @@ SilverStripe\Core\Injector\Injector:
 
   SwipeStripe\Order\Cart\CartFormInterface:
     class: SwipeStripe\Order\Cart\CartForm
+
+  SwipeStripe\Order\Checkout\CheckoutFormInterface:
+    class: SwipeStripe\Order\Checkout\CheckoutForm
