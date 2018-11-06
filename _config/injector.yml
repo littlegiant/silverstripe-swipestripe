@@ -26,3 +26,6 @@ SilverStripe\Core\Injector\Injector:
 
   SwipeStripe\Order\Checkout\CheckoutFormInterface:
     class: SwipeStripe\Order\Checkout\CheckoutForm
+
+  SwipeStripe\Order\OrderItem\OrderItemQuantityFieldInterface:
+    class: SwipeStripe\Order\OrderItem\OrderItemQuantityField

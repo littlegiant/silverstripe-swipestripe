@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\OrderItem;
 
-use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\ORM\DataObjectInterface;
@@ -13,7 +12,7 @@ use SwipeStripe\Order\Order;
  * Class OrderItemQuantityField
  * @package SwipeStripe\Order\OrderItem
  */
-class OrderItemQuantityField extends NumericField
+class OrderItemQuantityField extends NumericField implements OrderItemQuantityFieldInterface
 {
     /**
      * @var OrderItem
@@ -24,20 +23,6 @@ class OrderItemQuantityField extends NumericField
      * @var FormAction
      */
     protected $removeAction;
-
-    /**
-     * @inheritDoc
-     * @param OrderItem $item
-     */
-    public function __construct(OrderItem $item, string $name, ?string $title = null, ?int $value = null, ?int $maxLength = null, ?Form $form = null)
-    {
-        parent::__construct($name, $title, $value ?? $item->getQuantity(), $maxLength, $form);
-        $this->orderItem = $item;
-
-        if (!$item->IsMutable()) {
-            $this->setReadonly(true);
-        }
-    }
 
     /**
      * @inheritDoc
@@ -64,7 +49,8 @@ class OrderItemQuantityField extends NumericField
                 $record = $this->getOrderItem();
             } else {
                 // Order that doesn't contain this order item, can't determine what OrderItem to save to.
-                throw new \InvalidArgumentException("Order passed to " . __METHOD__ . " doesn't contain Order item '{$this->getOrderItem()->ID}'.");
+                throw new \InvalidArgumentException("Order passed to " . __METHOD__ .
+                    " doesn't contain Order item '{$this->getOrderItem()->ID}'.");
             }
         }
 
@@ -76,7 +62,19 @@ class OrderItemQuantityField extends NumericField
     }
 
     /**
-     * @return OrderItem
+     * @inheritdoc
+     */
+    public function setOrderItem(OrderItem $orderItem): OrderItemQuantityFieldInterface
+    {
+        $this->orderItem = $orderItem;
+        $this->setReadonly(!$orderItem->IsMutable());
+        $this->setValue($orderItem->getQuantity());
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getOrderItem(): OrderItem
     {
@@ -84,7 +82,7 @@ class OrderItemQuantityField extends NumericField
     }
 
     /**
-     * @return null|FormAction
+     * @inheritdoc
      */
     public function getRemoveAction(): ?FormAction
     {
@@ -92,10 +90,9 @@ class OrderItemQuantityField extends NumericField
     }
 
     /**
-     * @param FormAction $removeAction
-     * @return $this
+     * @inheritdoc
      */
-    public function setRemoveAction(FormAction $removeAction): self
+    public function setRemoveAction(FormAction $removeAction): OrderItemQuantityFieldInterface
     {
         $this->removeAction = $removeAction;
         return $this;
