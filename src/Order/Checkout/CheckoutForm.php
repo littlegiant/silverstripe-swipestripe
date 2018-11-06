@@ -162,7 +162,7 @@ class CheckoutForm extends Form implements CheckoutFormInterface
         $fields = FieldList::create([
             TextField::create('CustomerName', 'Name'),
             EmailField::create('CustomerEmail', 'Email'),
-            $this->getCart()->BillingAddress->scaffoldFormField('Billing Address'),
+            $this->getCart()->BillingAddress->scaffoldFormField(),
         ]);
 
         $gateways = $this->getAvailablePaymentMethods();
