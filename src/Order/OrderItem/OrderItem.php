@@ -115,7 +115,7 @@ class OrderItem extends DataObject
     }
 
     /**
-     * @return HasManyList|UnsavedRelationList|OrderItem[]
+     * @return HasManyList|UnsavedRelationList|OrderItemAddOn[]
      */
     public function OrderItemAddOns(): Relation
     {
@@ -141,7 +141,9 @@ class OrderItem extends DataObject
 
         if ($this->getQuantity() > 0) {
             foreach ($this->OrderItemAddOns() as $addOn) {
-                $money = $money->add($addOn->Amount->getMoney());
+                if ($addOn->isActive()) {
+                    $money = $money->add($addOn->Amount->getMoney());
+                }
             }
         }
 
