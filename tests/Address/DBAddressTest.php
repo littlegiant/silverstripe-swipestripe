@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\Tests\ORM\FieldType;
+namespace SwipeStripe\Tests\Address;
 
 use SilverStripe\Dev\SapphireTest;
-use SwipeStripe\ORM\FieldType\DBAddress;
+use SwipeStripe\Address\DBAddress;
 
 /**
  * Class DBAddressTest
- * @package SwipeStripe\Tests\ORM\FieldType
+ * @package SwipeStripe\Tests\Address
  */
 class DBAddressTest extends SapphireTest
 {

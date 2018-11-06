@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SwipeStripe\ORM\FieldType;
+namespace SwipeStripe\Address;
 
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\i18n\Data\Intl\IntlLocales;
@@ -10,7 +10,7 @@ use SwipeStripe\Forms\Fields\CountryDropdownField;
 
 /**
  * Class DBAddress
- * @package SwipeStripe\ORM\FieldType
+ * @package SwipeStripe\Address
  * @property string $Unit
  * @property string $Street
  * @property string $Suburb

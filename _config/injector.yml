@@ -7,7 +7,7 @@ SilverStripe\Core\Injector\Injector:
     class: SwipeStripe\Price\DBPrice
 
   Address:
-    class: SwipeStripe\ORM\FieldType\DBAddress
+    class: SwipeStripe\Address\DBAddress
 
   SwipeStripe\Price\SupportedCurrencies\AbstractSupportedCurrencies.DefaultSubUnitSource:
     class: Money\Currencies\ISOCurrencies
