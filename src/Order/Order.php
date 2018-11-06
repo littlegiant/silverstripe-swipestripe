@@ -609,15 +609,15 @@ class Order extends DataObject
             $data[] = [
                 $item->ID,
                 $item->Quantity,
-                $item->Price,
-                $item->Total,
+                $item->Price->getValue(),
+                $item->Total->getValue(),
             ];
 
             foreach ($item->OrderItemAddOns() as $addOn) {
                 $data[] = [
                     $addOn->ID,
                     $addOn->Priority,
-                    $addOn->Amount,
+                    $addOn->Amount->getValue(),
                     $addOn->isActive(),
                 ];
             }
@@ -627,7 +627,7 @@ class Order extends DataObject
             $data[] = [
                 $addOn->ID,
                 $addOn->Priority,
-                $addOn->Amount,
+                $addOn->Amount->getValue(),
                 $addOn->isActive(),
             ];
         }
