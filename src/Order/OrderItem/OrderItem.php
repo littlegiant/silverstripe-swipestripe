@@ -241,6 +241,7 @@ class OrderItem extends DataObject
 
     /**
      * @inheritDoc
+     * @codeCoverageIgnore
      */
     public function getCMSFields()
     {

@@ -193,6 +193,7 @@ class Order extends DataObject
 
     /**
      * @inheritDoc
+     * @codeCoverageIgnore
      */
     public function getCMSFields()
     {
