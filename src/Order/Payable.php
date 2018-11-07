@@ -51,6 +51,7 @@ class Payable extends DataExtension
             }
         }
 
+        $this->owner->extend('updateTotalPaid', $paidMoney);
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $paidMoney);
     }
 
@@ -85,6 +86,7 @@ class Payable extends DataExtension
             }
         }
 
+        $this->owner->extend('updateTotalPaidOrAuthorized', $paidMoney);
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $paidMoney);
     }
 
@@ -96,12 +98,15 @@ class Payable extends DataExtension
      */
     public function HasPendingPayments(): bool
     {
-        return $this->owner->Payments()->filter('Status', [
+        $hasPending = $this->owner->Payments()->filter('Status', [
             PaymentStatus::PENDING_AUTHORIZATION,
             PaymentStatus::PENDING_PURCHASE,
             PaymentStatus::PENDING_CAPTURE,
             PaymentStatus::PENDING_REFUND,
             PaymentStatus::PENDING_VOID,
         ])->exists();
+
+        $this->owner->extend('updateHasPendingPayments', $hasPending);
+        return $hasPending;
     }
 }

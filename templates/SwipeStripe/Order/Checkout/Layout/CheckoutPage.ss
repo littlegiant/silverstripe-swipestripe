@@ -22,7 +22,7 @@
             {$CheckoutForm}
 
             <% with $SwipeStripe.ActiveCart %>
-                <a href="{$Link}"><%t SwipeStripe\\Forms\\CheckoutForm.CANCEL_CHECKOUT 'Return to cart' %></a>
+                <a href="{$Link}"><%t SwipeStripe\\Order\\Checkout\\Layout\\CheckoutPage.CANCEL_CHECKOUT 'Return to cart' %></a>
             <% end_with %>
         </div>
     </div>
