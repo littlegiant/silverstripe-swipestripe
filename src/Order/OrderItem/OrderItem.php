@@ -49,7 +49,7 @@ class OrderItem extends DataObject
      * @var array
      */
     private static $db = [
-        'Quantity'                 => 'Int',
+        'Quantity' => 'Int',
     ];
 
     /**

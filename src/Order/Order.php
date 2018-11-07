@@ -254,7 +254,10 @@ class Order extends DataObject
     public function isWellFormedGuestToken(?string $token = null): bool
     {
         // bin2hex(GUEST_TOKEN_BYTES) will return 2 characters per byte.
-        return strlen($token) === 2 * static::GUEST_TOKEN_BYTES;
+        $wellFormed = strlen($token) === 2 * static::GUEST_TOKEN_BYTES;
+
+        $this->extend('isWellFormedGuestToken', $token, $wellFormed);
+        return $wellFormed;
     }
 
     /**
@@ -265,6 +268,7 @@ class Order extends DataObject
         $cartTotalMoney = $this->Total()->getMoney();
         $dueMoney = $cartTotalMoney->subtract($this->TotalPaid()->getMoney());
 
+        $this->extend('updateUnpaidTotal', $dueMoney);
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $dueMoney);
     }
 
@@ -290,6 +294,7 @@ class Order extends DataObject
             $runningTotal = new Money(0, $runningTotal->getCurrency());
         }
 
+        $this->extend('updateTotal', $applyOrderAddOns, $applyOrderItemAddOns, $runningTotal);
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $runningTotal);
     }
 
@@ -320,6 +325,7 @@ class Order extends DataObject
             $money = new Money(0, $money->getCurrency());
         }
 
+        $this->extend('updateSubTotal', $applyItemAddOns, $money);
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
     }
 
