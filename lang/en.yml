@@ -1,0 +1,88 @@
+en:
+  SwipeStripe\Forms\CheckoutForm:
+    CANCEL_CHECKOUT: 'Return to cart'
+  SwipeStripe\Order\Cart\CartForm:
+    QUANTITY_LABEL: Quantity
+    REMOVE_ITEM: Remove
+    UPDATE_CART: 'Update Cart'
+  SwipeStripe\Order\Cart\CartFormValidator:
+    CART_LOCKED: 'Your cart is currently locked because there is a checkout in progress. Please complete or cancel the checkout process to modify your cart.'
+  SwipeStripe\Order\Cart\ViewCartPage:
+    PLURALNAME: 'View Cart Pages'
+    PLURALS:
+      one: 'A View Cart Page'
+      other: '{count} View Cart Pages'
+    SINGULARNAME: 'View Cart Page'
+  SwipeStripe\Order\Checkout\CheckoutForm:
+    BillingAddress_TITLE: 'Billing Address'
+    CONFIRM_CHECKOUT: 'Confirm Checkout'
+    CustomerEmail_TITLE: Email
+    CustomerName_TITLE: Name
+    PAYMENT_ERROR: 'There was an error processing your payment. Please try again.'
+    PAYMENT_METHOD: 'Select your payment method'
+  SwipeStripe\Order\Checkout\CheckoutFormRequestHandler:
+    UNSUPPORTED_PAYMENT_METHOD: 'The payment method you have selected is not supported.'
+  SwipeStripe\Order\Checkout\CheckoutFormValidator:
+    CART_EMPTY: 'It looks like your cart is empty. Please add some items before attempting to checkout.'
+    ORDER_HASH_CHANGED: 'It looks like your cart has changed since you last loaded the checkout page. Please refresh, re-check your cart and try again.'
+  SwipeStripe\Order\Checkout\CheckoutPage:
+    PLURALNAME: 'Checkout Pages'
+    PLURALS:
+      one: 'A Checkout Page'
+      other: '{count} Checkout Pages'
+    SINGULARNAME: 'Checkout Page'
+  SwipeStripe\Order\Order:
+    NONCART_NOT_LOCKED: 'Non-cart order must be locked to a certain time.'
+    PLURALNAME: Orders
+    PLURALS:
+      one: 'An Order'
+      other: '{count} Orders'
+    SINGULARNAME: Order
+    Title: '{name} #{id}'
+  SwipeStripe\Order\OrderAddOn:
+    PLURALNAME: 'Order Add Ons'
+    PLURALS:
+      one: 'An Order Add On'
+      other: '{count} Order Add Ons'
+    SINGULARNAME: 'Order Add On'
+  SwipeStripe\Order\OrderAdmin:
+    MENUTITLE: Orders
+  SwipeStripe\Order\OrderConfirmationEmail:
+    SUBJECT: 'Your {site} order confirmation - {order_title}'
+  SwipeStripe\Order\OrderConfirmationPage:
+    PLURALNAME: 'Order Confirmation Pages'
+    PLURALS:
+      one: 'An Order Confirmation Page'
+      other: '{count} Order Confirmation Pages'
+    SINGULARNAME: 'Order Confirmation Page'
+  SwipeStripe\Order\OrderItem\OrderItem:
+    PLURALNAME: 'Order Items'
+    PLURALS:
+      one: 'An Order Item'
+      other: '{count} Order Items'
+    SINGULARNAME: 'Order Item'
+  SwipeStripe\Order\OrderItem\OrderItemAddOn:
+    PLURALNAME: 'Order Item Add Ons'
+    PLURALS:
+      one: 'An Order Item Add On'
+      other: '{count} Order Item Add Ons'
+    SINGULARNAME: 'Order Item Add On'
+  SwipeStripe\Order\Status\OrderStatusUpdate:
+    NOTIFIED_TITLE: 'Customer Notified'
+    NOTIFY_HELP: 'Send a notification email about this update to the customer. A notification will not be sent if the customer has disabled notifications. Only applies for new, customer visible updates.'
+    PLURALNAME: 'Order Status Updates'
+    PLURALS:
+      one: 'An Order Status Update'
+      other: '{count} Order Status Updates'
+    SINGULARNAME: 'Order Status Update'
+    Title: '{order_title} - {status}'
+  SwipeStripe\Order\Status\OrderStatusUpdateEmail:
+    SUBJECT: 'Update on your {site} order - {order_title} ({status})'
+  SwipeStripe\Order\ViewOrderPage:
+    PLURALNAME: 'View Order Pages'
+    PLURALS:
+      one: 'A View Order Page'
+      other: '{count} View Order Pages'
+    SINGULARNAME: 'View Order Page'
+  SwipeStripe\Order\ViewOrderPageController:
+    RECEIPT_PDF_TITLE: '{site_title} - {order_title}'

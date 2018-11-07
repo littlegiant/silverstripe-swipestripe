@@ -59,14 +59,20 @@ class GlobalTemplateHelper extends ViewableData implements TemplateGlobalProvide
      */
     public function DisplayStatus(string $status): ?string
     {
+        $authorized = _t(PaymentStatus::class . '.AUTHORIZED', PaymentStatus::AUTHORIZED);
+        $refunded = _t(PaymentStatus::class . '.REFUNDED', PaymentStatus::REFUNDED);
+        $paid = _t(PaymentStatus::class . '.PAID', 'Paid');
+        $pending = _t(PaymentStatus::class . '.PENDING', 'Pending');
+        $pendingRefund = _t(PaymentStatus::class . '.PENDING_REFUND', 'Pending refund');
+
         $displayStatuses = [
-            PaymentStatus::AUTHORIZED            => PaymentStatus::AUTHORIZED,
-            PaymentStatus::REFUNDED              => PaymentStatus::REFUNDED,
-            PaymentStatus::CAPTURED              => 'Paid',
-            PaymentStatus::PENDING_AUTHORIZATION => 'Pending',
-            PaymentStatus::PENDING_CAPTURE       => 'Pending',
-            PaymentStatus::PENDING_PURCHASE      => 'Pending',
-            PaymentStatus::PENDING_REFUND        => 'Pending refund',
+            PaymentStatus::AUTHORIZED            => $authorized,
+            PaymentStatus::REFUNDED              => $refunded,
+            PaymentStatus::CAPTURED              => $paid,
+            PaymentStatus::PENDING_AUTHORIZATION => $pending,
+            PaymentStatus::PENDING_CAPTURE       => $pending,
+            PaymentStatus::PENDING_PURCHASE      => $pending,
+            PaymentStatus::PENDING_REFUND        => $pendingRefund,
         ];
 
         return $displayStatuses[$status] ?? null;

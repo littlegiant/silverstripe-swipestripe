@@ -184,8 +184,8 @@ class Order extends DataObject
         $result = parent::validate();
 
         if (!$this->IsCart && empty($this->CartLockedAt)) {
-            $result->addFieldError('CartLockedAt',
-                'Non-cart order must be locked to a certain time.');
+            $result->addFieldError('CartLockedAt', _t(self::class . '.NONCART_NOT_LOCKED',
+                'Non-cart order must be locked to a certain time.'));
         }
 
         return $result;
