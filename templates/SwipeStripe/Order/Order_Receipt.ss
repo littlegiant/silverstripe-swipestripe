@@ -11,13 +11,13 @@
     <header>
         <div class="container site-header">
             <div class="site-header-brand">
-                <a title="<%t CWP_Header.Title "Go to Home Page" %>" class="site-header-brand-link-default"
-                   href="$BaseHref">
+                <a class="site-header-brand-link-default" href="{$BaseHref}">
                     <% if $SiteConfig.Logo %>
-                        <img src="$SiteConfig.Logo.URL" width="$SiteConfig.Logo.Width" height="$SiteConfig.Logo.Height"
-                             alt="$SiteConfig.Title" aria-hidden="true"/>
+                        <img src="$SiteConfig.Logo.URL" width="{$SiteConfig.Logo.Width}"
+                             height="{$SiteConfig.Logo.Height}"
+                             alt="{$SiteConfig.Title}" aria-hidden="true"/>
                     <% else %>
-                        <span>$SiteConfig.Title</span>
+                        <span>{$SiteConfig.Title}</span>
                     <% end_if %>
                 </a>
 
@@ -33,7 +33,7 @@
     <footer class="footer-site">
         <div class="container">
             <p>&copy; {$CurrentDatetime.Format(Y)} {$SiteConfig.Title}</p>
-            <p>View online: <a href="{$AbsoluteLink}">{$AbsoluteLink}</a></p>
+            <p><%t SwipeStripe\\Order\\Order_Receipt.VIEW_ONLINE 'View online: <a href="{link}">{link}</a>' link=$AbsoluteLink %></p>
         </div>
     </footer>
 </body>

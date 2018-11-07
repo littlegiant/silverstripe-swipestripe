@@ -15,18 +15,14 @@
     <div class="row">
         <div class="col-md-12">
             <% if $Order.CustomerVisibleOrderStatusUpdates %>
-                <h3>Updates</h3>
+                <h3><%t SwipeStripe\\Order\\Layout\\ViewOrderPage.UPDATES 'Updates' %></h3>
 
                 <table class="table">
                     <thead>
                     <tr>
-                        <td>Time</td>
-                        <td>Status</td>
-                        <td>Notes</td>
-                    </tr>
-
-                    <tr>
-
+                        <td><%t SwipeStripe\\Order\\Layout\\ViewOrderPage.TIME 'Time' %></td>
+                        <td><%t SwipeStripe\\Order\\Layout\\ViewOrderPage.STATUS 'Status' %></td>
+                        <td><%t SwipeStripe\\Order\\Layout\\ViewOrderPage.NOTES 'Notes' %>/td>
                     </tr>
                     </thead>
 

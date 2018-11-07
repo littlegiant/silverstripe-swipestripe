@@ -1,4 +1,4 @@
-<h4>Payments</h4>
+<h4><%t SwipeStripe\\Order\\Includes\\PaymentSummary.PAYMENTS 'Payments' %></h4>
 
 <% loop $Order.Payments %>
     <% if $SwipeStripe.DisplayStatus($Status) %>
@@ -15,7 +15,7 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <strong>Ref:</strong> {$TransactionReference}
+                    <strong><%t SwipeStripe\\Order\\Includes\\PaymentSummary.TXN_REFERENCE 'Ref:' %></strong> {$TransactionReference}
                 </div>
             </div>
             <hr>

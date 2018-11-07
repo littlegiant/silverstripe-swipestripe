@@ -10,10 +10,10 @@
 
     <div class="row">
         <% if $SwipeStripe.ActiveCart.Empty %>
-            <h3>Your cart is empty.</h3>
+            <h3><%t SwipeStripe\\Order\\Cart\\Layout\\ViewCartPage.CART_EMPTY 'Your cart is empty.' %></h3>
         <% else %>
             {$CartForm}
-            <a href="{$Top.CheckoutLink}">Checkout</a>
+            <a href="{$Top.CheckoutLink}"><%t SwipeStripe\\Order\\Cart\\Layout\\ViewCartPage.CHECKOUT 'Checkout' %></a>
         <% end_if %>
     </div>
 </div>

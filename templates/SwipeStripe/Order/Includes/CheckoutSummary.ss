@@ -5,7 +5,7 @@
                 <h3><a href="{$Purchasable.Link}">{$Title}</a>
                     <small>{$Price.Nice}</small>
                 </h3>
-                <h5>Quantity: {$Quantity}</h5>
+                <h5><%t SwipeStripe\\Order\\Includes\\CheckoutSummary.QUANTITY 'Quantity: {qty}' qty=$Quantity %></h5>
                 <div>{$Description}</div>
 
                 <% if $OrderItemAddOns %>
