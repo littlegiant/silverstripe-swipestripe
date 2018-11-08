@@ -9,6 +9,7 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
+use SilverStripe\ORM\FieldType\DBDatetime;
 use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
@@ -269,6 +270,36 @@ class OrderTest extends SapphireTest
         $addOn->write();
 
         $this->assertTrue($this->order->Total()->getMoney()->equals($total));
+    }
+
+    /**
+     *
+     */
+    public function testPaymentCaptured()
+    {
+        $order = $this->order;
+        $order->CustomerEmail = 'customer@example.org';
+        $order->addItem($this->product);
+        $order->Lock();
+
+        $fullTotalMoney = $order->Total()->getMoney();
+        $halfTotalMoney = $fullTotalMoney->divide(2);
+
+        $payment = $this->addPaymentWithStatus($order, $halfTotalMoney, PaymentStatus::CAPTURED);
+        $order->paymentCaptured($payment);
+
+        $this->assertTrue($order->UnpaidTotal()->getMoney()->isPositive());
+        $this->assertTrue(boolval($order->IsCart));
+        $this->assertNull($order->ConfirmationTime);
+
+        DBDatetime::set_mock_now(time());
+        $payment2 = $this->addPaymentWithStatus($order, $halfTotalMoney, PaymentStatus::CAPTURED);
+        $order->paymentCaptured($payment2);
+
+        $this->assertTrue($order->UnpaidTotal()->getMoney()->isZero());
+        $this->assertFalse(boolval($order->IsCart));
+        $this->assertSame(DBDatetime::now()->getValue(), $order->ConfirmationTime);
+        $this->assertEmailSent($order->CustomerEmail);
     }
 
     /**
