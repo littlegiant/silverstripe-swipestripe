@@ -535,9 +535,9 @@ class Order extends DataObject
 
     /**
      * @param Payment $payment
-     * @param ServiceResponse $response
+     * @param null|ServiceResponse $response
      */
-    public function paymentCaptured(Payment $payment, ServiceResponse $response): void
+    public function paymentCaptured(Payment $payment, ?ServiceResponse $response = null): void
     {
         if (!$this->UnpaidTotal()->getMoney()->isPositive()) {
             $this->ConfirmationTime = DBDatetime::now()->getValue();
