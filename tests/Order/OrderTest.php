@@ -13,7 +13,6 @@ use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
-use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Order\ViewOrderPage;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
@@ -30,6 +29,7 @@ use SwipeStripe\Tests\WaitsMockTime;
  */
 class OrderTest extends SapphireTest
 {
+    use AddsPayments;
     use NeedsSupportedCurrencies;
     use PublishesFixtures;
     use WaitsMockTime;
@@ -124,26 +124,12 @@ class OrderTest extends SapphireTest
         $fullTotalMoney = $order->Total()->getMoney();
         $halfTotalMoney = $fullTotalMoney->divide(2);
 
-        /** @var SupportedCurrenciesInterface $supportedCurrencies */
-        $supportedCurrencies = Injector::inst()->get(SupportedCurrenciesInterface::class);
-        /** @var Payment|PaymentExtension $payment */
-        $payment = Payment::create()->init('Dummy',
-            $supportedCurrencies->formatDecimal($halfTotalMoney), $halfTotalMoney->getCurrency()->getCode());
-        $payment->Status = PaymentStatus::CAPTURED;
-        $payment->OrderID = $order->ID;
-        $payment->write();
-
+        $this->addPaymentWithStatus($order, $halfTotalMoney, PaymentStatus::CAPTURED);
         $this->assertTrue($order->Total()->getMoney()->equals($fullTotalMoney));
         $this->assertTrue($order->TotalPaid()->getMoney()->equals($halfTotalMoney));
         $this->assertTrue($order->UnpaidTotal()->getMoney()->equals($halfTotalMoney));
 
-        /** @var Payment|PaymentExtension $payment2 */
-        $payment2 = Payment::create()->init('Dummy',
-            $supportedCurrencies->formatDecimal($halfTotalMoney), $halfTotalMoney->getCurrency()->getCode());
-        $payment2->Status = PaymentStatus::CAPTURED;
-        $payment2->OrderID = $order->ID;
-        $payment2->write();
-
+        $this->addPaymentWithStatus($order, $halfTotalMoney, PaymentStatus::CAPTURED);
         $this->assertTrue($order->Total()->getMoney()->equals($fullTotalMoney));
         $this->assertTrue($order->TotalPaid()->getMoney()->equals($fullTotalMoney));
         $this->assertTrue($order->UnpaidTotal()->getMoney()->isZero());
