@@ -48,6 +48,7 @@ class CheckoutFormRequestHandler extends FormRequestHandler
             // This stops being able to create multiple active checkouts on one order
             $original = $form->getCart();
             $clone = $original->duplicate();
+            $clone->Unlock();
 
             if ($original->ID === $this->ActiveCart->ID) {
                 $this->setActiveCart($clone);
