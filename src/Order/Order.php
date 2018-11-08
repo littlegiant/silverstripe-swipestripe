@@ -539,11 +539,11 @@ class Order extends DataObject
      */
     public function paymentCaptured(Payment $payment, ServiceResponse $response): void
     {
-        $this->ConfirmationTime = DBDatetime::now()->getValue();
-        $this->IsCart = false;
-        $this->write();
-
         if (!$this->UnpaidTotal()->getMoney()->isPositive()) {
+            $this->ConfirmationTime = DBDatetime::now()->getValue();
+            $this->IsCart = false;
+            $this->write();
+
             OrderConfirmationEmail::create($this)->send();
         }
 
