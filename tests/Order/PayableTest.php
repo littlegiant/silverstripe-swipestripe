@@ -10,7 +10,6 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
 use SwipeStripe\Order\Order;
-use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
 use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
@@ -21,17 +20,13 @@ use SwipeStripe\Tests\Price\SupportedCurrencies\NeedsSupportedCurrencies;
  */
 class PayableTest extends SapphireTest
 {
+    use AddsPayments;
     use NeedsSupportedCurrencies;
 
     /**
      * @var bool
      */
     protected $usesDatabase = true;
-
-    /**
-     * @var SupportedCurrenciesInterface
-     */
-    protected $supportedCurrencies;
 
     /**
      * @var Currency
@@ -56,27 +51,9 @@ class PayableTest extends SapphireTest
     {
         parent::setUp();
 
-        $this->supportedCurrencies = Injector::inst()->get(SupportedCurrenciesInterface::class);
-        $this->currency = $this->supportedCurrencies->getDefaultCurrency();
-    }
-
-    /**
-     * @param Order $order
-     * @param Money $amount
-     * @param string $status
-     * @return int Payment ID
-     * @throws \SilverStripe\ORM\ValidationException
-     */
-    private function addPaymentWithStatus(Order $order, Money $amount, string $status): int
-    {
-        /** @var Payment|PaymentExtension $payment */
-        $payment = Payment::create()->init('Dummy',
-            $this->supportedCurrencies->formatDecimal($amount),
-            $amount->getCurrency()->getCode());
-        $payment->Status = $status;
-        $payment->OrderID = $order->ID;
-
-        return $payment->write();
+        /** @var SupportedCurrenciesInterface $supportedCurrencies */
+        $supportedCurrencies = Injector::inst()->get(SupportedCurrenciesInterface::class);
+        $this->currency = $supportedCurrencies->getDefaultCurrency();
     }
 
     /**
@@ -159,8 +136,8 @@ class PayableTest extends SapphireTest
         $this->addPaymentWithStatus($order, $capturedAmount->divide(2), PaymentStatus::CAPTURED);
         $this->addPaymentWithStatus($order, $capturedAmount->divide(2), PaymentStatus::CAPTURED);
         $this->addPaymentWithStatus($order, $authorizedAmount, PaymentStatus::AUTHORIZED);
-        $pending1 = $this->addPaymentWithStatus($order, $pendingAmount->divide(2), PaymentStatus::PENDING_PURCHASE);
-        $pending2 = $this->addPaymentWithStatus($order, $pendingAmount->divide(2), PaymentStatus::PENDING_CAPTURE);
+        $pending1 = $this->addPaymentWithStatus($order, $pendingAmount->divide(2), PaymentStatus::PENDING_PURCHASE)->ID;
+        $pending2 = $this->addPaymentWithStatus($order, $pendingAmount->divide(2), PaymentStatus::PENDING_CAPTURE)->ID;
         $this->addPaymentWithStatus($order, $refundAmount, PaymentStatus::REFUNDED);
         $this->addPaymentWithStatus($order, $voidAmount, PaymentStatus::VOID);
 

@@ -9,11 +9,12 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\ValidationException;
 use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
 use SwipeStripe\Order\OrderItem\OrderItemAddOn;
-use SwipeStripe\Order\PaymentExtension;
 use SwipeStripe\Order\PaymentStatus;
 use SwipeStripe\Order\ViewOrderPage;
 use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
@@ -30,6 +31,7 @@ use SwipeStripe\Tests\WaitsMockTime;
  */
 class OrderTest extends SapphireTest
 {
+    use AddsPayments;
     use NeedsSupportedCurrencies;
     use PublishesFixtures;
     use WaitsMockTime;
@@ -124,26 +126,12 @@ class OrderTest extends SapphireTest
         $fullTotalMoney = $order->Total()->getMoney();
         $halfTotalMoney = $fullTotalMoney->divide(2);
 
-        /** @var SupportedCurrenciesInterface $supportedCurrencies */
-        $supportedCurrencies = Injector::inst()->get(SupportedCurrenciesInterface::class);
-        /** @var Payment|PaymentExtension $payment */
-        $payment = Payment::create()->init('Dummy',
-            $supportedCurrencies->formatDecimal($halfTotalMoney), $halfTotalMoney->getCurrency()->getCode());
-        $payment->Status = PaymentStatus::CAPTURED;
-        $payment->OrderID = $order->ID;
-        $payment->write();
-
+        $this->addPaymentWithStatus($order, $halfTotalMoney, PaymentStatus::CAPTURED);
         $this->assertTrue($order->Total()->getMoney()->equals($fullTotalMoney));
         $this->assertTrue($order->TotalPaid()->getMoney()->equals($halfTotalMoney));
         $this->assertTrue($order->UnpaidTotal()->getMoney()->equals($halfTotalMoney));
 
-        /** @var Payment|PaymentExtension $payment2 */
-        $payment2 = Payment::create()->init('Dummy',
-            $supportedCurrencies->formatDecimal($halfTotalMoney), $halfTotalMoney->getCurrency()->getCode());
-        $payment2->Status = PaymentStatus::CAPTURED;
-        $payment2->OrderID = $order->ID;
-        $payment2->write();
-
+        $this->addPaymentWithStatus($order, $halfTotalMoney, PaymentStatus::CAPTURED);
         $this->assertTrue($order->Total()->getMoney()->equals($fullTotalMoney));
         $this->assertTrue($order->TotalPaid()->getMoney()->equals($fullTotalMoney));
         $this->assertTrue($order->UnpaidTotal()->getMoney()->isZero());
@@ -283,6 +271,84 @@ class OrderTest extends SapphireTest
         $addOn->write();
 
         $this->assertTrue($this->order->Total()->getMoney()->equals($total));
+    }
+
+    /**
+     *
+     */
+    public function testPaymentCaptured()
+    {
+        $order = $this->order;
+        $order->CustomerEmail = 'customer@example.org';
+        $order->addItem($this->product);
+        $order->Lock();
+
+        $fullTotalMoney = $order->Total()->getMoney();
+        $halfTotalMoney = $fullTotalMoney->divide(2);
+
+        $payment = $this->addPaymentWithStatus($order, $halfTotalMoney, PaymentStatus::CAPTURED);
+        $order->paymentCaptured($payment);
+
+        $this->assertTrue($order->UnpaidTotal()->getMoney()->isPositive());
+        $this->assertTrue(boolval($order->IsCart));
+        $this->assertNull($order->ConfirmationTime);
+
+        DBDatetime::set_mock_now(time());
+        $payment2 = $this->addPaymentWithStatus($order, $halfTotalMoney, PaymentStatus::CAPTURED);
+        $order->paymentCaptured($payment2);
+
+        $this->assertTrue($order->UnpaidTotal()->getMoney()->isZero());
+        $this->assertFalse(boolval($order->IsCart));
+        $this->assertSame(DBDatetime::now()->getValue(), $order->ConfirmationTime);
+        $this->assertEmailSent($order->CustomerEmail);
+    }
+
+    /**
+     *
+     */
+    public function testIsCartFalseWithoutLock()
+    {
+        $order = $this->order;
+        $order->IsCart = false;
+
+        $this->expectException(ValidationException::class);
+        $order->write();
+    }
+
+    /**
+     *
+     */
+    public function testUnlockConfirmedOrder()
+    {
+        $now = DBDatetime::now();
+
+        DBDatetime::set_mock_now($now);
+        $order = $this->order;
+        $order->IsCart = false;
+        $order->Lock();
+
+        $this->mockWait();
+        $order->Unlock();
+
+        $this->assertSame($now->getValue(), $order->CartLockedAt);
+    }
+
+    /**
+     *
+     */
+    public function testDoubleLock()
+    {
+        $now = DBDatetime::now();
+
+        DBDatetime::set_mock_now($now);
+        $order = $this->order;
+        $order->IsCart = false;
+        $order->Lock();
+
+        $this->mockWait();
+        $order->Lock();
+
+        $this->assertSame($now->getValue(), $order->CartLockedAt);
     }
 
     /**
