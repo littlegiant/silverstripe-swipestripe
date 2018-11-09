@@ -10,6 +10,7 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\ValidationException;
 use SwipeStripe\Order\Cart\ViewCartPage;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderAddOn;
@@ -300,6 +301,54 @@ class OrderTest extends SapphireTest
         $this->assertFalse(boolval($order->IsCart));
         $this->assertSame(DBDatetime::now()->getValue(), $order->ConfirmationTime);
         $this->assertEmailSent($order->CustomerEmail);
+    }
+
+    /**
+     *
+     */
+    public function testIsCartFalseWithoutLock()
+    {
+        $order = $this->order;
+        $order->IsCart = false;
+
+        $this->expectException(ValidationException::class);
+        $order->write();
+    }
+
+    /**
+     *
+     */
+    public function testUnlockConfirmedOrder()
+    {
+        $now = DBDatetime::now();
+
+        DBDatetime::set_mock_now($now);
+        $order = $this->order;
+        $order->IsCart = false;
+        $order->Lock();
+
+        $this->mockWait();
+        $order->Unlock();
+
+        $this->assertSame($now->getValue(), $order->CartLockedAt);
+    }
+
+    /**
+     *
+     */
+    public function testDoubleLock()
+    {
+        $now = DBDatetime::now();
+
+        DBDatetime::set_mock_now($now);
+        $order = $this->order;
+        $order->IsCart = false;
+        $order->Lock();
+
+        $this->mockWait();
+        $order->Lock();
+
+        $this->assertSame($now->getValue(), $order->CartLockedAt);
     }
 
     /**
