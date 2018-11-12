@@ -102,6 +102,57 @@ class DBPriceTest extends SapphireTest
     /**
      *
      */
+    public function testGetCurrencySymbol()
+    {
+        $price = DBPrice::create();
+        $hundredJpy = new Money(100, new Currency('JPY'));
+        $hundredNzd = new Money(10000, new Currency('NZD'));
+        $hundredUsd = new Money(10000, new Currency('USD'));
+
+        $this->assertSame('¥', $price->setValue($hundredJpy)->getCurrencySymbol());
+
+        $price->setLocale('en-NZ');
+        $this->assertSame('$', $price->setValue($hundredNzd)->getCurrencySymbol());
+        $this->assertSame('US$', $price->setValue($hundredUsd)->getCurrencySymbol());
+
+        $price->setLocale('en-US');
+        $this->assertSame('NZ$', $price->setValue($hundredNzd)->getCurrencySymbol());
+        $this->assertSame('$', $price->setValue($hundredUsd)->getCurrencySymbol());
+    }
+
+    /**
+     *
+     */
+    public function testGetCurrencyCode()
+    {
+        $price = DBPrice::create();
+        $hundredJpy = new Money(100, new Currency('JPY'));
+        $hundredNzd = new Money(10000, new Currency('NZD'));
+        $hundredUsd = new Money(10000, new Currency('USD'));
+
+        $this->assertSame('NZD', $price->setValue($hundredNzd)->getCurrencyCode());
+        $this->assertSame('USD', $price->setValue($hundredUsd)->getCurrencyCode());
+        $this->assertSame('JPY', $price->setValue($hundredJpy)->getCurrencyCode());
+    }
+
+    /**
+     *
+     */
+    public function testGetDecimalValue()
+    {
+        $price = DBPrice::create();
+        $hundredJpy = new Money(100, new Currency('JPY'));
+        $hundredNzd = new Money(10000, new Currency('NZD'));
+        $hundredUsd = new Money(10000, new Currency('USD'));
+
+        $this->assertSame('100.00', $price->setValue($hundredNzd)->getDecimalValue());
+        $this->assertSame('100.00', $price->setValue($hundredUsd)->getDecimalValue());
+        $this->assertSame('100', $price->setValue($hundredJpy)->getDecimalValue());
+    }
+
+    /**
+     *
+     */
     public function testScaffoldedFormField()
     {
         $this->assertInstanceOf(PriceField::class, DBPrice::create('Price')->scaffoldFormField());

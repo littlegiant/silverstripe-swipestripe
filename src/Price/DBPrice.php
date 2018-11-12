@@ -66,7 +66,7 @@ class DBPrice extends DBComposite
     public function getMoney(): Money
     {
         return $this->exists()
-            ? new Money($this->getField('Amount'), new Currency($this->getField('Currency')))
+            ? new Money($this->Amount, new Currency($this->Currency))
             : new Money(0, $this->supportedCurrencies->getDefaultCurrency());
     }
 
@@ -75,7 +75,7 @@ class DBPrice extends DBComposite
      */
     public function exists()
     {
-        return !empty($this->getField('Currency')) && is_numeric($this->getField('Amount'));
+        return !empty($this->Currency) && is_numeric($this->Amount);
     }
 
     /**
@@ -144,6 +144,30 @@ class DBPrice extends DBComposite
     public function hasAmount(): bool
     {
         return !$this->getMoney()->isZero();
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrencySymbol(): string
+    {
+        return $this->getNumberFormatter()->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrencyCode(): string
+    {
+        return $this->getMoney()->getCurrency()->getCode();
+    }
+
+    /**
+     * @return string
+     */
+    public function getDecimalValue(): string
+    {
+        return $this->supportedCurrencies->formatDecimal($this->getMoney());
     }
 
     /**
