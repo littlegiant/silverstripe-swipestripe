@@ -147,6 +147,30 @@ class DBPrice extends DBComposite
     }
 
     /**
+     * @return string
+     */
+    public function getCurrencySymbol(): string
+    {
+        return $this->getNumberFormatter()->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrencyCode(): string
+    {
+        return $this->getMoney()->getCurrency()->getCode();
+    }
+
+    /**
+     * @return string
+     */
+    public function getDecimalValue(): string
+    {
+        return $this->supportedCurrencies->formatDecimal($this->getMoney());
+    }
+
+    /**
      * @inheritdoc
      */
     public function scaffoldFormField($title = null, $params = null)
