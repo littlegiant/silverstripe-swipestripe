@@ -4,4 +4,4 @@ Name: swipestripe-core-extensions
 
 SilverStripe\Omnipay\Model\Payment:
   extensions:
-  - SwipeStripe\Order\PaymentExtension
+   swipestripe-payment: SwipeStripe\Order\PaymentExtension
