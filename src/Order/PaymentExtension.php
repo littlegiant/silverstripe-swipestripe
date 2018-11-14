@@ -53,6 +53,18 @@ class PaymentExtension extends DataExtension
     }
 
     /**
+     * @param ServiceResponse $response
+     */
+    public function onError(ServiceResponse $response): void
+    {
+        $order = $this->owner->Order();
+
+        if ($order->exists()) {
+            $order->paymentError($this->owner, $response);
+        }
+    }
+
+    /**
      * @param null|Member $member
      * @return bool|null
      */

@@ -560,6 +560,16 @@ class Order extends DataObject
     }
 
     /**
+     * @param Payment $payment
+     * @param null|ServiceResponse $response
+     */
+    public function paymentError(Payment $payment, ?ServiceResponse $response = null): void
+    {
+        $this->Unlock();
+        $this->extend('paymentError', $payment, $response);
+    }
+
+    /**
      * Unlock the cart to restore ability to modify.
      * @param bool $writeImmediately
      */
