@@ -580,7 +580,8 @@ class Order extends DataObject
             return;
         }
 
-        $this->CartLockedAt = null;
+        $this->CartLockedAt = '';
+
         if ($writeImmediately) {
             $this->write();
         }
