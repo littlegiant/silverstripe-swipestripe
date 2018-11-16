@@ -15,13 +15,10 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\Omnipay\Exception\InvalidConfigurationException;
 use SilverStripe\Omnipay\GatewayFieldsFactory;
 use SilverStripe\Omnipay\GatewayInfo;
-use SilverStripe\Omnipay\Model\Message\CompletePurchaseError;
 use SilverStripe\Omnipay\Model\Message\PaymentMessage;
-use SilverStripe\Omnipay\Model\Message\PurchaseError;
 use SilverStripe\Omnipay\Model\Payment;
 use SwipeStripe\Order\Order;
 use SwipeStripe\Order\OrderConfirmationPage;
-use SwipeStripe\Order\PaymentStatus;
 
 /**
  * Class CheckoutForm
@@ -90,7 +87,6 @@ class CheckoutForm extends Form implements CheckoutFormInterface
         }
 
         $paymentIdentifier = $this->getRequest()->getVar(static::PAYMENT_ID_QUERY_PARAM);
-
         if (empty($paymentIdentifier)) {
             // No payment query param
             $this->paymentError = false;
@@ -99,28 +95,18 @@ class CheckoutForm extends Form implements CheckoutFormInterface
 
         /** @var Payment|null $payment */
         $payment = $this->getCart()->Payments()->find('Identifier', $paymentIdentifier);
-        $defaultMessage = _t(self::class . '.PAYMENT_ERROR',
+        $errorMessage = _t(self::class . '.PAYMENT_ERROR',
             'There was an error processing your payment. Please try again.');
 
         if ($payment === null) {
             // No payment with that identifier for this order, can't show error
             $errorMessage = false;
-        } elseif ($payment->Status === PaymentStatus::VOID) {
-            // Void status is returned for cancelled or declined card
-            $errorMessage = $defaultMessage;
         } else {
-            /** @var PaymentMessage|null $message */
-            $message = $payment->Messages()->last();
-            $errorMessage = $message instanceof PurchaseError || $message instanceof CompletePurchaseError
-                ? $message->Message
-                : $defaultMessage;
+            $this->extend('updatePaymentError', $payment, $errorMessage);
         }
 
-        $this->paymentError = $errorMessage;
-        $message = $errorMessage ?: null;
-
-        $this->extend('updatePaymentError', $payment,$message);
-        return $message;
+        $this->paymentError = $errorMessage ?: false;
+        return $errorMessage ?: null;
     }
 
     /**
