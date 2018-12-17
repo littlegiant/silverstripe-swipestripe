@@ -105,9 +105,9 @@ class OrderTest extends SapphireTest
 
         // Applied for item in cart
         $order->setItemQuantity($product, 1);
-        $this->assertTrue($order->Total(false)->getMoney()->equals($product->getPrice()->getMoney()));
+        $this->assertTrue($order->Total(false)->getMoney()->equals($product->getBasePrice()->getMoney()));
         $this->assertTrue($order->Total()->getMoney()->equals(
-            $product->getPrice()->getMoney()->add($addOn->Amount->getMoney())
+            $product->getBasePrice()->getMoney()->add($addOn->Amount->getMoney())
         ));
     }
 
@@ -120,7 +120,7 @@ class OrderTest extends SapphireTest
         $product = $this->product;
         $order->addItem($product);
 
-        $this->assertTrue($order->Total()->getMoney()->equals($product->getPrice()->getMoney()));
+        $this->assertTrue($order->Total()->getMoney()->equals($product->getBasePrice()->getMoney()));
         $this->assertTrue($order->UnpaidTotal()->getMoney()->equals($order->Total()->getMoney()));
 
         $fullTotalMoney = $order->Total()->getMoney();
@@ -145,7 +145,7 @@ class OrderTest extends SapphireTest
         $order = $this->order;
         $product = $this->product;
 
-        $fullPrice = $product->getPrice()->getMoney();
+        $fullPrice = $product->getBasePrice()->getMoney();
         $halfPrice = $fullPrice->divide(2);
 
         $addOn = OrderItemAddOn::create();
@@ -200,17 +200,17 @@ class OrderTest extends SapphireTest
        $product = $this->product;
        $order->addItem($product);
 
-       $this->assertTrue($order->Total()->getMoney()->equals($product->getPrice()->getMoney()));
+       $this->assertTrue($order->Total()->getMoney()->equals($product->getBasePrice()->getMoney()));
 
        $halfPriceAddOn = OrderItemAddOn::create();
-       $halfPriceAddOn->Amount->setValue($product->getPrice()->getMoney()->multiply(-0.5));
+       $halfPriceAddOn->Amount->setValue($product->getBasePrice()->getMoney()->multiply(-0.5));
        $halfPriceAddOn->write();
 
        $order->attachPurchasableAddOn($product, $halfPriceAddOn);
-       $this->assertTrue($order->Total()->getMoney()->equals($product->getPrice()->getMoney()->multiply(0.5)));
+       $this->assertTrue($order->Total()->getMoney()->equals($product->getBasePrice()->getMoney()->multiply(0.5)));
 
        $order->detachPurchasableAddOn($product, $halfPriceAddOn);
-       $this->assertTrue($order->Total()->getMoney()->equals($product->getPrice()->getMoney()));
+       $this->assertTrue($order->Total()->getMoney()->equals($product->getBasePrice()->getMoney()));
     }
 
     /**
@@ -220,7 +220,7 @@ class OrderTest extends SapphireTest
     {
         $order = $this->order;
         $product = $this->product;
-        $productOriginalPrice = $product->getPrice()->getMoney();
+        $productOriginalPrice = $product->getBasePrice()->getMoney();
 
         $order->addItem($product);
         $this->assertTrue($order->Total()->getMoney()->equals($productOriginalPrice));

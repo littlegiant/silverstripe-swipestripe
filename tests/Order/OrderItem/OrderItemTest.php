@@ -99,27 +99,27 @@ class OrderItemTest extends SapphireTest
         // This is because silverstripe uses many php objects to represent the same row in the database
         // Only our local instance of $order and existing references to it will be updated
         $orderItem = $order->getOrderItem($product, false);
-        $this->assertTrue($orderItem->Purchasable()->getPrice()->getMoney()->equals($productOriginalPrice));
-        $this->assertTrue($orderItem->getPrice()->getMoney()->equals($productOriginalPrice));
+        $this->assertTrue($orderItem->Purchasable()->getBasePrice()->getMoney()->equals($productOriginalPrice));
+        $this->assertTrue($orderItem->getBasePrice()->getMoney()->equals($productOriginalPrice));
 
         // Test fetching OrderItem directly, rather than through relation
         /** @var OrderItem $orderItem */
         $orderItem = OrderItem::get()->byID($orderItem->ID);
-        $this->assertTrue($orderItem->Purchasable()->getPrice()->getMoney()->equals($productOriginalPrice));
-        $this->assertTrue($orderItem->getPrice()->getMoney()->equals($productOriginalPrice));
+        $this->assertTrue($orderItem->Purchasable()->getBasePrice()->getMoney()->equals($productOriginalPrice));
+        $this->assertTrue($orderItem->getBasePrice()->getMoney()->equals($productOriginalPrice));
 
         $order->Unlock();
 
         // Test again, with new instance of the OrderItem
         $orderItem = $order->getOrderItem($product, false);
-        $this->assertTrue($orderItem->Purchasable()->getPrice()->getMoney()->equals($productNewPrice));
-        $this->assertTrue($orderItem->getPrice()->getMoney()->equals($productNewPrice));
+        $this->assertTrue($orderItem->Purchasable()->getBasePrice()->getMoney()->equals($productNewPrice));
+        $this->assertTrue($orderItem->getBasePrice()->getMoney()->equals($productNewPrice));
 
         // Test fetching OrderItem directly, rather than through relation
         /** @var OrderItem $orderItem */
         $orderItem = OrderItem::get()->byID($orderItem->ID);
-        $this->assertTrue($orderItem->Purchasable()->getPrice()->getMoney()->equals($productNewPrice));
-        $this->assertTrue($orderItem->getPrice()->getMoney()->equals($productNewPrice));
+        $this->assertTrue($orderItem->Purchasable()->getBasePrice()->getMoney()->equals($productNewPrice));
+        $this->assertTrue($orderItem->getBasePrice()->getMoney()->equals($productNewPrice));
     }
 
     /**
@@ -132,7 +132,7 @@ class OrderItemTest extends SapphireTest
         $orderItem = $order->getOrderItem($this->product);
         $this->assertTrue($orderItem->Total->getMoney()->isPositive());
 
-        $productPrice = $this->product->getPrice()->getMoney();
+        $productPrice = $this->product->getBasePrice()->getMoney();
         $addOn = OrderItemAddOn::create();
         $addOn->Amount->setValue($productPrice->negative()->multiply(3));
         $addOn->OrderItemID = $orderItem->ID;
@@ -152,7 +152,7 @@ class OrderItemTest extends SapphireTest
         $this->assertTrue($orderItem->Total->getMoney()->isPositive());
 
         OrderItemAddOn::add_extension(AddOnInactiveExtension::class);
-        $productPrice = $this->product->getPrice()->getMoney();
+        $productPrice = $this->product->getBasePrice()->getMoney();
         $addOn = OrderItemAddOn::create();
         $addOn->Amount->setValue($productPrice->negative()->multiply(3));
         $addOn->OrderItemID = $orderItem->ID;

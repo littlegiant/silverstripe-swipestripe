@@ -627,7 +627,7 @@ class Order extends DataObject
             $data[] = [
                 $item->ID,
                 $item->Quantity,
-                $item->Price->getValue(),
+                $item->BasePrice->getValue(),
                 $item->Total->getValue(),
             ];
 

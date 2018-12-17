@@ -24,7 +24,7 @@ use SwipeStripe\Price\PriceField;
  * Class OrderItem
  * @package SwipeStripe\Order\OrderItem
  * @property string $Description
- * @property DBPrice $Price
+ * @property DBPrice $BasePrice
  * @property int $Quantity
  * @property int $OrderID
  * @property string $PurchasableClass
@@ -161,7 +161,7 @@ class OrderItem extends DataObject
      */
     public function getSubTotal(): DBPrice
     {
-        $money = $this->getPrice()->getMoney()->multiply($this->getQuantity());
+        $money = $this->getBasePrice()->getMoney()->multiply($this->getQuantity());
         return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
     }
 
@@ -169,9 +169,9 @@ class OrderItem extends DataObject
      * Unit price.
      * @return DBPrice
      */
-    public function getPrice(): DBPrice
+    public function getBasePrice(): DBPrice
     {
-        return $this->Purchasable()->getPrice();
+        return $this->Purchasable()->getBasePrice();
     }
 
     /**

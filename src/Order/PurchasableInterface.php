@@ -31,5 +31,11 @@ interface PurchasableInterface extends DataObjectInterface
      * Unit price.
      * @return DBPrice
      */
+    public function getBasePrice(): DBPrice;
+
+    /**
+     * Unit price with additions from modules
+     * @return DBPrice
+     */
     public function getPrice(): DBPrice;
 }
