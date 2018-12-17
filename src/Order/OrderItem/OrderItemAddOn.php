@@ -68,8 +68,8 @@ class OrderItemAddOn extends DataObject
      * @var array
      */
     private static $summary_fields = [
-        'Title'             => 'Title',
-        'Amount.Value'      => 'Amount',
+        'Title'  => 'Title',
+        'Amount' => 'Amount',
     ];
 
     /**
