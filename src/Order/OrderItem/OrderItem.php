@@ -171,7 +171,7 @@ class OrderItem extends DataObject
      */
     public function getBasePrice(): DBPrice
     {
-        return $this->Purchasable()->getBasePrice();
+        return $this->Purchasable() ? $this->Purchasable()->getBasePrice() : DBPrice::create();
     }
 
     /**
