@@ -43,6 +43,11 @@ class OrderItem extends DataObject
     const PURCHASABLE_ID = 'PurchasableID';
 
     /**
+     * "empty" db placeholder
+     */
+    const EMPTY = '-';
+
+    /**
      * @var string
      */
     private static $table_name = 'SwipeStripe_Order_OrderItem';
@@ -112,7 +117,7 @@ class OrderItem extends DataObject
     {
         $title = $this->getField('Title') ?: $this->generateTitle();
         $this->setField('Title', $title);
-        return $title;
+        return $title === self::EMPTY ? '' : $title;
     }
 
     /**
@@ -126,11 +131,11 @@ class OrderItem extends DataObject
         // Get uncached title from purchasable record
         $purchasable = $this->Purchasable();
         if ($purchasable && $purchasable->exists()) {
-            return $purchasable->getTitle();
+            return $purchasable->getTitle() ?: self::EMPTY;
         }
 
         // No title
-        return '';
+        return self::EMPTY;
     }
 
     /**
@@ -160,7 +165,7 @@ class OrderItem extends DataObject
     {
         $description = $this->getField('Description') ?: $this->generateDescription();
         $this->setField('Description', $description);
-        return $description;
+        return $description === self::EMPTY ? '' : $description;
     }
 
     /**
@@ -174,11 +179,11 @@ class OrderItem extends DataObject
         // Get uncached title from purchasable record
         $purchasable = $this->Purchasable();
         if ($purchasable && $purchasable->exists()) {
-            return $purchasable->getDescription();
+            return $purchasable->getDescription() ?: self::EMPTY;
         }
 
         // No description
-        return '';
+        return self::EMPTY;
     }
 
     /**
