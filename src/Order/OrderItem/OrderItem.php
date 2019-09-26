@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\OrderItem;
 
+use Exception;
 use Money\Money;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
@@ -11,6 +12,7 @@ use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\Relation;
 use SilverStripe\ORM\UnsavedRelationList;
+use SilverStripe\ORM\ValidationException;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\CMSHelper;
 use SwipeStripe\Forms\Fields\HasOneButtonField;
@@ -23,12 +25,12 @@ use SwipeStripe\Price\PriceField;
 /**
  * Class OrderItem
  * @package SwipeStripe\Order\OrderItem
- * @property string $Description
- * @property DBPrice $BasePrice
- * @property int $Quantity
- * @property int $OrderID
- * @property string $PurchasableClass
- * @property int $PurchasableID
+ * @property string       $Description
+ * @property DBPrice      $BasePrice
+ * @property int          $Quantity
+ * @property int          $OrderID
+ * @property string       $PurchasableClass
+ * @property int          $PurchasableID
  * @property-read DBPrice $SubTotal
  * @property-read DBPrice $Total
  * @method Order Order()
@@ -49,7 +51,11 @@ class OrderItem extends DataObject
      * @var array
      */
     private static $db = [
-        'Quantity' => 'Int',
+        'Quantity'    => 'Int',
+        'Title'       => 'Varchar',
+        'Description' => 'Text',
+        'BasePrice'   => 'Price',
+        'Total'       => 'Price',
     ];
 
     /**
@@ -99,15 +105,37 @@ class OrderItem extends DataObject
     ];
 
     /**
-     * @inheritDoc
+     * @return mixed|string
+     * @throws Exception
      */
     public function getTitle()
     {
-        return $this->Purchasable() ? $this->Purchasable()->getTitle() : '';
+        $title = $this->getField('Title') ?: $this->generateTitle();
+        $this->setField('Title', $title);
+        return $title;
+    }
+
+    /**
+     * Generate title from purchasable record
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function generateTitle(): string
+    {
+        // Get uncached title from purchasable record
+        $purchasable = $this->Purchasable();
+        if ($purchasable && $purchasable->exists()) {
+            return $purchasable->getTitle();
+        }
+
+        // No title
+        return '';
     }
 
     /**
      * @return null|DataObject|PurchasableInterface
+     * @throws Exception
      */
     public function Purchasable(): ?PurchasableInterface
     {
@@ -126,17 +154,55 @@ class OrderItem extends DataObject
 
     /**
      * @return string|DBHTMLText
+     * @throws Exception
      */
     public function getDescription()
     {
-        return $this->Purchasable() ? $this->Purchasable()->getDescription() : '';
+        $description = $this->getField('Description') ?: $this->generateDescription();
+        $this->setField('Description', $description);
+        return $description;
+    }
+
+    /**
+     * Generate description from purchasable record
+     *
+     * @return DBHTMLText|string
+     * @throws Exception
+     */
+    protected function generateDescription()
+    {
+        // Get uncached title from purchasable record
+        $purchasable = $this->Purchasable();
+        if ($purchasable && $purchasable->exists()) {
+            return $purchasable->getDescription();
+        }
+
+        // No description
+        return '';
     }
 
     /**
      * Subtotal with add-ons.
      * @return DBPrice
+     * @throws Exception
      */
     public function getTotal(): DBPrice
+    {
+        /** @var DBPrice $total */
+        $total = $this->getField('Total');
+        if (!$total->exists()) {
+            $total->setValue($this->generateTotal());
+        }
+        return $total;
+    }
+
+    /**
+     * Generate total
+     *
+     * @return Money
+     * @throws Exception
+     */
+    protected function generateTotal(): Money
     {
         $money = $this->getSubTotal()->getMoney();
 
@@ -151,13 +217,14 @@ class OrderItem extends DataObject
         if ($money->isNegative()) {
             $money = new Money(0, $money->getCurrency());
         }
-
-        return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
+        return $money;
     }
 
     /**
      * Unit price x quantity.
+     *
      * @return DBPrice
+     * @throws Exception
      */
     public function getSubTotal(): DBPrice
     {
@@ -168,10 +235,35 @@ class OrderItem extends DataObject
     /**
      * Unit price.
      * @return DBPrice
+     * @throws Exception
      */
     public function getBasePrice(): DBPrice
     {
-        return $this->Purchasable() ? $this->Purchasable()->getBasePrice() : DBPrice::create();
+        /** @var DBPrice $basePrice */
+        $basePrice = $this->getField('BasePrice');
+        if (!$basePrice->exists()) {
+            $price = $this->generateBasePrice();
+            if ($price) {
+                $basePrice->setValue($price);
+            }
+        }
+        return $basePrice;
+    }
+
+    /**
+     * Generate base price from purchasable record
+     *
+     * @return DBPrice
+     * @throws Exception
+     */
+    protected function generateBasePrice()
+    {
+        // Get base price from purchasable record
+        $purchasable = $this->Purchasable();
+        if ($purchasable && $purchasable->exists()) {
+            return $purchasable->getBasePrice();
+        }
+        return null;
     }
 
     /**
@@ -205,9 +297,10 @@ class OrderItem extends DataObject
     }
 
     /**
-     * @param int $quantity
+     * @param int  $quantity
      * @param bool $writeImmediately
      * @return OrderItem
+     * @throws ValidationException
      */
     public function setQuantity(int $quantity, bool $writeImmediately = true): self
     {
@@ -260,5 +353,27 @@ class OrderItem extends DataObject
         });
 
         return parent::getCMSFields();
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function onBeforeWrite()
+    {
+        // Invalidate cached columns
+        $this->setField('Title', null);
+        $this->setField('Description', null);
+        $this->setField('BasePriceCurrency', null);
+        $this->setField('BasePriceAmount', null);
+        $this->setField('TotalCurrency', null);
+        $this->setField('TotalAmount', null);
+
+        // Refresh cached columns
+        $this->getTitle();
+        $this->getDescription();
+        $this->getBasePrice();
+        $this->getTotal();
+
+        parent::onBeforeWrite();
     }
 }
