@@ -31,6 +31,7 @@ use SwipeStripe\Price\PriceField;
  * @property int          $OrderID
  * @property string       $PurchasableClass
  * @property int          $PurchasableID
+ * @property int          $PurchasableVersion
  * @property-read DBPrice $SubTotal
  * @property-read DBPrice $Total
  * @method Order Order()
@@ -56,11 +57,12 @@ class OrderItem extends DataObject
      * @var array
      */
     private static $db = [
-        'Quantity'    => 'Int',
-        'Title'       => 'Varchar',
-        'Description' => 'Text',
-        'BasePrice'   => 'Price',
-        'Total'       => 'Price',
+        'Quantity'           => 'Int',
+        'Title'              => 'Varchar',
+        'Description'        => 'Text',
+        'BasePrice'          => 'Price',
+        'Total'              => 'Price',
+        'PurchasableVersion' => 'Int',
     ];
 
     /**
@@ -144,8 +146,38 @@ class OrderItem extends DataObject
      */
     public function Purchasable(): ?PurchasableInterface
     {
-        $this->setSourceQueryParams($this->Order()->getVersionedQueryParams());
-        return $this->getComponent('Purchasable');
+        if (isset($this->components['Purchasable'])) {
+            return $this->components['Purchasable'];
+        }
+
+        // no class / id to query
+        if (!$this->PurchasableClass || !$this->PurchasableID) {
+            return null;
+        }
+
+        // Get by Version ID if available
+        if ($this->PurchasableVersion) {
+            $purchasable = Versioned::get_version(
+                $this->PurchasableClass,
+                $this->PurchasableID,
+                $this->PurchasableVersion
+            );
+        } else {
+            $purchasable = DataObject::get($this->PurchasableClass)
+                ->filter('ID', $this->PurchasableID)
+                ->setDataQueryParam($this->Order()->getVersionedQueryParams())
+                ->first();
+            if ($purchasable && $purchasable->hasExtension(Versioned::class)) {
+                /** @var PurchasableInterface|Versioned $purchasable */
+                $this->PurchasableVersion = $purchasable->Version;
+            }
+        }
+
+        // Save in component relation
+        if ($purchasable) {
+            $this->setComponent('Purchasable', $purchasable);
+        }
+        return $purchasable;
     }
 
     /**
@@ -289,6 +321,10 @@ class OrderItem extends DataObject
             throw new OrderLockedException($this);
         }
 
+        // Save versioned version
+        if ($purchasable->hasExtension(Versioned::class)) {
+            $this->PurchasableVersion = $purchasable->Version;
+        }
         $this->setComponent('Purchasable', $purchasable);
         return $this;
     }
