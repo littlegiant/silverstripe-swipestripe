@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace SwipeStripe\Order\OrderItem;
 
+use Exception;
 use Money\Money;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBHTMLText;
-use SilverStripe\ORM\HasManyList;
-use SilverStripe\ORM\Relation;
-use SilverStripe\ORM\UnsavedRelationList;
+use SilverStripe\ORM\ValidationException;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\CMSHelper;
 use SwipeStripe\Forms\Fields\HasOneButtonField;
@@ -23,12 +22,13 @@ use SwipeStripe\Price\PriceField;
 /**
  * Class OrderItem
  * @package SwipeStripe\Order\OrderItem
- * @property string $Description
- * @property DBPrice $BasePrice
- * @property int $Quantity
- * @property int $OrderID
- * @property string $PurchasableClass
- * @property int $PurchasableID
+ * @property string       $Description
+ * @property DBPrice      $BasePrice
+ * @property int          $Quantity
+ * @property int          $OrderID
+ * @property string       $PurchasableClass
+ * @property int          $PurchasableID
+ * @property int          $PurchasableVersion
  * @property-read DBPrice $SubTotal
  * @property-read DBPrice $Total
  * @method Order Order()
@@ -41,6 +41,11 @@ class OrderItem extends DataObject
     const PURCHASABLE_ID = 'PurchasableID';
 
     /**
+     * "empty" db placeholder
+     */
+    const EMPTY = '-';
+
+    /**
      * @var string
      */
     private static $table_name = 'SwipeStripe_Order_OrderItem';
@@ -49,7 +54,12 @@ class OrderItem extends DataObject
      * @var array
      */
     private static $db = [
-        'Quantity' => 'Int',
+        'Quantity'           => 'Int',
+        'Title'              => 'Varchar',
+        'Description'        => 'Text',
+        'BasePrice'          => 'Price',
+        'Total'              => 'Price',
+        'PurchasableVersion' => 'Int',
     ];
 
     /**
@@ -99,44 +109,135 @@ class OrderItem extends DataObject
     ];
 
     /**
-     * @inheritDoc
+     * @return mixed|string
+     * @throws Exception
      */
     public function getTitle()
     {
-        return $this->Purchasable() ? $this->Purchasable()->getTitle() : '';
+        $title = $this->getField('Title') ?: $this->generateTitle();
+        $this->setField('Title', $title);
+        return $title === self::EMPTY ? '' : $title;
+    }
+
+    /**
+     * Generate title from purchasable record
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function generateTitle(): string
+    {
+        // Get uncached title from purchasable record
+        $purchasable = $this->Purchasable();
+        if ($purchasable && $purchasable->exists()) {
+            return $purchasable->getTitle() ?: self::EMPTY;
+        }
+
+        // No title
+        return self::EMPTY;
     }
 
     /**
      * @return null|DataObject|PurchasableInterface
+     * @throws Exception
      */
     public function Purchasable(): ?PurchasableInterface
     {
-        $this->setSourceQueryParams($this->Order()->getVersionedQueryParams());
-        return $this->getComponent('Purchasable');
-    }
+        if (isset($this->components['Purchasable'])) {
+            return $this->components['Purchasable'];
+        }
 
-    /**
-     * @return HasManyList|UnsavedRelationList|OrderItemAddOn[]
-     */
-    public function OrderItemAddOns(): Relation
-    {
-        $this->setSourceQueryParams($this->Order()->getVersionedQueryParams());
-        return $this->getComponents('OrderItemAddOns');
+        // no class / id to query
+        if (!$this->PurchasableClass || !$this->PurchasableID) {
+            return null;
+        }
+
+        // Get by Version ID if available
+        if ($this->PurchasableVersion > 0) {
+            $purchasable = Versioned::get_version(
+                $this->PurchasableClass,
+                $this->PurchasableID,
+                $this->PurchasableVersion
+            );
+        } elseif ($this->PurchasableVersion < 0
+            || !DataObject::singleton($this->PurchasableClass)->hasExtension(Versioned::class)
+            || !$this->OrderID
+            || !$this->Order()->exists()
+        ) {
+            $purchasable = DataObject::get($this->PurchasableClass)->byID($this->PurchasableID);
+            $this->PurchasableVersion = -1;
+        } else {
+            // @deprecated - This code only exists to migrate legacy data
+            /** @var PurchasableInterface|Versioned $purchasable */
+            $purchasable = DataObject::get($this->PurchasableClass)
+                ->filter('ID', $this->PurchasableID)
+                ->setDataQueryParam($this->Order()->getVersionedQueryParams())
+                ->first();
+            if ($purchasable) {
+                $this->PurchasableVersion = $purchasable->Version;
+            } else {
+                $this->PurchasableVersion = -1;
+            }
+        }
+
+        // Save in component relation
+        if ($purchasable) {
+            $this->setComponent('Purchasable', $purchasable);
+        }
+        return $purchasable;
     }
 
     /**
      * @return string|DBHTMLText
+     * @throws Exception
      */
     public function getDescription()
     {
-        return $this->Purchasable() ? $this->Purchasable()->getDescription() : '';
+        $description = $this->getField('Description') ?: $this->generateDescription();
+        $this->setField('Description', $description);
+        return $description === self::EMPTY ? '' : $description;
+    }
+
+    /**
+     * Generate description from purchasable record
+     *
+     * @return DBHTMLText|string
+     * @throws Exception
+     */
+    protected function generateDescription()
+    {
+        // Get uncached title from purchasable record
+        $purchasable = $this->Purchasable();
+        if ($purchasable && $purchasable->exists()) {
+            return $purchasable->getDescription() ?: self::EMPTY;
+        }
+
+        // No description
+        return self::EMPTY;
     }
 
     /**
      * Subtotal with add-ons.
      * @return DBPrice
+     * @throws Exception
      */
     public function getTotal(): DBPrice
+    {
+        /** @var DBPrice $total */
+        $total = $this->getField('Total');
+        if (!$total->exists()) {
+            $total->setValue($this->generateTotal());
+        }
+        return $total;
+    }
+
+    /**
+     * Generate total
+     *
+     * @return Money
+     * @throws Exception
+     */
+    protected function generateTotal(): Money
     {
         $money = $this->getSubTotal()->getMoney();
 
@@ -151,13 +252,14 @@ class OrderItem extends DataObject
         if ($money->isNegative()) {
             $money = new Money(0, $money->getCurrency());
         }
-
-        return DBPrice::create_field(DBPrice::INJECTOR_SPEC, $money);
+        return $money;
     }
 
     /**
      * Unit price x quantity.
+     *
      * @return DBPrice
+     * @throws Exception
      */
     public function getSubTotal(): DBPrice
     {
@@ -168,10 +270,35 @@ class OrderItem extends DataObject
     /**
      * Unit price.
      * @return DBPrice
+     * @throws Exception
      */
     public function getBasePrice(): DBPrice
     {
-        return $this->Purchasable() ? $this->Purchasable()->getBasePrice() : DBPrice::create();
+        /** @var DBPrice $basePrice */
+        $basePrice = $this->getField('BasePrice');
+        if (!$basePrice->exists()) {
+            $price = $this->generateBasePrice();
+            if ($price) {
+                $basePrice->setValue($price);
+            }
+        }
+        return $basePrice;
+    }
+
+    /**
+     * Generate base price from purchasable record
+     *
+     * @return DBPrice
+     * @throws Exception
+     */
+    protected function generateBasePrice()
+    {
+        // Get base price from purchasable record
+        $purchasable = $this->Purchasable();
+        if ($purchasable && $purchasable->exists()) {
+            return $purchasable->getBasePrice();
+        }
+        return null;
     }
 
     /**
@@ -192,6 +319,13 @@ class OrderItem extends DataObject
             throw new OrderLockedException($this);
         }
 
+        // Save versioned version
+        if ($purchasable->hasExtension(Versioned::class)) {
+            $this->PurchasableVersion = $purchasable->Version;
+        } else {
+            $this->PurchasableVersion = -1;
+        }
+
         $this->setComponent('Purchasable', $purchasable);
         return $this;
     }
@@ -205,9 +339,10 @@ class OrderItem extends DataObject
     }
 
     /**
-     * @param int $quantity
+     * @param int  $quantity
      * @param bool $writeImmediately
      * @return OrderItem
+     * @throws ValidationException
      */
     public function setQuantity(int $quantity, bool $writeImmediately = true): self
     {
@@ -260,5 +395,27 @@ class OrderItem extends DataObject
         });
 
         return parent::getCMSFields();
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function onBeforeWrite()
+    {
+        // Invalidate cached columns
+        $this->setField('Title', null);
+        $this->setField('Description', null);
+        $this->setField('BasePriceCurrency', null);
+        $this->setField('BasePriceAmount', null);
+        $this->setField('TotalCurrency', null);
+        $this->setField('TotalAmount', null);
+
+        // Refresh cached columns
+        $this->getTitle();
+        $this->getDescription();
+        $this->getBasePrice();
+        $this->getTotal();
+
+        parent::onBeforeWrite();
     }
 }
