@@ -695,34 +695,4 @@ class Order extends DataObject
                 'Versioned.stage' => Versioned::get_stage() ?? Versioned::LIVE,
             ];
     }
-
-    /**
-     * @return UnsavedRelationList|HasManyList|OrderItem[]
-     */
-    public function OrderItems(): Relation
-    {
-        $orderItems = $this->getComponents('OrderItems');
-
-        // Don't call on UnsavedRelationList
-        if ($orderItems instanceof DataList) {
-            $orderItems = $orderItems->setDataQueryParam($this->getVersionedQueryParams());
-        }
-
-        return $orderItems;
-    }
-
-    /**
-     * @return UnsavedRelationList|HasManyList|OrderAddOn[]
-     */
-    public function OrderAddOns(): Relation
-    {
-        $orderAddOns = $this->getComponents('OrderAddOns');
-
-        // Don't call on UnsavedRelationList
-        if ($orderAddOns instanceof DataList) {
-            $orderAddOns = $orderAddOns->setDataQueryParam($this->getVersionedQueryParams());
-        }
-
-        return $orderAddOns;
-    }
 }

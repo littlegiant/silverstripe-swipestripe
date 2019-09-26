@@ -9,9 +9,6 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBHTMLText;
-use SilverStripe\ORM\HasManyList;
-use SilverStripe\ORM\Relation;
-use SilverStripe\ORM\UnsavedRelationList;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Versioned\Versioned;
 use SwipeStripe\CMSHelper;
@@ -156,20 +153,30 @@ class OrderItem extends DataObject
         }
 
         // Get by Version ID if available
-        if ($this->PurchasableVersion) {
+        if ($this->PurchasableVersion > 0) {
             $purchasable = Versioned::get_version(
                 $this->PurchasableClass,
                 $this->PurchasableID,
                 $this->PurchasableVersion
             );
+        } elseif ($this->PurchasableVersion < 0
+            || !DataObject::singleton($this->PurchasableClass)->hasExtension(Versioned::class)
+            || !$this->OrderID
+            || !$this->Order()->exists()
+        ) {
+            $purchasable = DataObject::get($this->PurchasableClass)->byID($this->PurchasableID);
+            $this->PurchasableVersion = -1;
         } else {
+            // @deprecated - This code only exists to migrate legacy data
+            /** @var PurchasableInterface|Versioned $purchasable */
             $purchasable = DataObject::get($this->PurchasableClass)
                 ->filter('ID', $this->PurchasableID)
                 ->setDataQueryParam($this->Order()->getVersionedQueryParams())
                 ->first();
-            if ($purchasable && $purchasable->hasExtension(Versioned::class)) {
-                /** @var PurchasableInterface|Versioned $purchasable */
+            if ($purchasable) {
                 $this->PurchasableVersion = $purchasable->Version;
+            } else {
+                $this->PurchasableVersion = -1;
             }
         }
 
@@ -178,15 +185,6 @@ class OrderItem extends DataObject
             $this->setComponent('Purchasable', $purchasable);
         }
         return $purchasable;
-    }
-
-    /**
-     * @return HasManyList|UnsavedRelationList|OrderItemAddOn[]
-     */
-    public function OrderItemAddOns(): Relation
-    {
-        $this->setSourceQueryParams($this->Order()->getVersionedQueryParams());
-        return $this->getComponents('OrderItemAddOns');
     }
 
     /**
@@ -324,7 +322,10 @@ class OrderItem extends DataObject
         // Save versioned version
         if ($purchasable->hasExtension(Versioned::class)) {
             $this->PurchasableVersion = $purchasable->Version;
+        } else {
+            $this->PurchasableVersion = -1;
         }
+
         $this->setComponent('Purchasable', $purchasable);
         return $this;
     }
