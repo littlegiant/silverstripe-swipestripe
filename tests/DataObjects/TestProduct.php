@@ -82,4 +82,16 @@ class TestProduct extends DataObject implements PurchasableInterface
     {
         return FieldList::create();
     }
+
+    /**
+     * Unit price with additions from modules
+     * @return DBPrice
+     */
+    public function getPrice(): DBPrice
+    {
+        /** @var DBPrice $price */
+        $price = $this->dbObject('Price');
+
+        return $price;
+    }
 }
