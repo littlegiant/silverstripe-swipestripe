@@ -13,10 +13,10 @@ use SwipeStripe\Price\DBPrice;
  * Add on applied to on order item on a purchase. The add-on is applied once to the item's subtotal (unit price x quantity),
  * not to the unit price (i.e. add-on is not applied $quantity times).
  * @package SwipeStripe\Order\OrderItem
- * @property string $Title
- * @property int $Priority
+ * @property string  $Title
+ * @property int     $Priority
  * @property DBPrice $Amount
- * @property int $OrderItemID
+ * @property int     $OrderItemID
  * @method OrderItem OrderItem()
  * @mixin Versioned
  */
@@ -117,5 +117,14 @@ class OrderItemAddOn extends DataObject
         $active = true;
         $this->extend('isActive', $active);
         return $active;
+    }
+
+    protected function onAfterWrite()
+    {
+        parent::onAfterWrite();
+
+        // When modify an orderitem, make sure we recalculate price
+        // and other dependant fields on orderitem
+        $this->OrderItem()->write();
     }
 }
