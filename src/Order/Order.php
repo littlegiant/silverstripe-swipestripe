@@ -11,12 +11,9 @@ use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\HasManyList;
-use SilverStripe\ORM\Relation;
-use SilverStripe\ORM\UnsavedRelationList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Versioned\Versioned;
@@ -36,16 +33,18 @@ use SwipeStripe\ShopPermissions;
 /**
  * Class Order
  * @package SwipeStripe\Order
- * @property bool $IsCart
- * @property string $CartLockedAt
- * @property string $GuestToken
- * @property string $Hash
- * @property string $CustomerName
- * @property string $CustomerEmail
- * @property DBAddress $BillingAddress
- * @property string $ConfirmationTime
- * @property string $Status
+ * @property bool                              $IsCart
+ * @property string                            $CartLockedAt
+ * @property string                            $GuestToken
+ * @property string                            $Hash
+ * @property string                            $CustomerName
+ * @property string                            $CustomerEmail
+ * @property DBAddress                         $BillingAddress
+ * @property string                            $ConfirmationTime
+ * @property string                            $Status
  * @method HasManyList|OrderStatusUpdate[] OrderStatusUpdates()
+ * @method HasManyList|OrderItem[] OrderItems()
+ * @method HasManyList|OrderAddOn[] OrderAddOns()
  * @mixin Payable
  * @property-read SupportedCurrenciesInterface $supportedCurrencies
  */
@@ -694,5 +693,16 @@ class Order extends DataObject
                 'Versioned.date'  => $this->CartLockedAt,
                 'Versioned.stage' => Versioned::get_stage() ?? Versioned::LIVE,
             ];
+    }
+
+
+    /**
+     * Returns the real total quantity of the items in the cart
+     *
+     * @return int
+     */
+    public function getTotalQuantity()
+    {
+        return $this->OrderItems()->sum('Quantity') ?: 0;
     }
 }
