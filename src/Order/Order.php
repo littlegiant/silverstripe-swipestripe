@@ -699,10 +699,10 @@ class Order extends DataObject
     /**
      * Returns the real total quantity of the items in the cart
      *
-     * @return float|int
+     * @return int
      */
     public function getTotalQuantity()
     {
-        return $this->OrderItems()->sum('Quantity');
+        return $this->OrderItems()->sum('Quantity') ?: 0;
     }
 }
