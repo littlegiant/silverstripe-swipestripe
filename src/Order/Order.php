@@ -103,6 +103,7 @@ class Order extends DataObject
      * @var array
      */
     private static $summary_fields = [
+        'ID'               => 'ID',
         'Title'            => 'Title',
         'Status'           => 'Status',
         'CustomerName'     => 'Customer Name',
@@ -233,9 +234,9 @@ class Order extends DataObject
         /** @see DataObject::getCMSFields() */
         $tabbedFields = $this->scaffoldFormFields(array(
             'includeRelations' => $this->isInDB(),
-            'tabbed' => true,
-            'ajaxSafe' => true,
-            'fieldClasses' => [
+            'tabbed'           => true,
+            'ajaxSafe'         => true,
+            'fieldClasses'     => [
                 'OrderStatusUpdates' => AlwaysModifiableGridField::class,
             ],
         ));
@@ -339,7 +340,7 @@ class Order extends DataObject
 
     /**
      * @param PurchasableInterface $item
-     * @param int $quantity
+     * @param int                  $quantity
      */
     public function setItemQuantity(PurchasableInterface $item, int $quantity = 1): void
     {
@@ -360,7 +361,7 @@ class Order extends DataObject
 
     /**
      * @param PurchasableInterface $item
-     * @param bool $createIfMissing
+     * @param bool                 $createIfMissing
      * @return null|OrderItem
      */
     public function getOrderItem(PurchasableInterface $item, bool $createIfMissing = true): ?OrderItem
@@ -383,7 +384,7 @@ class Order extends DataObject
 
     /**
      * @param PurchasableInterface $item
-     * @param int $quantity
+     * @param int                  $quantity
      * @return $this
      */
     public function addItem(PurchasableInterface $item, int $quantity = 1): self
@@ -422,7 +423,7 @@ class Order extends DataObject
 
     /**
      * @param PurchasableInterface $item
-     * @param OrderItemAddOn $addOn
+     * @param OrderItemAddOn       $addOn
      */
     public function attachPurchasableAddOn(PurchasableInterface $item, OrderItemAddOn $addOn): void
     {
@@ -439,7 +440,7 @@ class Order extends DataObject
 
     /**
      * @param PurchasableInterface $item
-     * @param OrderItemAddOn $addOn
+     * @param OrderItemAddOn       $addOn
      */
     public function detachPurchasableAddOn(PurchasableInterface $item, OrderItemAddOn $addOn): void
     {
@@ -490,7 +491,7 @@ class Order extends DataObject
 
     /**
      * @param null|Member $member
-     * @param string[] $guestTokens
+     * @param string[]    $guestTokens
      * @return bool
      */
     public function canViewOrderPage(?Member $member = null, array $guestTokens = []): bool
@@ -534,7 +535,7 @@ class Order extends DataObject
     }
 
     /**
-     * @param Payment $payment
+     * @param Payment              $payment
      * @param null|ServiceResponse $response
      */
     public function paymentCaptured(Payment $payment, ?ServiceResponse $response = null): void
@@ -560,7 +561,7 @@ class Order extends DataObject
     }
 
     /**
-     * @param Payment $payment
+     * @param Payment              $payment
      * @param null|ServiceResponse $response
      */
     public function paymentError(Payment $payment, ?ServiceResponse $response = null): void
