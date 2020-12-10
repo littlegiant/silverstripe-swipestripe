@@ -33,15 +33,15 @@ use SwipeStripe\ShopPermissions;
 /**
  * Class Order
  * @package SwipeStripe\Order
- * @property bool                              $IsCart
- * @property string                            $CartLockedAt
- * @property string                            $GuestToken
- * @property string                            $Hash
- * @property string                            $CustomerName
- * @property string                            $CustomerEmail
- * @property DBAddress                         $BillingAddress
- * @property string                            $ConfirmationTime
- * @property string                            $Status
+ * @property bool $IsCart
+ * @property string $CartLockedAt
+ * @property string $GuestToken
+ * @property string $Hash
+ * @property string $CustomerName
+ * @property string $CustomerEmail
+ * @property DBAddress $BillingAddress
+ * @property string $ConfirmationTime
+ * @property string $Status
  * @method HasManyList|OrderStatusUpdate[] OrderStatusUpdates()
  * @method HasManyList|OrderItem[] OrderItems()
  * @method HasManyList|OrderAddOn[] OrderAddOns()
@@ -340,7 +340,7 @@ class Order extends DataObject
 
     /**
      * @param PurchasableInterface $item
-     * @param int                  $quantity
+     * @param int $quantity
      */
     public function setItemQuantity(PurchasableInterface $item, int $quantity = 1): void
     {
@@ -361,7 +361,7 @@ class Order extends DataObject
 
     /**
      * @param PurchasableInterface $item
-     * @param bool                 $createIfMissing
+     * @param bool $createIfMissing
      * @return null|OrderItem
      */
     public function getOrderItem(PurchasableInterface $item, bool $createIfMissing = true): ?OrderItem
@@ -384,7 +384,7 @@ class Order extends DataObject
 
     /**
      * @param PurchasableInterface $item
-     * @param int                  $quantity
+     * @param int $quantity
      * @return $this
      */
     public function addItem(PurchasableInterface $item, int $quantity = 1): self
@@ -415,15 +415,17 @@ class Order extends DataObject
             }
         }
 
-        $itemID = is_int($item) ? $item : $item->ID;
-        $this->OrderItems()->removeByID($itemID);
+        if (is_numeric($item)) {
+            $item = $this->OrderItems()->byID($item);
+        }
+        $item->delete();
 
         return $this;
     }
 
     /**
      * @param PurchasableInterface $item
-     * @param OrderItemAddOn       $addOn
+     * @param OrderItemAddOn $addOn
      */
     public function attachPurchasableAddOn(PurchasableInterface $item, OrderItemAddOn $addOn): void
     {
@@ -440,7 +442,7 @@ class Order extends DataObject
 
     /**
      * @param PurchasableInterface $item
-     * @param OrderItemAddOn       $addOn
+     * @param OrderItemAddOn $addOn
      */
     public function detachPurchasableAddOn(PurchasableInterface $item, OrderItemAddOn $addOn): void
     {
@@ -491,7 +493,7 @@ class Order extends DataObject
 
     /**
      * @param null|Member $member
-     * @param string[]    $guestTokens
+     * @param string[] $guestTokens
      * @return bool
      */
     public function canViewOrderPage(?Member $member = null, array $guestTokens = []): bool
@@ -535,7 +537,7 @@ class Order extends DataObject
     }
 
     /**
-     * @param Payment              $payment
+     * @param Payment $payment
      * @param null|ServiceResponse $response
      */
     public function paymentCaptured(Payment $payment, ?ServiceResponse $response = null): void
@@ -561,7 +563,7 @@ class Order extends DataObject
     }
 
     /**
-     * @param Payment              $payment
+     * @param Payment $payment
      * @param null|ServiceResponse $response
      */
     public function paymentError(Payment $payment, ?ServiceResponse $response = null): void
