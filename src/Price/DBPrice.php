@@ -16,10 +16,10 @@ use SwipeStripe\Price\SupportedCurrencies\SupportedCurrenciesInterface;
  * A monetary value database object that's currency aware, and explicitly designed to use MoneyPHP to avoid potential
  * floating point errors.
  * @package SwipeStripe\Price
- * @see PriceField
- * @see DBMoney
- * @property string $Currency
- * @property string $Amount
+ * @see     PriceField
+ * @see     DBMoney
+ * @property string                            $Currency
+ * @property string                            $Amount
  * @property-read SupportedCurrenciesInterface $supportedCurrencies
  */
 class DBPrice extends DBComposite
@@ -177,5 +177,37 @@ class DBPrice extends DBComposite
     {
         return PriceField::create($this->getName(), $title)
             ->setLocale($this->getLocale());
+    }
+
+
+    public function getNice(): string
+    {
+        $money = $this->getMoney();
+
+        /** @var IntlMoneyFormatter $formatter */
+        $formatter = Injector::inst()->create(
+            IntlMoneyFormatter::class,
+            $this->getNumberFormatter(),
+            $this->supportedCurrencies
+        );
+        return $formatter->format($money);
+    }
+
+    /**
+     * Assign value based on dollars
+     *
+     * @param float  $dollarValue
+     * @param string $currency
+     * @return $this
+     */
+    public function setFromDollars($dollarValue, $currency)
+    {
+        // Safely convert dollars to cents, rounding and trimming decimals
+        $amount = strval(intval(round($dollarValue * 100)));
+        $this->setValue([
+            'Currency' => $currency,
+            'Amount'   => $amount,
+        ]);
+        return $this;
     }
 }

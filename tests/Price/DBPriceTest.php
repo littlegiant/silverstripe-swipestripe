@@ -64,9 +64,25 @@ class DBPriceTest extends SapphireTest
 
         $price->setValue([
             'Currency' => $value->getCurrency()->getCode(),
-            'Amount' => $value->getAmount(),
+            'Amount'   => $value->getAmount(),
         ]);
         $this->assertTrue($price->getMoney()->equals($value));
+    }
+
+    public function testSetFromDollars()
+    {
+        // Set whole number
+        $price = DBPrice::create();
+        $price->setFromDollars(1, 'NZD');
+        $this->assertTrue($price->getMoney()->equals(new Money(100, new Currency('NZD'))));
+
+        // Set rounded number (down)
+        $price->setFromDollars(12.333, 'NZD');
+        $this->assertTrue($price->getMoney()->equals(new Money(1233, new Currency('NZD'))));
+
+        // Set rounded number (up)
+        $price->setFromDollars(12.337, 'NZD');
+        $this->assertTrue($price->getMoney()->equals(new Money(1234, new Currency('NZD'))));
     }
 
     /**
