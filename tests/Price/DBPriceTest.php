@@ -125,7 +125,7 @@ class DBPriceTest extends SapphireTest
         $hundredNzd = new Money(10000, new Currency('NZD'));
         $hundredUsd = new Money(10000, new Currency('USD'));
 
-        $this->assertSame('¥', $price->setValue($hundredJpy)->getCurrencySymbol());
+        $this->assertSame('JP¥', $price->setValue($hundredJpy)->getCurrencySymbol());
 
         $price->setLocale('en-NZ');
         $this->assertSame('$', $price->setValue($hundredNzd)->getCurrencySymbol());
