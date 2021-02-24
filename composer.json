@@ -36,13 +36,11 @@
     },
     "autoload": {
         "psr-4": {
-            "SwipeStripe\\": "src/"
+            "SwipeStripe\\": "src/",
+            "SwipeStripe\\Tests\\": "tests/"
         }
     },
     "autoload-dev": {
-        "psr-4": {
-            "SwipeStripe\\Tests\\": "tests/"
-        },
         "classmap": [
             "app/src/Page.php",
             "app/src/PageController.php"
